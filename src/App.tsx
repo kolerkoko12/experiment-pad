@@ -344,7 +344,7 @@ export default function App() {
             </div>
           </section>
 
-          <div className="h-40 lg:h-32" />
+          <div className="h-56 lg:h-44" />
         </div>
 
         <LoraPanel

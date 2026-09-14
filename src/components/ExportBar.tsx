@@ -27,25 +27,6 @@ export function ExportBar({
 }: ExportBarProps) {
   return (
     <div className="space-y-2">
-      <Button
-        size="lg"
-        className="w-full bg-rose-400 text-ink hover:bg-rose-300"
-        disabled={disabled || generating}
-        onClick={onGenerate}
-      >
-        {generating ? <Loader2 className="animate-spin" /> : <Wand2 />}
-        {generating ? 'Generando…' : 'Generar'}
-      </Button>
-      <div className="grid grid-cols-2 gap-2">
-        <Button size="lg" className="bg-teal-300 text-ink" disabled={disabled} onClick={onDirect}>
-          <ClipboardCopy />
-          Directo
-        </Button>
-        <Button size="lg" variant="secondary" disabled={disabled} onClick={onPromptbox}>
-          <ClipboardCopy />
-          Promptbox
-        </Button>
-      </div>
       {generating ? (
         <p className="flex items-center gap-2 text-[13px] text-teal-100">
           <Loader2 className="size-4 animate-spin" />
@@ -66,7 +47,26 @@ export function ExportBar({
           </figcaption>
         </figure>
       ) : null}
-      <p className="flex items-start gap-1 text-[11px] leading-snug text-muted-foreground">
+      <Button
+        size="lg"
+        className="w-full bg-rose-400 text-ink hover:bg-rose-300"
+        disabled={disabled || generating}
+        onClick={onGenerate}
+      >
+        {generating ? <Loader2 className="animate-spin" /> : <Wand2 />}
+        {generating ? 'Generando…' : 'Generar'}
+      </Button>
+      <div className="grid grid-cols-2 gap-2">
+        <Button size="lg" className="bg-teal-300 text-ink" disabled={disabled} onClick={onDirect}>
+          <ClipboardCopy />
+          Directo
+        </Button>
+        <Button size="lg" variant="secondary" disabled={disabled} onClick={onPromptbox}>
+          <ClipboardCopy />
+          Promptbox
+        </Button>
+      </div>
+      <p className="flex items-start gap-1 pb-1 text-[11px] leading-snug text-muted-foreground">
         <GlossaryTip term={termById(catalog.glossary, 'promptbox')} />
         <span>
           <strong className="text-paper/70">Generar</strong> envía Prompt Final (o el ensamblado) a
