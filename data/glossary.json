@@ -3,7 +3,7 @@
     {
       "id": "lora",
       "term": "LoRA",
-      "text": "Archivo pequeño que empuja un estilo o un cuerpo. En este panel, Incluir solo pega sus triggers en el texto; Mage tiene que tener el archivo cargado."
+      "text": "Archivo pequeño que empuja un estilo o un cuerpo. Incluir solo pega sus triggers en el prompt; Generar / Comfy tiene que tener el archivo cargado."
     },
     {
       "id": "trigger",
@@ -18,17 +18,17 @@
     {
       "id": "peso",
       "term": "Peso",
-      "text": "Fuerza del LoRA en Mage (0–1 típico). Bajo = toque, medio = punto de partida, alto = arriesga distorsión."
+      "text": "Fuerza del LoRA (0–1 típico). Bajo = toque, medio = punto de partida, alto = arriesga distorsión."
     },
     {
       "id": "imported",
       "term": "Importada",
-      "text": "LoRA que marcaste como tuya (checkpoint o archivo que ya usas en Mage). Va arriba del catálogo."
+      "text": "LoRA que marcaste como tuya (checkpoint o archivo que ya usas). Va arriba del catálogo."
     },
     {
       "id": "promptbox",
       "term": "Promptbox",
-      "text": "Caja de texto de Mage. Este modo copia el prompt en líneas, más fácil de pegar y editar allí."
+      "text": "Copia el prompt en líneas (una cláusula por línea), más fácil de pegar y editar en otro sitio."
     },
     {
       "id": "spicy",
@@ -39,6 +39,51 @@
       "id": "exaggeration",
       "term": "Exageración",
       "text": "Intensidad sobre cuerpo o escena. Los tramos grises del prompt son tocables: el color marca cuánto empujas. Beta."
+    },
+    {
+      "id": "steps",
+      "term": "Steps",
+      "text": "Cuántos pasos da el modelo al pintar. Más pasos = más detalle y más tiempo. 20–30 suele bastar; subir mucho no siempre mejora."
+    },
+    {
+      "id": "guidance",
+      "term": "Guidance / CFG",
+      "text": "Cuánto obedece el texto. Bajo = más libertad (a veces borroso). Alto = más literal (a veces rígido o quemado). Empieza por el valor recomendado."
+    },
+    {
+      "id": "shift",
+      "term": "Shift",
+      "text": "Desplaza el muestreo (típico en FLUX). Subirlo cambia el contraste y el «carácter» de la imagen, no el texto del prompt."
+    },
+    {
+      "id": "resolution",
+      "term": "Resolución",
+      "text": "Tamaño de la imagen (ancho × alto). Más grande = más nítido y más lento. 1024×1024 es el punto de partida habitual."
+    },
+    {
+      "id": "negative",
+      "term": "Negative",
+      "text": "Lo que no quieres ver (manos extra, texto, borroso…). Solo algunos cerebros lo usan; FLUX lo oculta porque no le aporta."
+    },
+    {
+      "id": "auto-bloques",
+      "term": "Auto desde bloques",
+      "text": "El Prompt Final se arma solo con tus bloques, LoRAs y sliders. Si lo editas a mano, se congela hasta que pulses Actualizar desde bloques."
+    },
+    {
+      "id": "seed",
+      "term": "Seed",
+      "text": "Número de la «suerte». El mismo seed + mismo prompt tiende a repetir la imagen. −1 o vacío = una nueva cada vez."
+    },
+    {
+      "id": "scheduler",
+      "term": "Scheduler",
+      "text": "La receta de cómo avanza cada step. Cambia textura y nitidez; no reescribe el prompt. Si no sabes, deja el recomendado."
+    },
+    {
+      "id": "piloto",
+      "term": "Piloto coherente",
+      "text": "Cuando está ON, escena / luz / ropa / cuerpo salen de un grafo (piscina → lluvia → mojado). OFF usa listas sueltas. El interruptor cambia el prompt al momento."
     }
   ]
 }

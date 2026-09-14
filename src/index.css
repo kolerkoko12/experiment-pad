@@ -97,3 +97,18 @@ button,
 input {
   font: inherit;
 }
+
+@keyframes prompt-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgb(45 212 191 / 0.55);
+    background-color: rgb(45 212 191 / 0.16);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgb(45 212 191 / 0);
+    background-color: transparent;
+  }
+}
+
+.prompt-flash {
+  animation: prompt-flash 0.7s ease-out;
+}

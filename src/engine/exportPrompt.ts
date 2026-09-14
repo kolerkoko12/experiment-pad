@@ -2,7 +2,7 @@ import { findModel, findOption } from './catalog'
 import { selectedLoraTokens } from './loras'
 import { exaggerationClauses, spicyClause } from './spicy'
 import { variationClause } from './variations'
-import type { AffectKind, Block, Catalog, PromptSegment, PromptState } from './types'
+import type { AffectKind, Block, Catalog, PromptDelta, PromptSegment, PromptState } from './types'
 
 const CAMERA_OPS: Record<PromptState['cameraOp'], string> = {
   fixed: 'locked focal length, no zoom',
@@ -42,6 +42,7 @@ export function buildSegments(state: PromptState, catalog: Catalog): PromptSegme
       color: block.color,
       text,
       affect: affectFor(block.type),
+      coherent: block.meta.coherent === true,
     })
   }
 
@@ -116,4 +117,24 @@ export function exportPromptbox(state: PromptState, catalog: Catalog): string {
 
 export function promptIsEmpty(state: PromptState, catalog: Catalog): boolean {
   return buildSegments(state, catalog).length === 0
+}
+
+function splitPhrases(prompt: string): string[] {
+  return prompt
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean)
+}
+
+/** Comma-clause diff so the UI can flash what the last edit added or removed. */
+export function promptPhraseDelta(prev: string, next: string): PromptDelta {
+  if (prev === next) return { added: [], removed: [] }
+  const before = splitPhrases(prev)
+  const after = splitPhrases(next)
+  const beforeSet = new Set(before)
+  const afterSet = new Set(after)
+  return {
+    added: after.filter((phrase) => !beforeSet.has(phrase)),
+    removed: before.filter((phrase) => !afterSet.has(phrase)),
+  }
 }

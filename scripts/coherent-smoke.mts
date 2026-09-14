@@ -10,7 +10,8 @@ import {
   renderConceptPrompt,
   seedUnlockedWithConcept,
 } from '../src/engine/coherent.ts'
-import { randomizeUnlocked } from '../src/engine/combination.ts'
+import { randomizePilotPair, randomizeUnlocked } from '../src/engine/combination.ts'
+import { promptPhraseDelta } from '../src/engine/exportPrompt.ts'
 import type { Block, Catalog } from '../src/engine/types.ts'
 
 const raw = JSON.parse(readFileSync(new URL('../data/concepts-piloto.json', import.meta.url), 'utf8'))
@@ -140,6 +141,24 @@ if (applySemanticScene(unlocked, sceneBuilt, graph).find((b) => b.locked)) {
   /* no-op, just using apply */
 }
 if (sceneBuilt.active.length === 0) throw new Error('empty semantic scene')
+
+const pair = randomizePilotPair(unlocked, catalog, piloto, rngSeq([0.11, 0.22, 0.33, 0.44, 0.55]), 'all-unlocked')
+const pairSceneOn = pair.on.find((b) => b.type === 'scene')
+const pairSceneOff = pair.off.find((b) => b.type === 'scene')
+if (pairSceneOn?.meta.coherent !== true) throw new Error('pair ON scene should be coherent')
+if (pairSceneOff?.meta.coherent === true) throw new Error('pair OFF scene should not be coherent')
+if (JSON.stringify(pairSceneOn?.value) === JSON.stringify(pairSceneOff?.value)) {
+  throw new Error('pair ON/OFF scene should differ')
+}
+const pairCharOn = pair.on.find((b) => b.type === 'character')
+const pairCharOff = pair.off.find((b) => b.type === 'character')
+if (JSON.stringify(pairCharOn?.value) !== JSON.stringify(pairCharOff?.value)) {
+  throw new Error('pair should keep character aligned')
+}
+
+const delta = promptPhraseDelta('wet stone deck, desert', 'night outdoor swimming pool, wet stone deck')
+if (!delta.added.some((p) => /pool/i.test(p))) throw new Error('delta missing added pool')
+if (!delta.removed.includes('desert')) throw new Error('delta missing removed desert')
 
 console.log('ok', {
   ids,

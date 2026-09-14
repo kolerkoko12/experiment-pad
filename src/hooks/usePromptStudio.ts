@@ -20,8 +20,9 @@ import {
   mergeBlocksWithCatalog,
   migrateState,
   normalizeLoraIds,
+  pairContainsBlocks,
   promptIsEmpty,
-  randomizeUnlocked,
+  randomizePilotPair,
   releaseAll,
   seedUnlockedWithConcept,
   setBlockLocked,
@@ -76,27 +77,85 @@ export function usePromptStudio() {
   const [cameraOp, setCameraOp] = useState<CameraOp>('fixed')
   const [piloto, setPiloto] = useState<ConceptsPiloto | null>(null)
   const [useCoherentPilot, setUseCoherentPilotState] = useState(true)
+  const [pilotPair, setPilotPair] = useState<{ on: Block[]; off: Block[] } | null>(null)
+  const [stashCompare, setStashCompare] = useState<{ on: string; off: string } | null>(null)
   const didInit = useRef(false)
   const pilotoRef = useRef<ConceptsPiloto | null>(null)
   const coherentRef = useRef(true)
+  const catalogRef = useRef<Catalog | null>(null)
+  const blocksRef = useRef<Block[]>([])
+  const pairRef = useRef<{ on: Block[]; off: Block[] } | null>(null)
+  const snapshotRef = useRef({
+    selectedModelId: '',
+    selectedLoraIds: [] as string[],
+    selectedPlanId: 'proPlus',
+    mode: 'experimental' as StudioMode,
+    spicyLevel: 0 as Intensity,
+    exaggeration: defaultExaggeration(),
+    cameraOp: 'fixed' as CameraOp,
+  })
+
+  const exportBlocks = (nextBlocks: Block[], loaded: Catalog, snap = snapshotRef.current) =>
+    exportPrompt(
+      {
+        version: 2,
+        blocks: nextBlocks,
+        selectedModelId: snap.selectedModelId,
+        selectedLoraIds: snap.selectedLoraIds,
+        selectedPlanId: snap.selectedPlanId,
+        mode: snap.mode,
+        spicyLevel: snap.spicyLevel,
+        exaggeration: snap.exaggeration,
+        cameraOp: snap.cameraOp,
+        updatedAt: new Date().toISOString(),
+      },
+      loaded,
+    )
+
+  const publishPair = (
+    pair: { on: Block[]; off: Block[] },
+    loaded: Catalog,
+    apply: 'on' | 'off' | 'none',
+  ) => {
+    pairRef.current = pair
+    setPilotPair(pair)
+    setStashCompare({ on: exportBlocks(pair.on, loaded), off: exportBlocks(pair.off, loaded) })
+    if (apply === 'on') setBlocks(pair.on)
+    if (apply === 'off') setBlocks(pair.off)
+  }
+
+  const dropPair = () => {
+    pairRef.current = null
+    setPilotPair(null)
+  }
 
   const setUseCoherentPilot = (value: boolean) => {
     coherentRef.current = value
     setUseCoherentPilotState(value)
     writeCoherentFlag(value)
+    const loaded = catalogRef.current
+    if (!loaded) return
+    const current = blocksRef.current
+    if (pairContainsBlocks(pairRef.current, current) && pairRef.current) {
+      publishPair(pairRef.current, loaded, value ? 'on' : 'off')
+      return
+    }
+    publishPair(
+      randomizePilotPair(current, loaded, pilotoRef.current, Math.random, 'piloto-types'),
+      loaded,
+      value ? 'on' : 'off',
+    )
   }
-
-  const randomize = (current: Block[], loaded: Catalog) =>
-    randomizeUnlocked(current, loaded, Math.random, {
-      piloto: pilotoRef.current,
-      useCoherentPilot: coherentRef.current,
-    })
 
   const hydrate = (loaded: Catalog, saved?: PromptState) => {
     const next = migrateState(saved, loaded)
+    catalogRef.current = loaded
     setCatalog(loaded)
+    pairRef.current = null
+    setPilotPair(null)
     if (saved) {
-      setBlocks(mergeBlocksWithCatalog(saved.blocks, loaded))
+      const restored = mergeBlocksWithCatalog(saved.blocks, loaded)
+      setBlocks(restored)
       setSelectedModelId(
         loaded.models.some((model) => model.id === saved.selectedModelId)
           ? saved.selectedModelId
@@ -108,8 +167,51 @@ export function usePromptStudio() {
       setSpicyLevel(next.spicyLevel ?? 0)
       setExaggeration(next.exaggeration ?? defaultExaggeration())
       setCameraOp(next.cameraOp ?? 'fixed')
+      snapshotRef.current = {
+        selectedModelId: loaded.models.some((model) => model.id === saved.selectedModelId)
+          ? saved.selectedModelId
+          : (loaded.models[0]?.id ?? ''),
+        selectedLoraIds: normalizeLoraIds(saved.selectedLoraIds, loaded),
+        selectedPlanId: next.selectedPlanId ?? loaded.mage.defaultPlanId,
+        mode: saved.mode,
+        spicyLevel: next.spicyLevel ?? 0,
+        exaggeration: next.exaggeration ?? defaultExaggeration(),
+        cameraOp: next.cameraOp ?? 'fixed',
+      }
+      const opposite = randomizePilotPair(
+        restored,
+        loaded,
+        pilotoRef.current,
+        Math.random,
+        'piloto-types',
+      )
+      const pair = coherentRef.current
+        ? { on: restored, off: opposite.off }
+        : { on: opposite.on, off: restored }
+      pairRef.current = pair
+      setPilotPair(pair)
+      setStashCompare({ on: exportBlocks(pair.on, loaded), off: exportBlocks(pair.off, loaded) })
     } else {
-      setBlocks(randomize(createBlocksFromCatalog(loaded), loaded))
+      snapshotRef.current = {
+        selectedModelId: loaded.models[0]?.id ?? '',
+        selectedLoraIds: [],
+        selectedPlanId: loaded.mage.defaultPlanId,
+        mode: 'experimental',
+        spicyLevel: 0,
+        exaggeration: defaultExaggeration(),
+        cameraOp: 'fixed',
+      }
+      const pair = randomizePilotPair(
+        createBlocksFromCatalog(loaded),
+        loaded,
+        pilotoRef.current,
+        Math.random,
+        'all-unlocked',
+      )
+      pairRef.current = pair
+      setPilotPair(pair)
+      setStashCompare({ on: exportBlocks(pair.on, loaded), off: exportBlocks(pair.off, loaded) })
+      setBlocks(coherentRef.current ? pair.on : pair.off)
       setSelectedModelId(loaded.models[0]?.id ?? '')
       setSelectedPlanId(loaded.mage.defaultPlanId)
     }
@@ -165,6 +267,30 @@ export function usePromptStudio() {
   )
 
   useEffect(() => {
+    catalogRef.current = catalog
+    blocksRef.current = blocks
+    snapshotRef.current = {
+      selectedModelId,
+      selectedLoraIds,
+      selectedPlanId,
+      mode,
+      spicyLevel,
+      exaggeration,
+      cameraOp,
+    }
+  }, [
+    catalog,
+    blocks,
+    selectedModelId,
+    selectedLoraIds,
+    selectedPlanId,
+    mode,
+    spicyLevel,
+    exaggeration,
+    cameraOp,
+  ])
+
+  useEffect(() => {
     if (!didInit.current || status !== 'ready') return
     const handle = window.setTimeout(() => autosave(state), 280)
     return () => window.clearTimeout(handle)
@@ -181,6 +307,42 @@ export function usePromptStudio() {
     () => (catalog ? suggestLorasForScene(state, catalog, 3) : []),
     [catalog, state],
   )
+
+  const pilotCompare = useMemo(() => {
+    if (!catalog) return null
+    const currentSnap = {
+      selectedModelId,
+      selectedLoraIds,
+      selectedPlanId,
+      mode,
+      spicyLevel,
+      exaggeration,
+      cameraOp,
+    }
+    if (pilotPair) {
+      return {
+        on: exportBlocks(pilotPair.on, catalog, currentSnap),
+        off: exportBlocks(pilotPair.off, catalog, currentSnap),
+      }
+    }
+    if (!stashCompare) return null
+    return useCoherentPilot
+      ? { on: exported, off: stashCompare.off }
+      : { on: stashCompare.on, off: exported }
+  }, [
+    catalog,
+    pilotPair,
+    stashCompare,
+    exported,
+    useCoherentPilot,
+    selectedModelId,
+    selectedLoraIds,
+    selectedPlanId,
+    mode,
+    spicyLevel,
+    exaggeration,
+    cameraOp,
+  ])
 
   const labelFor = useCallback(
     (block: Block) => {
@@ -219,6 +381,7 @@ export function usePromptStudio() {
     recommendedLoras,
     piloto,
     useCoherentPilot,
+    pilotCompare,
     setUseCoherentPilot,
     setMode,
     setSelectedModelId,
@@ -246,29 +409,46 @@ export function usePromptStudio() {
     labelFor,
     experiment: () => {
       if (!catalog) return
-      setBlocks((current) => randomize(current, catalog))
+      publishPair(
+        randomizePilotPair(blocksRef.current, catalog, pilotoRef.current, Math.random, 'all-unlocked'),
+        catalog,
+        coherentRef.current ? 'on' : 'off',
+      )
     },
     seedPiloto: (conceptId: string) => {
       if (!catalog || !pilotoRef.current) return
-      setBlocks((current) =>
-        seedUnlockedWithConcept(current, catalog, pilotoRef.current!, conceptId),
-      )
+      const current = blocksRef.current
+      const on = seedUnlockedWithConcept(current, catalog, pilotoRef.current, conceptId)
+      const off =
+        pairContainsBlocks(pairRef.current, current) && pairRef.current
+          ? pairRef.current.off
+          : randomizePilotPair(current, catalog, pilotoRef.current, Math.random, 'piloto-types').off
+      publishPair({ on, off }, catalog, coherentRef.current ? 'on' : 'off')
     },
     toggleLock: (blockId: string) => {
+      dropPair()
       setBlocks((current) => {
         const target = current.find((block) => block.id === blockId)
         if (!target) return current
         return setBlockLocked(current, blockId, !target.locked)
       })
     },
-    anchorFilled: () => setBlocks((current) => anchorFilled(current)),
-    releaseAll: () => setBlocks((current) => releaseAll(current)),
+    anchorFilled: () => {
+      dropPair()
+      setBlocks((current) => anchorFilled(current))
+    },
+    releaseAll: () => {
+      dropPair()
+      setBlocks((current) => releaseAll(current))
+    },
     setBlockValue: (blockId: string, value: Block['value']) => {
       if (!catalog) return
+      dropPair()
       setBlocks((current) => applyBlockValue(current, blockId, value, catalog))
     },
     applyParsed: (rows: ParsedAssignment[]) => {
       if (!catalog) return
+      dropPair()
       setBlocks((current) => {
         let next = current
         for (const row of rows) {
@@ -318,7 +498,17 @@ export function usePromptStudio() {
       setSpicyLevel(0)
       setExaggeration(defaultExaggeration())
       setCameraOp('fixed')
-      setBlocks(randomize(createBlocksFromCatalog(catalog), catalog))
+      publishPair(
+        randomizePilotPair(
+          createBlocksFromCatalog(catalog),
+          catalog,
+          pilotoRef.current,
+          Math.random,
+          'all-unlocked',
+        ),
+        catalog,
+        coherentRef.current ? 'on' : 'off',
+      )
     },
     retry: () => {
       setStatus('loading')

@@ -162,6 +162,13 @@ export type PromptSegment = {
   color: string
   text: string
   affect: AffectKind
+  /** True when the clause came from the coherent piloto engine. */
+  coherent?: boolean
+}
+
+export type PromptDelta = {
+  added: string[]
+  removed: string[]
 }
 
 export type Catalog = {

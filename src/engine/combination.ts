@@ -49,6 +49,22 @@ function pickWeighted(options: OptionDef[], scores: number[], rng: Rng): OptionD
 export type RandomizeOpts = {
   piloto?: ConceptsPiloto | null
   useCoherentPilot?: boolean
+  /** If set, only these unlocked types are rerolled (others stay as-is). */
+  onlyTypes?: string[]
+}
+
+export function blockFingerprint(blocks: Block[]): string {
+  return blocks
+    .map((block) => {
+      const value =
+        block.value?.kind === 'option'
+          ? `o:${block.value.optionId}`
+          : block.value?.kind === 'custom'
+            ? `c:${block.value.text}`
+            : 'empty'
+      return `${block.id}:${block.locked ? 1 : 0}:${value}:${block.meta.coherent === true ? 1 : 0}`
+    })
+    .join('|')
 }
 
 function randomizeBlockOption(
@@ -104,9 +120,42 @@ export function randomizeUnlocked(
 
   return working.map((block) => {
     if (block.locked) return block
+    if (opts?.onlyTypes && !opts.onlyTypes.includes(block.type)) return block
     if (graph && block.meta.coherent === true) return block
     return randomizeBlockOption(block, catalog, lockedTags, rng)
   })
+}
+
+/** Same locked + non-piloto blocks; ON fills scene/luz/ropa/cuerpo from the graph. */
+export function randomizePilotPair(
+  blocks: Block[],
+  catalog: Catalog,
+  piloto: ConceptsPiloto | null | undefined,
+  rng: Rng = Math.random,
+  scope: 'all-unlocked' | 'piloto-types' = 'all-unlocked',
+): { on: Block[]; off: Block[] } {
+  const types = piloto?.pilotBlockTypes
+  const onlyTypes = scope === 'piloto-types' && types && types.length > 0 ? types : undefined
+  const off = randomizeUnlocked(blocks, catalog, rng, {
+    piloto,
+    useCoherentPilot: false,
+    onlyTypes,
+  })
+  if (!pilotoIsUsable(piloto, true)) {
+    return { on: off, off }
+  }
+  const graph = indexPiloto(piloto)
+  const scene = buildSemanticScene(off, graph, catalog, rng)
+  return { on: applySemanticScene(off, scene, graph), off }
+}
+
+export function pairContainsBlocks(
+  pair: { on: Block[]; off: Block[] } | null | undefined,
+  blocks: Block[],
+): boolean {
+  if (!pair) return false
+  const fp = blockFingerprint(blocks)
+  return fp === blockFingerprint(pair.on) || fp === blockFingerprint(pair.off)
 }
 
 export function setBlockLocked(blocks: Block[], blockId: string, locked: boolean): Block[] {

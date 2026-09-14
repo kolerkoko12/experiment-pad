@@ -108,7 +108,7 @@ function LoraPanelBody({
         ) : null}
         {at || over ? (
           <p className="mt-2 text-[12px] leading-snug text-rose-100">
-            Aviso fuerte: Mage / tu plan cortan aquí. Hay mensaje de upsell junto al motor.
+            Tope de slots: quita una LoRA o abre «motor legado / techo LoRAs» para subir el plan.
           </p>
         ) : null}
         <div className="mt-3 flex flex-wrap gap-2">

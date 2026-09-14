@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react'
+import { useState } from 'react'
 
 import type { Catalog, MageModel } from '@/engine'
 import { effectiveLoraLimit, findPlan, isOverLoraLimit } from '@/engine'
@@ -11,9 +12,6 @@ type ModelPanelProps = {
   selectedLoraCount: number
   onChange: (id: string) => void
   onPlan: (id: string) => void
-  onPasteAnalysis: () => void
-  /** Soft-deprioritize: collapse by default when brains UI is active */
-  collapsedDefault?: boolean
 }
 
 export function ModelPanel({
@@ -24,25 +22,30 @@ export function ModelPanel({
   selectedLoraCount,
   onChange,
   onPlan,
-  onPasteAnalysis,
-  collapsedDefault = true,
 }: ModelPanelProps) {
   const model = models.find((item) => item.id === selectedId) ?? models[0]
   const plan = findPlan(catalog, planId)
+  const [open, setOpen] = useState(false)
   if (!model || !plan) return null
   const max = effectiveLoraLimit(catalog, model, planId)
   const over = isOverLoraLimit(selectedLoraCount, max)
 
   return (
     <details
-      className="rounded-[22px] border border-border bg-card/50 p-3"
-      open={!collapsedDefault ? true : undefined}
+      className="rounded-[22px] border border-dashed border-white/10 bg-black/20 p-3 opacity-80"
+      open={open}
+      onToggle={(event) => setOpen((event.target as HTMLDetailsElement).open)}
     >
       <summary className="cursor-pointer list-none text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-        Motor legado / cuotas (opcional) · {model.name}
+        Opcional · motor legado / techo LoRAs · {model.name}
       </summary>
 
       <div className="mt-3 space-y-3">
+        <p className="rounded-2xl bg-black/30 px-3 py-2 text-[12px] leading-snug text-paper/55">
+          No es el camino principal. El cerebro de arriba + Generar (Comfy) mandan. Esto solo
+          ajusta el techo de slots LoRA si lo necesitas.
+        </p>
+
         <label className="flex flex-col gap-1.5">
           <span className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
             Familia / checkpoint (legado)
@@ -91,10 +94,7 @@ export function ModelPanel({
 
         {over ? (
           <div className="mt-2 rounded-2xl bg-rose-500/20 px-3 py-2 text-[13px] text-rose-50">
-            Pasaste el techo ({selectedLoraCount}/{max || 0}). Quita LoRAs o sube el plan.{' '}
-            <a className="underline" href={catalog.mage.helpUrl} target="_blank" rel="noreferrer">
-              Ayuda cuotas
-            </a>
+            Pasaste el techo ({selectedLoraCount}/{max || 0}). Quita LoRAs o sube el plan legado.
           </div>
         ) : null}
 
@@ -121,13 +121,6 @@ export function ModelPanel({
           {model.notes ? (
             <p className="text-[12px] leading-relaxed text-muted-foreground">{model.notes}</p>
           ) : null}
-          <button
-            type="button"
-            onClick={onPasteAnalysis}
-            className="block min-h-11 text-left text-[13px] text-paper/70 underline"
-          >
-            Pegar análisis → bloques
-          </button>
         </div>
       </div>
     </details>
