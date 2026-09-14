@@ -1,4 +1,13 @@
 import { findOption } from './catalog'
+import {
+  applySemanticScene,
+  buildSemanticScene,
+  collectPilotoTags,
+  indexPiloto,
+  pilotoIsUsable,
+  tagsFromScene,
+  type ConceptsPiloto,
+} from './coherent'
 import { excludeRecent, rememberOption } from './memory'
 import { variationClause } from './variations'
 import type { Block, Catalog, OptionDef } from './types'
@@ -37,35 +46,66 @@ function pickWeighted(options: OptionDef[], scores: number[], rng: Rng): OptionD
   return options[options.length - 1] ?? options[0]
 }
 
+export type RandomizeOpts = {
+  piloto?: ConceptsPiloto | null
+  useCoherentPilot?: boolean
+}
+
+function randomizeBlockOption(
+  block: Block,
+  catalog: Catalog,
+  lockedTags: Set<string>,
+  rng: Rng,
+): Block {
+  const pool = catalog.optionsByType[block.type] ?? []
+  if (pool.length === 0) return block
+
+  const currentId = block.value?.kind === 'option' ? block.value.optionId : null
+  const fresh = excludeRecent(
+    block.type,
+    pool.length > 1 ? pool.filter((option) => option.id !== currentId) : pool,
+  )
+  const explore = rng() < 0.14
+  const scores = fresh.map((option) => scoreOption(option, lockedTags, explore))
+  const picked = pickWeighted(fresh, scores, rng)
+  rememberOption(block.type, picked.id)
+  return {
+    ...block,
+    value: { kind: 'option', optionId: picked.id },
+    meta: {
+      ...block.meta,
+      coherent: false,
+      pilotoConceptIds: undefined,
+      compatibility: undefined,
+      variation: variationClause(picked, block.type, catalog, true),
+    },
+  }
+}
+
 export function randomizeUnlocked(
   blocks: Block[],
   catalog: Catalog,
   rng: Rng = Math.random,
+  opts?: RandomizeOpts,
 ): Block[] {
-  const lockedTags = collectLockedTags(blocks, catalog)
+  const usePilot = pilotoIsUsable(opts?.piloto, opts?.useCoherentPilot)
+  const graph = usePilot && opts?.piloto ? indexPiloto(opts.piloto) : null
 
-  return blocks.map((block) => {
+  let working = blocks
+  const extraTags = new Set<string>()
+  if (graph) {
+    const scene = buildSemanticScene(blocks, graph, catalog, rng)
+    working = applySemanticScene(blocks, scene, graph)
+    tagsFromScene(scene).forEach((tag) => extraTags.add(tag))
+    collectPilotoTags(working, graph).forEach((tag) => extraTags.add(tag))
+  }
+
+  const lockedTags = new Set([...collectLockedTags(working, catalog), ...extraTags])
+
+  return working.map((block) => {
     if (block.locked) return block
-    const pool = catalog.optionsByType[block.type] ?? []
-    if (pool.length === 0) return block
-
-    const currentId = block.value?.kind === 'option' ? block.value.optionId : null
-    const fresh = excludeRecent(
-      block.type,
-      pool.length > 1 ? pool.filter((option) => option.id !== currentId) : pool,
-    )
-    const explore = rng() < 0.14
-    const scores = fresh.map((option) => scoreOption(option, lockedTags, explore))
-    const picked = pickWeighted(fresh, scores, rng)
-    rememberOption(block.type, picked.id)
-    return {
-      ...block,
-      value: { kind: 'option', optionId: picked.id },
-      meta: {
-        ...block.meta,
-        variation: variationClause(picked, block.type, catalog, true),
-      },
-    }
+    if (graph && block.meta.coherent === true) return block
+    return randomizeBlockOption(block, catalog, lockedTags, rng)
   })
 }
 
@@ -106,6 +146,9 @@ function setBlockValueWithCatalog(
       value,
       meta: {
         ...block.meta,
+        coherent: false,
+        pilotoConceptIds: undefined,
+        compatibility: undefined,
         variation: option ? variationClause(option, block.type, catalog, true) : '',
       },
     }

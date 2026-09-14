@@ -55,6 +55,24 @@ export function BlockCard({
               Libre
             </span>
           )}
+          {block.meta.coherent === true ? (
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] tracking-wide uppercase ${
+                block.meta.compatibility === 'red'
+                  ? 'bg-rose-400/25 text-rose-200'
+                  : block.meta.compatibility === 'yellow'
+                    ? 'bg-amber-400/25 text-amber-200'
+                    : 'bg-teal-400/25 text-teal-200'
+              }`}
+            >
+              Piloto{' '}
+              {block.meta.compatibility === 'red'
+                ? 'rojo'
+                : block.meta.compatibility === 'yellow'
+                  ? 'ámbar'
+                  : 'verde'}
+            </span>
+          ) : null}
         </div>
         <p
           className={`w-full text-[15px] leading-snug ${empty ? 'text-paper/40 italic' : 'text-paper'}`}

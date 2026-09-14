@@ -62,8 +62,25 @@ Archivos en `/data` (se sirven en `/data/…`):
 | `data/glossary.json` | Textos del `?`. |
 | `data/spicy.json` | Niveles picante / exageración / ganchos extra. |
 | `data/micro-variations.json` | 2 obvias + pool inusual rotatorio. |
+| `data/concepts-piloto.json` | Grafo piloto (piscina/lluvia/humedad…). Copia en `public/data/` para el mismo path. |
 
 Tras editar, recarga Safari. En producción, vuelve a `npm run build` (los JSON se copian a `dist/data`).
+
+### Piloto coherente (Experimental)
+
+Grafo **pequeño**: conceptos ponderados → relaciones → consecuencias simples → texto en inglés para el modelo. No hay Neo4j, embeddings ni LLM. El camino clásico de `options.json` sigue siendo el fallback (personaje, pose, objeto, acción, cámara, y el resto si apagas el piloto).
+
+**Probar**
+
+1. Modo **Experimental**. El interruptor **Piloto coherente** está activado por defecto (también `useCoherentPilot` en el JSON).
+2. Pulsa **Experimentar**. Escena / luz / ropa / complexión libres se rellenan desde el grafo (p. ej. piscina + lluvia + reflejos + piel/ropa mojada), no con frases sueltas al azar.
+3. **Ancla** un bloque y vuelve a Experimentar: los anclados no cambian.
+4. Chips (Piscina, Lluvia, …) siembran ese concepto y expanden consecuencias en bloques libres.
+5. Apaga **Piloto coherente** (o pon `"useCoherentPilot": false` en el JSON y recarga) para el randomizador de opciones anterior. El flag se guarda en `localStorage` (`control-experimental.useCoherentPilot`).
+
+Bloques piloto llevan una etiqueta Verde / Ámbar / Rojo según compatibilidad con lo anclado.
+
+Comprobar el motor (sin UI): `npx tsx scripts/coherent-smoke.mts`.
 
 Las entradas con `"placeholder": true` son aproximaciones (p. ej. Illustrious/Pony importados). Márcalas o corrige nombres cuando confirmes el catálogo real de tu cuenta.
 
@@ -96,7 +113,7 @@ Templates live in `localStorage`. Session auto-saves.
 ### Architecture
 
 - UI: Vite + React + TypeScript + Tailwind. Spanish chrome, English export.
-- Engine: pure TS in `src/engine` (no React). Constrained randomness uses option weights + tag overlap with locked blocks (~14% explore).
+- Engine: pure TS in `src/engine` (no React). Constrained randomness uses option weights + tag overlap with locked blocks (~14% explore). Optional coherent pilot (`src/engine/coherent.ts`) fills scene-related unlocked blocks from `data/concepts-piloto.json`.
 - Catalogs are data, not code. New block types = JSON only.
 - Extension points only (no v1 UI): `src/engine/extensions.ts` — poetry engine, chat assistant, LoRA injection.
 

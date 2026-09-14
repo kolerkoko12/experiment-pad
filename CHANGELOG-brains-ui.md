@@ -1,5 +1,14 @@
 # CHANGELOG — brains UI (dynamic shell)
 
+## Piloto coherente (2026-09-14)
+
+Grafo mínimo para Experimental: `data/concepts-piloto.json` (+ `public/data/concepts-piloto.json`) y `src/engine/coherent.ts`.
+
+- Conceptos: piscina, lluvia, cuero, noche, agua, reflejos, humedad, piel_mojada, ropa_mojada.
+- Flujo: peso → relaciones → consecuencias → fragmentos EN. Compatibilidad verde/ámbar/rojo.
+- UI: interruptor **Piloto coherente** (default on). Anclados intactos. Resto de bloques sigue en `options.json`.
+- Cómo probar: Experimental → Experimentar; ancla escena y vuelve a tirar; apaga el interruptor para el path clásico. Ver README «Piloto coherente».
+
 **Fecha:** 2026-09-14 (Europe/Madrid)  
 **Snapshot local:** `/workspace/pack-100pct/app` (SCM Origin/GitHub no usado)
 
@@ -14,7 +23,7 @@
   - Uploads solo para el modo activo (`image_ref`, `video_ref`, `character_refs`)
 - **Control / Experimental + candados:** intactos.
 - **Mage suavizado:** labels hacia Comfy/familia; panel legado colapsable; `mage.json` sigue cargando.
-- **Conceptos piloto (nice-to-have):** si existe `data/concepts-piloto.json`, chips en Experimental para rellenar escena con `[concept:id]`.
+- **Conceptos piloto:** grafo en `data/concepts-piloto.json` + motor `src/engine/coherent.ts` (ver sección arriba).
 - **Refs:** UI-ready (File + objectURL). El adaptador Comfy que manda base64/metadata es el siguiente lote (Enviar actual = prompt string vía Function Netlify si existe).
 
 ## Archivos tocados

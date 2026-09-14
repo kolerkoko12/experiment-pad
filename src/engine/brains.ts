@@ -200,15 +200,3 @@ export function revokeRefState(refs: BrainRefState) {
   }
 }
 
-export type ConceptsPiloto = {
-  concepts?: Array<{ id: string; label?: string; scene?: string; tags?: string[] }>
-}
-
-/** Optional light hook — prefer concept ids for scene when file exists. */
-export async function loadConceptsPiloto(): Promise<ConceptsPiloto | null> {
-  try {
-    return await fetchJson<ConceptsPiloto>('/data/concepts-piloto.json')
-  } catch {
-    return null
-  }
-}

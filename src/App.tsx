@@ -7,6 +7,7 @@ import {
   createBrainPanelState,
   type BrainPanelState,
 } from '@/components/BrainPanel'
+import { CoherentPilotBar } from '@/components/CoherentPilotBar'
 import { ExportBar } from '@/components/ExportBar'
 import { LoraOpenButton, LoraPanel } from '@/components/LoraPanel'
 import { MagePasteDialog } from '@/components/MagePasteDialog'
@@ -19,12 +20,10 @@ import { TemplateDialog } from '@/components/TemplateDialog'
 import { Button } from '@/components/ui/button'
 import {
   loadBrains,
-  loadConceptsPiloto,
   loraKeywordText,
   suggestModelIdForBrain,
   type Block,
   type BrainUiPack,
-  type ConceptsPiloto,
   type LoraDef,
 } from '@/engine'
 import { usePromptStudio } from '@/hooks/usePromptStudio'
@@ -38,7 +37,6 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null)
   const [brainPack, setBrainPack] = useState<BrainUiPack | null>(null)
   const [brainState, setBrainState] = useState<BrainPanelState | null>(null)
-  const [concepts, setConcepts] = useState<ConceptsPiloto | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -51,9 +49,6 @@ export default function App() {
       .catch((err: unknown) => {
         console.warn('brains-ui-pack no cargó', err)
       })
-    loadConceptsPiloto().then((c) => {
-      if (!cancelled) setConcepts(c)
-    })
     return () => {
       cancelled = true
     }
@@ -107,16 +102,15 @@ export default function App() {
   }
 
   const applyConcept = (conceptId: string) => {
-    const concept = concepts?.concepts?.find((c) => c.id === conceptId)
+    const concept = studio.piloto?.concepts.find((item) => item.id === conceptId)
     if (!concept) return
-    const scene = studio.blocks.find((b) => b.type === 'scene')
-    if (!scene || scene.locked) {
-      flash('Ancla/escena no disponible (bloque ausente o anclado).')
-      return
-    }
-    const text = concept.scene?.trim() || concept.label || concept.id
-    studio.setBlockValue(scene.id, { kind: 'custom', text: `[concept:${concept.id}] ${text}` })
-    flash(`Concepto ${concept.id} → escena`)
+    studio.seedPiloto(conceptId)
+    const scene = studio.blocks.find((block) => block.type === 'scene')
+    flash(
+      scene?.locked
+        ? `Piloto: ${concept.label} (escena anclada intacta)`
+        : `Piloto: ${concept.label}`,
+    )
   }
 
   if (studio.status === 'loading') {
@@ -190,6 +184,9 @@ export default function App() {
               {studio.mode === 'experimental'
                 ? 'Toca el candado de un bloque que te guste. Experimentar solo mueve los libres (anti-repetición).'
                 : 'Edita bloques desanclados. Los anclados no se tocan.'}{' '}
+              {studio.useCoherentPilot && studio.piloto ? (
+                <span className="text-teal-300/80">Piloto coherente en escena/luz/ropa/cuerpo. </span>
+              ) : null}
               <span className="text-paper/40">
                 {studio.lockedCount}/{studio.blocks.length} anclados
               </span>
@@ -209,24 +206,13 @@ export default function App() {
             </p>
           )}
 
-          {concepts?.concepts && concepts.concepts.length > 0 && studio.mode === 'experimental' ? (
-            <section className="rounded-[22px] border border-border bg-black/20 p-3">
-              <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                Conceptos piloto (opcional)
-              </p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {concepts.concepts.slice(0, 12).map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    className="min-h-10 rounded-2xl border border-border bg-input px-3 text-[12px] text-paper/80"
-                    onClick={() => applyConcept(c.id)}
-                  >
-                    {c.label ?? c.id}
-                  </button>
-                ))}
-              </div>
-            </section>
+          {studio.piloto && studio.mode === 'experimental' ? (
+            <CoherentPilotBar
+              enabled={studio.useCoherentPilot}
+              concepts={studio.piloto.concepts}
+              onToggle={studio.setUseCoherentPilot}
+              onSeed={applyConcept}
+            />
           ) : null}
 
           <ModelPanel

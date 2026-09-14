@@ -16,23 +16,49 @@ import {
   isAtLoraLimit,
   loadAutosave,
   loadCatalog,
+  loadConceptsPiloto,
   mergeBlocksWithCatalog,
   migrateState,
   normalizeLoraIds,
   promptIsEmpty,
   randomizeUnlocked,
   releaseAll,
+  seedUnlockedWithConcept,
   setBlockLocked,
   suggestLorasForScene,
   type Block,
   type CameraOp,
   type Catalog,
+  type ConceptsPiloto,
   type ExaggerationState,
   type Intensity,
   type ParsedAssignment,
   type PromptState,
   type StudioMode,
 } from '@/engine'
+
+const COHERENT_FLAG_KEY = 'control-experimental.useCoherentPilot'
+
+function readCoherentFlag(fallback: boolean): boolean {
+  if (typeof localStorage === 'undefined') return fallback
+  try {
+    const raw = localStorage.getItem(COHERENT_FLAG_KEY)
+    if (raw === '0') return false
+    if (raw === '1') return true
+  } catch {
+    /* ignore */
+  }
+  return fallback
+}
+
+function writeCoherentFlag(value: boolean): void {
+  if (typeof localStorage === 'undefined') return
+  try {
+    localStorage.setItem(COHERENT_FLAG_KEY, value ? '1' : '0')
+  } catch {
+    /* ignore */
+  }
+}
 
 type Status = 'loading' | 'ready' | 'error'
 
@@ -48,7 +74,23 @@ export function usePromptStudio() {
   const [spicyLevel, setSpicyLevel] = useState<Intensity>(0)
   const [exaggeration, setExaggeration] = useState<ExaggerationState>(defaultExaggeration)
   const [cameraOp, setCameraOp] = useState<CameraOp>('fixed')
+  const [piloto, setPiloto] = useState<ConceptsPiloto | null>(null)
+  const [useCoherentPilot, setUseCoherentPilotState] = useState(true)
   const didInit = useRef(false)
+  const pilotoRef = useRef<ConceptsPiloto | null>(null)
+  const coherentRef = useRef(true)
+
+  const setUseCoherentPilot = (value: boolean) => {
+    coherentRef.current = value
+    setUseCoherentPilotState(value)
+    writeCoherentFlag(value)
+  }
+
+  const randomize = (current: Block[], loaded: Catalog) =>
+    randomizeUnlocked(current, loaded, Math.random, {
+      piloto: pilotoRef.current,
+      useCoherentPilot: coherentRef.current,
+    })
 
   const hydrate = (loaded: Catalog, saved?: PromptState) => {
     const next = migrateState(saved, loaded)
@@ -67,7 +109,7 @@ export function usePromptStudio() {
       setExaggeration(next.exaggeration ?? defaultExaggeration())
       setCameraOp(next.cameraOp ?? 'fixed')
     } else {
-      setBlocks(randomizeUnlocked(createBlocksFromCatalog(loaded), loaded))
+      setBlocks(randomize(createBlocksFromCatalog(loaded), loaded))
       setSelectedModelId(loaded.models[0]?.id ?? '')
       setSelectedPlanId(loaded.mage.defaultPlanId)
     }
@@ -75,9 +117,14 @@ export function usePromptStudio() {
 
   useEffect(() => {
     let cancelled = false
-    loadCatalog()
-      .then((loaded) => {
+    Promise.all([loadCatalog(), loadConceptsPiloto()])
+      .then(([loaded, concepts]) => {
         if (cancelled) return
+        pilotoRef.current = concepts
+        setPiloto(concepts)
+        const flag = readCoherentFlag(concepts?.useCoherentPilot !== false)
+        coherentRef.current = flag
+        setUseCoherentPilotState(flag)
         hydrate(loaded, loadAutosave()?.state)
         setStatus('ready')
         didInit.current = true
@@ -170,6 +217,9 @@ export function usePromptStudio() {
     lockedCount,
     loraMax,
     recommendedLoras,
+    piloto,
+    useCoherentPilot,
+    setUseCoherentPilot,
     setMode,
     setSelectedModelId,
     setSelectedPlanId,
@@ -196,7 +246,13 @@ export function usePromptStudio() {
     labelFor,
     experiment: () => {
       if (!catalog) return
-      setBlocks((current) => randomizeUnlocked(current, catalog))
+      setBlocks((current) => randomize(current, catalog))
+    },
+    seedPiloto: (conceptId: string) => {
+      if (!catalog || !pilotoRef.current) return
+      setBlocks((current) =>
+        seedUnlockedWithConcept(current, catalog, pilotoRef.current!, conceptId),
+      )
     },
     toggleLock: (blockId: string) => {
       setBlocks((current) => {
@@ -262,13 +318,18 @@ export function usePromptStudio() {
       setSpicyLevel(0)
       setExaggeration(defaultExaggeration())
       setCameraOp('fixed')
-      setBlocks(randomizeUnlocked(createBlocksFromCatalog(catalog), catalog))
+      setBlocks(randomize(createBlocksFromCatalog(catalog), catalog))
     },
     retry: () => {
       setStatus('loading')
       setError(null)
-      loadCatalog()
-        .then((loaded) => {
+      Promise.all([loadCatalog(), loadConceptsPiloto()])
+        .then(([loaded, concepts]) => {
+          pilotoRef.current = concepts
+          setPiloto(concepts)
+          const flag = readCoherentFlag(concepts?.useCoherentPilot !== false)
+          coherentRef.current = flag
+          setUseCoherentPilotState(flag)
           hydrate(loaded)
           setStatus('ready')
           didInit.current = true

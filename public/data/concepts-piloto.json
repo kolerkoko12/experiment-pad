@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "note": "Piloto coherente (escena piscina/lluvia). Experimental opera conceptos → relaciones → consecuencias → lenguaje. Sin Neo4j/embeddings/LLM. useCoherentPilot default true; la UI puede apagarlo.",
+  "useCoherentPilot": true,
+  "pilotBlockTypes": ["scene", "lighting", "clothing", "physique"],
+  "concepts": [
+    {
+      "id": "piscina",
+      "label": "Piscina",
+      "prompt": "night outdoor swimming pool, dark still water, wet stone deck and tiles",
+      "weight": 1.25,
+      "tags": ["water", "night", "pool", "scene"],
+      "blockTypes": ["scene"],
+      "relations": ["agua", "lluvia", "noche", "reflejos", "humedad"],
+      "consequences": [
+        { "id": "lluvia", "weight": 0.88, "tags": ["rain", "water"] },
+        { "id": "agua", "weight": 1, "tags": ["water"] },
+        { "id": "reflejos", "weight": 0.92, "tags": ["night", "water"] },
+        { "id": "humedad", "weight": 0.84, "tags": ["wet"] },
+        { "id": "piel_mojada", "weight": 0.78, "tags": ["wet", "body"] },
+        { "id": "ropa_mojada", "weight": 0.74, "tags": ["wet", "clothing"] }
+      ]
+    },
+    {
+      "id": "lluvia",
+      "label": "Lluvia",
+      "prompt": "falling rain, raindrops hitting water and stone, wet atmosphere",
+      "weight": 1.2,
+      "tags": ["rain", "water", "weather", "scene"],
+      "blockTypes": ["scene"],
+      "relations": ["piscina", "agua", "humedad", "ropa_mojada", "piel_mojada", "reflejos"],
+      "consequences": [
+        { "id": "agua", "weight": 0.95, "tags": ["water"] },
+        { "id": "humedad", "weight": 0.9, "tags": ["wet"] },
+        { "id": "reflejos", "weight": 0.86, "tags": ["water"] },
+        { "id": "ropa_mojada", "weight": 0.88, "tags": ["wet", "clothing"] },
+        { "id": "piel_mojada", "weight": 0.82, "tags": ["wet", "body"] },
+        { "id": "piscina", "weight": 0.7, "tags": ["pool", "water"] },
+        { "id": "cuero", "weight": 0.48, "tags": ["leather"] }
+      ]
+    },
+    {
+      "id": "cuero",
+      "label": "Cuero",
+      "prompt": "black leather catching rain, glossy hide beading with droplets",
+      "weight": 1,
+      "tags": ["leather", "clothing", "wet"],
+      "blockTypes": ["clothing"],
+      "relations": ["ropa_mojada", "lluvia", "humedad"],
+      "consequences": [
+        { "id": "ropa_mojada", "weight": 0.8, "tags": ["wet"] },
+        { "id": "humedad", "weight": 0.55, "tags": ["wet"] }
+      ]
+    },
+    {
+      "id": "noche",
+      "label": "Noche",
+      "prompt": "nighttime, low ambient light, deep shadows",
+      "weight": 0.95,
+      "tags": ["night", "scene"],
+      "blockTypes": ["scene"],
+      "relations": ["piscina", "lluvia", "reflejos"],
+      "consequences": [
+        { "id": "reflejos", "weight": 0.8, "tags": ["night"] },
+        { "id": "piscina", "weight": 0.62, "tags": ["pool", "water"] }
+      ]
+    },
+    {
+      "id": "agua",
+      "label": "Agua",
+      "prompt": "standing water, wet ground, pooled rain on hard surfaces",
+      "weight": 0.85,
+      "tags": ["water", "wet", "scene"],
+      "blockTypes": ["scene"],
+      "relations": ["piscina", "lluvia", "reflejos", "humedad"],
+      "consequences": [
+        { "id": "reflejos", "weight": 0.9, "tags": ["water"] },
+        { "id": "humedad", "weight": 0.72, "tags": ["wet"] },
+        { "id": "piel_mojada", "weight": 0.6, "tags": ["wet"] }
+      ]
+    },
+    {
+      "id": "reflejos",
+      "label": "Reflejos",
+      "prompt": "specular reflections, lights doubling on wet surfaces and black water",
+      "weight": 1.05,
+      "tags": ["water", "night", "reflection", "lighting"],
+      "blockTypes": ["lighting"],
+      "relations": ["piscina", "agua", "noche", "lluvia"],
+      "consequences": [
+        { "id": "humedad", "weight": 0.5, "tags": ["wet"] }
+      ]
+    },
+    {
+      "id": "humedad",
+      "label": "Humedad",
+      "prompt": "humid air, beaded moisture, damp atmosphere",
+      "weight": 1,
+      "tags": ["wet", "humidity", "lighting"],
+      "blockTypes": ["lighting"],
+      "relations": ["lluvia", "piscina", "piel_mojada", "ropa_mojada"],
+      "consequences": [
+        { "id": "piel_mojada", "weight": 0.7, "tags": ["wet", "body"] },
+        { "id": "ropa_mojada", "weight": 0.66, "tags": ["wet", "clothing"] }
+      ]
+    },
+    {
+      "id": "piel_mojada",
+      "label": "Piel mojada",
+      "prompt": "rain-slick skin, wet hair clinging, droplets along collarbones",
+      "weight": 1.1,
+      "tags": ["wet", "water", "body"],
+      "blockTypes": ["physique"],
+      "relations": ["humedad", "lluvia", "agua", "piscina"],
+      "consequences": [
+        { "id": "humedad", "weight": 0.55, "tags": ["wet"] }
+      ]
+    },
+    {
+      "id": "ropa_mojada",
+      "label": "Ropa mojada",
+      "prompt": "soaked fabric clinging to the body, translucent with rain",
+      "weight": 1.1,
+      "tags": ["wet", "water", "clothing"],
+      "blockTypes": ["clothing"],
+      "relations": ["lluvia", "humedad", "cuero", "piscina"],
+      "consequences": [
+        { "id": "cuero", "weight": 0.42, "tags": ["leather"] },
+        { "id": "humedad", "weight": 0.5, "tags": ["wet"] }
+      ]
+    }
+  ]
+}
