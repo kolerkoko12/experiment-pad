@@ -112,7 +112,7 @@ export default defineConfig(({ mode }) => {
           name: '100% Control, 100% Experimental',
           short_name: '100% Ctrl',
           description:
-            'Compositor táctil de prompts para usar junto a Mage.space en Split View.',
+            'Compositor táctil de prompts para Control / Experimental (Comfy).',
           theme_color: '#100e0c',
           background_color: '#100e0c',
           display: 'standalone',

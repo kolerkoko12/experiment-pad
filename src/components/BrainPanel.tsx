@@ -1,7 +1,10 @@
 import { ChevronDown, Upload, X } from 'lucide-react'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { GlossaryTip, termOrFallback } from '@/components/GlossaryTip'
+import { PromptCompare } from '@/components/PromptCompare'
 import { Input } from '@/components/ui/input'
+import type { GlossaryTerm } from '@/engine'
 import {
   defaultMode,
   defaultParamValues,
@@ -32,7 +35,55 @@ type BrainPanelProps = {
   pack: BrainUiPack
   state: BrainPanelState
   assembledPrompt: string
+  glossary?: GlossaryTerm[]
+  pilotoEnabled?: boolean
+  compareOn?: string
+  compareOff?: string
+  deltaLabel?: string | null
   onChange: (next: BrainPanelState) => void
+}
+
+const PARAM_HELP: Record<string, GlossaryTerm> = {
+  steps: {
+    id: 'steps',
+    term: 'Steps',
+    text: 'Cuántos pasos da el modelo al pintar. Más pasos = más detalle y más tiempo.',
+  },
+  guidance: {
+    id: 'guidance',
+    term: 'Guidance / CFG',
+    text: 'Cuánto obedece el texto. Bajo = más libertad. Alto = más literal.',
+  },
+  shift: {
+    id: 'shift',
+    term: 'Shift',
+    text: 'Desplaza el muestreo (típico en FLUX). Cambia el carácter, no el texto.',
+  },
+  resolution: {
+    id: 'resolution',
+    term: 'Resolución',
+    text: 'Tamaño de la imagen (ancho × alto). Más grande = más nítido y más lento.',
+  },
+  seed: {
+    id: 'seed',
+    term: 'Seed',
+    text: 'Número de la suerte. −1 o vacío = una imagen nueva cada vez.',
+  },
+  scheduler_family: {
+    id: 'scheduler',
+    term: 'Scheduler',
+    text: 'Receta de cómo avanza cada step. Si no sabes, deja el recomendado.',
+  },
+  negative: {
+    id: 'negative',
+    term: 'Negative',
+    text: 'Lo que no quieres ver. Solo aparece si el cerebro lo soporta.',
+  },
+  'auto-bloques': {
+    id: 'auto-bloques',
+    term: 'Auto desde bloques',
+    text: 'El Prompt Final se arma solo. Si lo editas a mano, se congela hasta actualizar.',
+  },
 }
 
 export function createBrainPanelState(pack: BrainUiPack, preferredId?: string): BrainPanelState {
@@ -62,9 +113,20 @@ export function createBrainPanelState(pack: BrainUiPack, preferredId?: string): 
   }
 }
 
-export function BrainPanel({ pack, state, assembledPrompt, onChange }: BrainPanelProps) {
+export function BrainPanel({
+  pack,
+  state,
+  assembledPrompt,
+  glossary,
+  pilotoEnabled,
+  compareOn,
+  compareOff,
+  deltaLabel,
+  onChange,
+}: BrainPanelProps) {
   const brain = findBrain(pack, state.brainId) ?? pack.brains[0]
   const displayPrompt = state.promptDirty ? state.promptFinal : assembledPrompt
+  const assembledDrifted = state.promptDirty && state.promptFinal.trim() !== assembledPrompt.trim()
 
   if (!brain) {
     return (
@@ -106,11 +168,13 @@ export function BrainPanel({ pack, state, assembledPrompt, onChange }: BrainPane
       <DynamicParams
         brain={brain}
         values={state.params}
+        glossary={glossary}
         onChange={(params) => onChange({ ...state, params })}
       />
       <ConditionalNegative
         brain={brain}
         value={state.negativePrompt}
+        glossary={glossary}
         onChange={(negativePrompt) => onChange({ ...state, negativePrompt })}
       />
       <ReferenceUploads
@@ -123,6 +187,12 @@ export function BrainPanel({ pack, state, assembledPrompt, onChange }: BrainPane
         value={displayPrompt}
         dirty={state.promptDirty}
         assembled={assembledPrompt}
+        drifted={assembledDrifted}
+        glossary={glossary}
+        pilotoEnabled={pilotoEnabled}
+        compareOn={compareOn}
+        compareOff={compareOff}
+        deltaLabel={deltaLabel}
         onChange={(promptFinal, promptDirty) => onChange({ ...state, promptFinal, promptDirty })}
       />
       {brain.prompting_style ? (
@@ -217,13 +287,25 @@ function ModeSelector({
   )
 }
 
+function paramTerm(glossary: GlossaryTerm[] | undefined, paramId: string): GlossaryTerm | undefined {
+  const fallback = PARAM_HELP[paramId] ?? (paramId === 'cfg' ? PARAM_HELP.guidance : undefined)
+  if (!fallback && !glossary?.length) return undefined
+  return termOrFallback(
+    glossary,
+    paramId === 'cfg' ? 'guidance' : paramId === 'scheduler_family' ? 'scheduler' : paramId,
+    fallback ?? { id: paramId, term: paramId, text: 'Parámetro del cerebro seleccionado.' },
+  )
+}
+
 function DynamicParams({
   brain,
   values,
+  glossary,
   onChange,
 }: {
   brain: BrainUiDef
   values: BrainParamValues
+  glossary?: GlossaryTerm[]
   onChange: (v: BrainParamValues) => void
 }) {
   if (!brain.params.length) return null
@@ -244,12 +326,16 @@ function DynamicParams({
             param.recommended !== null && param.recommended !== undefined
               ? String(param.recommended)
               : null
+          const tip = paramTerm(glossary, param.id)
 
           if (isNum) {
             return (
               <label key={param.id} className="flex flex-col gap-1 rounded-2xl bg-black/20 px-3 py-2">
-                <span className="flex items-baseline justify-between gap-2 text-[12px] text-paper/80">
-                  <span>{param.label}</span>
+                <span className="flex items-center justify-between gap-2 text-[12px] text-paper/80">
+                  <span className="flex items-center gap-0.5">
+                    {param.label}
+                    <GlossaryTip term={tip} />
+                  </span>
                   <span className="tabular-nums text-teal-100">{Number.isFinite(num) ? num : '—'}</span>
                 </span>
                 <input
@@ -300,8 +386,9 @@ function DynamicParams({
 
           return (
             <label key={param.id} className="flex flex-col gap-1 rounded-2xl bg-black/20 px-3 py-2 sm:col-span-2">
-              <span className="text-[12px] text-paper/80">
+              <span className="flex items-center gap-0.5 text-[12px] text-paper/80">
                 {param.label}
+                <GlossaryTip term={tip} />
                 {recommended ? (
                   <span className="ml-2 text-[11px] text-muted-foreground">rec. {recommended}</span>
                 ) : null}
@@ -322,10 +409,12 @@ function DynamicParams({
 function ConditionalNegative({
   brain,
   value,
+  glossary,
   onChange,
 }: {
   brain: BrainUiDef
   value: string
+  glossary?: GlossaryTerm[]
   onChange: (v: string) => void
 }) {
   if (!brain.negatives.supported) {
@@ -339,8 +428,9 @@ function ConditionalNegative({
   const ph = negativePlaceholder(brain)
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+      <span className="flex items-center gap-0.5 text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
         Negative prompt
+        <GlossaryTip term={termOrFallback(glossary, 'negative', PARAM_HELP.negative)} />
       </span>
       <textarea
         className="min-h-24 w-full rounded-2xl border border-border bg-input px-3 py-2 text-[14px] outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
@@ -474,35 +564,104 @@ function PromptFinalField({
   value,
   dirty,
   assembled,
+  drifted,
+  glossary,
+  pilotoEnabled,
+  compareOn,
+  compareOff,
+  deltaLabel,
   onChange,
 }: {
   value: string
   dirty: boolean
   assembled: string
+  drifted: boolean
+  glossary?: GlossaryTerm[]
+  pilotoEnabled?: boolean
+  compareOn?: string
+  compareOff?: string
+  deltaLabel?: string | null
   onChange: (value: string, dirty: boolean) => void
 }) {
+  const [flash, setFlash] = useState(false)
+  const prevAssembled = useRef(assembled)
+
+  useEffect(() => {
+    if (prevAssembled.current === assembled) return
+    prevAssembled.current = assembled
+    setFlash(true)
+    const handle = window.setTimeout(() => setFlash(false), 700)
+    return () => window.clearTimeout(handle)
+  }, [assembled])
+
   return (
-    <label className="flex flex-col gap-1.5">
-      <span className="flex items-center justify-between gap-2 text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-        <span>Prompt Final</span>
-        {dirty ? (
-          <button
-            type="button"
-            className="normal-case tracking-normal text-teal-200 underline"
-            onClick={() => onChange(assembled, false)}
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-2">
+        {pilotoEnabled === undefined ? null : (
+          <span
+            className={
+              pilotoEnabled
+                ? 'rounded-full bg-teal-300/20 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-teal-100 uppercase'
+                : 'rounded-full bg-white/8 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-paper/60 uppercase'
+            }
           >
-            Restaurar ensamblado
-          </button>
-        ) : (
-          <span className="normal-case tracking-normal text-paper/40">auto desde bloques</span>
+            {pilotoEnabled ? 'Con piloto' : 'Sin piloto'}
+          </span>
         )}
-      </span>
-      <textarea
-        className="min-h-28 w-full rounded-2xl border border-border bg-input px-3 py-2 text-[14px] outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        value={value}
-        onChange={(e) => onChange(e.target.value, true)}
-        placeholder="El prompt ensamblado aparece aquí; puedes editarlo a mano."
-      />
-    </label>
+        {deltaLabel ? (
+          <span className="rounded-full bg-amber-300/20 px-2.5 py-1 text-[11px] text-amber-100">
+            {deltaLabel}
+          </span>
+        ) : null}
+      </div>
+
+      <div
+        className={`rounded-2xl border border-teal-400/20 bg-black/25 px-3 py-2 ${flash ? 'prompt-flash' : ''}`}
+      >
+        <p className="flex items-center justify-between gap-2 text-[10px] font-semibold tracking-[0.16em] text-teal-200/80 uppercase">
+          <span>Ensamblado (siempre al día)</span>
+          <span className="normal-case tracking-normal text-paper/40">sigue bloques</span>
+        </p>
+        <p className="mt-1 text-[13px] leading-snug text-paper/85">
+          {assembled.trim() || 'Vacío. Experimenta o incluye un LoRA.'}
+        </p>
+      </div>
+
+      {compareOn !== undefined && compareOff !== undefined && pilotoEnabled !== undefined ? (
+        <PromptCompare enabled={pilotoEnabled} withPilot={compareOn} withoutPilot={compareOff} />
+      ) : null}
+
+      <label className="flex flex-col gap-1.5">
+        <span className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+          <span className="flex items-center gap-0.5">
+            Prompt Final
+            <GlossaryTip term={termOrFallback(glossary, 'auto-bloques', PARAM_HELP['auto-bloques'])} />
+          </span>
+          {dirty ? (
+            <button
+              type="button"
+              className="min-h-11 rounded-xl bg-teal-300 px-3 text-[12px] font-medium tracking-normal text-ink normal-case"
+              onClick={() => onChange(assembled, false)}
+            >
+              Actualizar desde bloques
+            </button>
+          ) : (
+            <span className="normal-case tracking-normal text-paper/40">auto desde bloques</span>
+          )}
+        </span>
+        {drifted ? (
+          <p className="rounded-xl bg-amber-400/15 px-3 py-2 text-[12px] text-amber-100">
+            Editaste el Final a mano. Los bloques / LoRAs siguen cambiando el ensamblado de
+            arriba. Pulsa <strong>Actualizar desde bloques</strong> para copiarlo aquí.
+          </p>
+        ) : null}
+        <textarea
+          className="min-h-28 w-full rounded-2xl border border-border bg-input px-3 py-2 text-[14px] outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          value={value}
+          onChange={(e) => onChange(e.target.value, true)}
+          placeholder="El prompt ensamblado aparece aquí; puedes editarlo a mano."
+        />
+      </label>
+    </div>
   )
 }

@@ -1,5 +1,6 @@
 import type { Catalog, Intensity, PromptSegment } from '@/engine'
 import { intensityTint } from '@/engine'
+import { cn } from '@/lib/utils'
 
 type PromptSegmentsProps = {
   segments: PromptSegment[]
@@ -7,6 +8,7 @@ type PromptSegmentsProps = {
   bodyLevel: Intensity
   sceneLevel: Intensity
   onAffect: (kind: 'body' | 'scene') => void
+  flashIds?: Set<string>
 }
 
 export function PromptSegments({
@@ -15,6 +17,7 @@ export function PromptSegments({
   bodyLevel,
   sceneLevel,
   onAffect,
+  flashIds,
 }: PromptSegmentsProps) {
   if (empty) {
     return (
@@ -29,6 +32,7 @@ export function PromptSegments({
       {segments.map((segment, index) => {
         const clickable = segment.affect !== 'none'
         const level = segment.affect === 'body' ? bodyLevel : sceneLevel
+        const coherent = segment.coherent === true
         return (
           <span key={segment.id}>
             {index > 0 ? <span className="text-paper/35">, </span> : null}
@@ -40,18 +44,33 @@ export function PromptSegments({
                   onAffect(segment.affect)
                 }
               }}
-              className="rounded-md px-0.5 text-left"
+              className={cn(
+                'rounded-md px-0.5 text-left',
+                coherent && 'ring-1 ring-teal-300/70 bg-teal-300/10',
+                flashIds?.has(segment.id) && 'prompt-flash',
+              )}
               style={{
                 color: segment.color,
-                background: clickable ? intensityTint(level) : 'transparent',
+                background: coherent
+                  ? undefined
+                  : clickable
+                    ? intensityTint(level)
+                    : 'transparent',
               }}
               title={
-                clickable
-                  ? 'Exageración (beta): toca para subir intensidad cuerpo/escena'
-                  : segment.label
+                coherent
+                  ? 'Este tramo lo escribió el piloto coherente'
+                  : clickable
+                    ? 'Exageración (beta): toca para subir intensidad cuerpo/escena'
+                    : segment.label
               }
             >
               {segment.text}
+              {coherent ? (
+                <span className="ml-1 align-middle text-[9px] font-semibold tracking-wide text-teal-200 uppercase">
+                  piloto
+                </span>
+              ) : null}
             </button>
           </span>
         )

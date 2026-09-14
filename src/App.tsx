@@ -10,7 +10,6 @@ import {
 import { CoherentPilotBar } from '@/components/CoherentPilotBar'
 import { ExportBar } from '@/components/ExportBar'
 import { LoraOpenButton, LoraPanel } from '@/components/LoraPanel'
-import { MagePasteDialog } from '@/components/MagePasteDialog'
 import { ModeToggle } from '@/components/ModeToggle'
 import { ModelPanel } from '@/components/ModelPanel'
 import { OptionSheet } from '@/components/OptionSheet'
@@ -22,6 +21,7 @@ import {
   generationSizeFromBrain,
   loadBrains,
   loraKeywordText,
+  promptPhraseDelta,
   suggestModelIdForBrain,
   type Block,
   type BrainUiPack,
@@ -35,8 +35,9 @@ export default function App() {
   const [editing, setEditing] = useState<Block | null>(null)
   const [templatesOpen, setTemplatesOpen] = useState(false)
   const [loraOpen, setLoraOpen] = useState(false)
-  const [pasteOpen, setPasteOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [deltaLabel, setDeltaLabel] = useState<string | null>(null)
+  const prevExported = useRef('')
   const [brainPack, setBrainPack] = useState<BrainUiPack | null>(null)
   const [brainState, setBrainState] = useState<BrainPanelState | null>(null)
   const [comfyBusy, setComfyBusy] = useState(false)
@@ -81,6 +82,31 @@ export default function App() {
     setToast(message)
     window.setTimeout(() => setToast(null), 2600)
   }
+
+  useEffect(() => {
+    const next = studio.exported
+    const prev = prevExported.current
+    prevExported.current = next
+    if (!prev || !next || prev === next) return
+    const delta = promptPhraseDelta(prev, next)
+    const added = delta.added[0]
+    const removed = delta.removed[0]
+    const clip = (text: string) => (text.length > 56 ? `${text.slice(0, 56).trim()}…` : text)
+    const label = added
+      ? `+ ${clip(added)}`
+      : removed
+        ? `− ${clip(removed)}`
+        : null
+    if (!label) return
+    setDeltaLabel(label)
+    setToast(label)
+    const hideChip = window.setTimeout(() => setDeltaLabel(null), 3600)
+    const hideToast = window.setTimeout(() => setToast(null), 2600)
+    return () => {
+      window.clearTimeout(hideChip)
+      window.clearTimeout(hideToast)
+    }
+  }, [studio.exported])
 
   const finalPrompt = () => {
     if (brainState?.promptDirty && brainState.promptFinal.trim()) {
@@ -256,6 +282,11 @@ export default function App() {
               pack={brainPack}
               state={brainState}
               assembledPrompt={studio.exported}
+              glossary={studio.catalog.glossary}
+              pilotoEnabled={studio.useCoherentPilot}
+              compareOn={studio.pilotCompare?.on}
+              compareOff={studio.pilotCompare?.off}
+              deltaLabel={deltaLabel}
               onChange={setBrainState}
             />
           ) : (
@@ -268,6 +299,7 @@ export default function App() {
             <CoherentPilotBar
               enabled={studio.useCoherentPilot}
               concepts={studio.piloto.concepts}
+              glossary={studio.catalog.glossary}
               onToggle={studio.setUseCoherentPilot}
               onSeed={applyConcept}
             />
@@ -281,8 +313,6 @@ export default function App() {
             selectedLoraCount={studio.selectedLoraIds.length}
             onChange={studio.setSelectedModelId}
             onPlan={studio.setSelectedPlanId}
-            onPasteAnalysis={() => setPasteOpen(true)}
-            collapsedDefault
           />
 
           <SpicyBar
@@ -313,6 +343,9 @@ export default function App() {
           <section className="rounded-[22px] border border-border bg-black/25 p-3">
             <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
               Vista por bloques · Prompt Final arriba en cerebro
+            </p>
+            <p className="mt-1 text-[11px] text-paper/45">
+              Tramos con marco teal y etiqueta «piloto» salen del motor coherente.
             </p>
             <PromptSegments
               segments={studio.segments}
@@ -360,7 +393,7 @@ export default function App() {
               flash('Tope de LoRAs. Quita una o sube de plan (upsell).')
               return 'blocked'
             }
-            flash('LoRA incluida en el export')
+            flash('LoRA incluida · el ensamblado se actualizó')
             return 'ok'
           }}
           onRemove={(id) => {
@@ -458,17 +491,6 @@ export default function App() {
         onOpenChange={setTemplatesOpen}
         state={studio.state}
         onLoad={studio.applyState}
-      />
-
-      <MagePasteDialog
-        open={pasteOpen}
-        onOpenChange={setPasteOpen}
-        catalog={studio.catalog}
-        blocks={studio.blocks}
-        onApply={(rows) => {
-          studio.applyParsed(rows)
-          flash(`Aplicadas ${rows.length} cláusulas a bloques libres`)
-        }}
       />
 
       {toast ? (
