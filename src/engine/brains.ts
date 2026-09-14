@@ -154,6 +154,30 @@ export function defaultParamValues(brain: BrainUiDef): BrainParamValues {
   return values
 }
 
+/** Width / height / steps for Comfy Cloud from BrainPanel params (resolution "1024x1024" or separate fields). */
+export function generationSizeFromBrain(params: BrainParamValues | null | undefined): {
+  width?: number
+  height?: number
+  steps?: number
+} {
+  if (!params) return {}
+  const steps = asPositiveInt(params.steps)
+  const width = asPositiveInt(params.width)
+  const height = asPositiveInt(params.height)
+  const match = String(params.resolution ?? '').match(/(\d+)\s*[x×]\s*(\d+)/i)
+  return {
+    width: width ?? (match ? Number(match[1]) : undefined),
+    height: height ?? (match ? Number(match[2]) : undefined),
+    steps,
+  }
+}
+
+function asPositiveInt(value: number | string | undefined): number | undefined {
+  const n = typeof value === 'number' ? value : Number(String(value ?? '').trim())
+  if (!Number.isFinite(n) || n <= 0) return undefined
+  return Math.round(n)
+}
+
 export function defaultMode(brain: BrainUiDef): string {
   return brain.modes[0] ?? 't2i'
 }
@@ -200,15 +224,3 @@ export function revokeRefState(refs: BrainRefState) {
   }
 }
 
-export type ConceptsPiloto = {
-  concepts?: Array<{ id: string; label?: string; scene?: string; tags?: string[] }>
-}
-
-/** Optional light hook — prefer concept ids for scene when file exists. */
-export async function loadConceptsPiloto(): Promise<ConceptsPiloto | null> {
-  try {
-    return await fetchJson<ConceptsPiloto>('/data/concepts-piloto.json')
-  } catch {
-    return null
-  }
-}

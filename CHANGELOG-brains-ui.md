@@ -1,5 +1,21 @@
 # CHANGELOG — brains UI (dynamic shell)
 
+## Comfy Cloud Function (2026-09-14)
+
+Restaura **Generar** sin tocar el piloto coherente:
+
+- `netlify/functions/comfy-generate.mjs` + `netlify.toml` (redirect `/api/comfy-generate`, SPA al final).
+- Clave solo en env `COMFY_CLOUD_API_KEY`. Stubs Mage que abrían mage.space fuera de ExportBar.
+
+## Piloto coherente (2026-09-14)
+
+Grafo mínimo para Experimental: `data/concepts-piloto.json` (+ `public/data/concepts-piloto.json`) y `src/engine/coherent.ts`.
+
+- Conceptos: piscina, lluvia, cuero, noche, agua, reflejos, humedad, piel_mojada, ropa_mojada.
+- Flujo: peso → relaciones → consecuencias → fragmentos EN. Compatibilidad verde/ámbar/rojo.
+- UI: interruptor **Piloto coherente** (default on). Anclados intactos. Resto de bloques sigue en `options.json`.
+- Cómo probar: Experimental → Experimentar; ancla escena y vuelve a tirar; apaga el interruptor para el path clásico. Ver README «Piloto coherente».
+
 **Fecha:** 2026-09-14 (Europe/Madrid)  
 **Snapshot local:** `/workspace/pack-100pct/app` (SCM Origin/GitHub no usado)
 
@@ -14,7 +30,7 @@
   - Uploads solo para el modo activo (`image_ref`, `video_ref`, `character_refs`)
 - **Control / Experimental + candados:** intactos.
 - **Mage suavizado:** labels hacia Comfy/familia; panel legado colapsable; `mage.json` sigue cargando.
-- **Conceptos piloto (nice-to-have):** si existe `data/concepts-piloto.json`, chips en Experimental para rellenar escena con `[concept:id]`.
+- **Conceptos piloto:** grafo en `data/concepts-piloto.json` + motor `src/engine/coherent.ts` (ver sección arriba).
 - **Refs:** UI-ready (File + objectURL). El adaptador Comfy que manda base64/metadata es el siguiente lote (Enviar actual = prompt string vía Function Netlify si existe).
 
 ## Archivos tocados
@@ -44,7 +60,7 @@ Site vivo: https://control-experimental-comfy.netlify.app
 3. Alternativa: [app.netlify.com/drop](https://app.netlify.com/drop) para un site nuevo de prueba.
 4. Safari / PWA: recarga forzada o reinstala icono si el service worker cachea el bundle viejo.
 
-**Nota:** Drop estático no incluye Netlify Functions; Enviar/Comfy generate solo funciona si el site ya tiene `comfy-generate` + `COMFY_CLOUD_API_KEY`. Este lote no cambia la Function.
+**Nota:** Drop estático no incluye Netlify Functions. Para Generar / Comfy hace falta deploy git o `netlify deploy --build` con `COMFY_CLOUD_API_KEY` (ver README «Publicar (Comfy Cloud Function)»).
 
 ## Limitaciones
 
