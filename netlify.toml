@@ -1,0 +1,21 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+# Sync Functions max out at 26s on many plans. The handler polls briefly then
+# returns 202 + promptId so the client can continue with GET ?promptId=.
+[functions."comfy-generate"]
+  timeout = 26
+
+# Pretty alias for the Function. Existing files (assets, /data) win over SPA.
+[[redirects]]
+  from = "/api/comfy-generate"
+  to = "/.netlify/functions/comfy-generate"
+  status = 200
+
+# SPA fallback — last.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,20 +1,33 @@
 # 100% Control, 100% Experimental
 
-## Publicar / refrescar en Safari (Netlify Drop)
+## Publicar (Comfy Cloud Function)
 
-Live de referencia: [polite-pothos-bced37.netlify.app](https://polite-pothos-bced37.netlify.app). Para **actualizar** esa URL:
+Site histórico: [control-experimental-comfy.netlify.app](https://control-experimental-comfy.netlify.app).
 
-1. Baja `artifacts/control-experimental-dist.zip` (o `npm ci && npm run build` y zippea `dist/` con `index.html` en la raíz).
-2. Abre [https://app.netlify.com/drop](https://app.netlify.com/drop) y arrastra la carpeta **descomprimida** (o el zip).
-3. Si ya existe el site, en Netlify: Deploys → **Add new deploy** → drag & drop el mismo `dist`.
-4. Safari iPad: recarga forzada o borra la PWA y vuelve a Añadir a pantalla de inicio.
+**Un Drop de zip/`dist` es solo estático.** No sube Netlify Functions. Por eso `POST /.netlify/functions/comfy-generate` acaba en 404 HTML y **Generar** no puede hablar con Comfy.
 
-Codebase Origin: [cursor.com/codebase/koko12-koko12/experiment-pad](https://cursor.com/codebase/koko12-koko12/experiment-pad).
+Para que vuelva la Function:
+
+1. Publica con el repo **conectado a git** en Netlify (site `control-experimental-comfy`) **o** `netlify deploy --build` (no arrastres solo `dist`).
+2. Variables de entorno del site (nunca en el cliente ni en el repo): `COMFY_CLOUD_API_KEY` (obligatoria). Opcionales: `COMFY_BASE_URL` (default `https://cloud.comfy.org`), `COMFY_CHECKPOINT`.
+3. Tras el deploy: `POST /.netlify/functions/comfy-generate` (o `/api/comfy-generate`) debe devolver JSON, no HTML.
+
+En local, `npm run dev` sirve el mismo endpoint. Sin clave verás el error 503 en español.
+
+### Drop estático (sin Generar)
+
+Live de referencia estático: [polite-pothos-bced37.netlify.app](https://polite-pothos-bced37.netlify.app). Solo UI:
+
+1. `npm ci && npm run build` y zippea `dist/` (`index.html` en la raíz).
+2. [app.netlify.com/drop](https://app.netlify.com/drop) o Deploys → **Add new deploy** → drag & drop.
+3. Safari iPad: recarga forzada o reinstala la PWA.
+
+Ese camino **no** restaura Comfy. Codebase Origin: [cursor.com/codebase/koko12-koko12/experiment-pad](https://cursor.com/codebase/koko12-koko12/experiment-pad).
 
 ### Novedades (lote A–F)
 
 - **LoRAs:** importadas arriba, categorías de color, contador verde, aviso fuerte al tope de slots, glosario `?`, seleccionadas fijadas bajo «Sugerir por escena», pesos bajo/medio/alto de color, «Ver ejemplos» solo con URL exacta.
-- **Export:** Directo / Promptbox / assistant Mage (gratis, stub) / análisis avanzado (~0,30 €, stub).
+- **Export:** **Generar** (Comfy Cloud vía Function) / Directo / Promptbox. Los stubs Mage que abrían mage.space se quitaron.
 - **Bloques:** prompt por colores; cámara Fija / Zoom+ / Zoom−; micro-variaciones 2+1; anti-repetición; bloque **Iluminación**.
 - **Picante + Exageración (beta):** niveles 1–3; tramos grises tocables (cuerpo/escena); ganchos futanari/fluidos (estructura, prompt vacío).
 - **Planes Mage:** cuotas en `data/mage.json`; upsell al pasarte; pegar análisis → bloques.
@@ -37,7 +50,7 @@ iPad-first PWA: colored prompt blocks, lock/anchor, constrained randomness, Mage
 3. Pulsa **Experimental** → **Experimentar**. Bloques de color (escenario, personaje, complexión, ropa, pose, objeto, acción, **luz**, cámara).
 4. Toca el candado de lo que te gusta (**Anclar**). Vuelve a **Experimentar**: solo se mueven los libres (sin repetir los últimos).
 5. Pasa a **Control** para editar a mano los bloques desanclados.
-6. **Directo** o **Promptbox** copian el prompt. El assistant / análisis Mage son stubs (copian y abren Mage).
+6. **Generar** envía Prompt Final a Comfy Cloud. **Directo** o **Promptbox** copian el prompt.
 7. Cambia motor y **plan** (cuotas). Pega un análisis del helper si quieres mapear a bloques.
 8. **LoRAs:** importadas primero; incluye solo las elegidas; tope = min(motor, plan).
 9. **Picante / Exageración (beta):** sliders y tramos de color en el prompt.
@@ -106,7 +119,7 @@ npm run preview
 
 ### Flow
 
-Experimental → interesting combo → **lock / Anclar combo** → keep rolling unlocked → **Control** (edit unlocked only) → **Exportar** (English Mage-ready text) → paste into Mage.
+Experimental → interesting combo → **lock / Anclar combo** → keep rolling unlocked → **Control** (edit unlocked only) → **Generar** (Comfy Cloud) or copy Directo / Promptbox.
 
 Templates live in `localStorage`. Session auto-saves.
 
@@ -130,5 +143,5 @@ API real de Mage, overlay flotante, scrape Civitai, shaman, vídeo continuo, aff
 - `data/brains-ui-pack.json` — cerebros FLUX / Illustrious / SDXL / SD3.5 / LTX / Wan.
 - `data/brains/*-model_profile.json` — perfiles completos (referencia; la UI usa el pack).
 - Un solo shell: el cerebro seleccionado muestra/oculta negative, params, modos y uploads.
-- Referencias (image_ref / video_ref / character_refs): UI-ready con objectURL; el adaptador Comfy que envía base64/metadata es el siguiente lote (el Enviar actual solo manda prompt string si hay Function Netlify).
+- Referencias (image_ref / video_ref / character_refs): UI-ready con objectURL; el adaptador de refs/base64 sigue siendo un lote aparte. **Generar** ya manda prompt + negative/width/height/steps a `comfy-generate`.
 - `mage.json` sigue cargando (planes/cuotas legado) sin romper el build.

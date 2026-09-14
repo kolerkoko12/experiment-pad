@@ -1,5 +1,5 @@
-import { Anchor, Dices, FolderOpen, RotateCcw, Unlock } from 'lucide-react'
-import { useEffect, useState, type ReactNode } from 'react'
+import { Anchor, Dices, FolderOpen, Loader2, RotateCcw, Unlock, Wand2 } from 'lucide-react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { BlockCard } from '@/components/BlockCard'
 import {
@@ -19,6 +19,7 @@ import { SpicyBar } from '@/components/SpicyBar'
 import { TemplateDialog } from '@/components/TemplateDialog'
 import { Button } from '@/components/ui/button'
 import {
+  generationSizeFromBrain,
   loadBrains,
   loraKeywordText,
   suggestModelIdForBrain,
@@ -27,6 +28,7 @@ import {
   type LoraDef,
 } from '@/engine'
 import { usePromptStudio } from '@/hooks/usePromptStudio'
+import { ComfyGenerateError, generateWithComfy } from '@/lib/comfyClient'
 
 export default function App() {
   const studio = usePromptStudio()
@@ -37,6 +39,10 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null)
   const [brainPack, setBrainPack] = useState<BrainUiPack | null>(null)
   const [brainState, setBrainState] = useState<BrainPanelState | null>(null)
+  const [comfyBusy, setComfyBusy] = useState(false)
+  const [comfyError, setComfyError] = useState<string | null>(null)
+  const [comfyImage, setComfyImage] = useState<string | null>(null)
+  const comfyAbort = useRef<AbortController | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -51,6 +57,12 @@ export default function App() {
       })
     return () => {
       cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      comfyAbort.current?.abort()
     }
   }, [])
 
@@ -99,6 +111,52 @@ export default function App() {
       return
     }
     await copyText(text, `Keywords copiadas · ${lora.name}`)
+  }
+
+  const runComfyGenerate = async () => {
+    const prompt = finalPrompt().trim()
+    if (!prompt) {
+      flash('Nada que generar. Experimenta o escribe en Prompt Final.')
+      return
+    }
+    comfyAbort.current?.abort()
+    const controller = new AbortController()
+    comfyAbort.current = controller
+    setComfyBusy(true)
+    setComfyError(null)
+    flash('Enviando a Comfy Cloud…')
+    try {
+      const size = generationSizeFromBrain(brainState?.params)
+      const result = await generateWithComfy(
+        {
+          prompt,
+          negative_prompt: brainState?.negativePrompt?.trim() || undefined,
+          width: size.width,
+          height: size.height,
+          steps: size.steps,
+        },
+        {
+          signal: controller.signal,
+          onStatus: (message) => flash(message),
+        },
+      )
+      setComfyImage(result.imageSrc)
+      flash('Imagen lista')
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return
+      if (err instanceof Error && err.name === 'AbortError') return
+      const message =
+        err instanceof ComfyGenerateError
+          ? err.message
+          : 'No se pudo generar. Revisa la Function y COMFY_CLOUD_API_KEY.'
+      setComfyError(message)
+      flash(message)
+    } finally {
+      if (comfyAbort.current === controller) {
+        setComfyBusy(false)
+        comfyAbort.current = null
+      }
+    }
   }
 
   const applyConcept = (conceptId: string) => {
@@ -267,6 +325,9 @@ export default function App() {
               <ExportBar
                 catalog={studio.catalog}
                 disabled={studio.empty && !brainState?.promptFinal?.trim()}
+                generating={comfyBusy}
+                error={comfyError}
+                resultSrc={comfyImage}
                 onDirect={() => {
                   void copyText(
                     finalPrompt(),
@@ -276,24 +337,14 @@ export default function App() {
                 onPromptbox={() => {
                   void copyText(studio.promptbox, 'Promptbox copiado (una línea por cláusula)')
                 }}
-                onAssistant={() => {
-                  void copyText(finalPrompt(), 'Copiado (stub destino).').then((ok) => {
-                    if (ok) window.open(studio.catalog!.mage.assistantUrl, '_blank', 'noreferrer')
-                  })
-                }}
-                onAnalysis={() => {
-                  void copyText(
-                    finalPrompt(),
-                    'Copiado. Análisis avanzado es un stub: no hay endpoint.',
-                  ).then((ok) => {
-                    if (ok) window.open(studio.catalog!.mage.analysisStubUrl, '_blank', 'noreferrer')
-                  })
+                onGenerate={() => {
+                  void runComfyGenerate()
                 }}
               />
             </div>
           </section>
 
-          <div className="h-40 lg:h-32" />
+          <div className="h-56 lg:h-44" />
         </div>
 
         <LoraPanel
@@ -348,15 +399,14 @@ export default function App() {
           </Button>
           <Button
             size="lg"
-            className="bg-teal-300 text-ink"
+            className="bg-teal-300 text-ink hover:bg-teal-200"
+            disabled={comfyBusy}
             onClick={() => {
-              void copyText(
-                finalPrompt(),
-                `Exportado · ${brainState?.brainId ?? studio.selectedModel?.name ?? 'Comfy'}`,
-              )
+              void runComfyGenerate()
             }}
           >
-            Directo
+            {comfyBusy ? <Loader2 className="animate-spin" /> : <Wand2 />}
+            {comfyBusy ? 'Generando…' : 'Generar'}
           </Button>
           <Button
             variant="secondary"
