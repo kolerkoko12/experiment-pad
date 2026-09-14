@@ -1,0 +1,494 @@
+{
+  "brain_id": "illustrious",
+  "family": "Illustrious XL",
+  "vendor": "Onoma AI / OnomaAI Research",
+  "modality": "image",
+  "scope": "model_brain_only",
+  "accessed": "2026-09-14",
+  "sources": [
+    "https://arxiv.org/abs/2409.19946",
+    "https://arxiv.org/html/2409.19946v1",
+    "https://huggingface.co/OnomaAIResearch/Illustrious-xl-early-release-v0",
+    "https://huggingface.co/OnomaAIResearch/Illustrious-XL-v1.0",
+    "https://huggingface.co/OnomaAIResearch/Illustrious-XL-v1.1",
+    "https://huggingface.co/OnomaAIResearch/Illustrious-XL-v2.0",
+    "https://civitai.com/models/795765/illustrious-xl",
+    "https://civitai.com/models/1232765/illustrious-xl-10",
+    "https://civitai.com/models/1369089/illustrious-xl-20",
+    "https://civitai.com/models/1489531/illustrious-xl-v20-stable",
+    "https://illustrious-xl.ai/",
+    "https://www.illustrious-xl.ai/docs/overview",
+    "https://www.linkedin.com/posts/onoma-ai_illustrious-v35-is-now-officially-live-activity-7328715628918308864-xXG3",
+    "https://www.shakker.ai/modelinfo/f125113915584517a862c9a4a2a1d583",
+    "/workspace/informes/illustrious-cerebro.md"
+  ],
+  "evidence_policy": {
+    "tags": {
+      "A": "oficial vendor",
+      "B": "paper",
+      "C": "HF card",
+      "D": "blog",
+      "E": "community",
+      "F": "product UI",
+      "G": "secondary",
+      "H": "REQUIERE INVESTIGACIÓN"
+    },
+    "note": "Las letras A–H son SOLO tags de evidencia. Las secciones temáticas (Identidad, Lenguaje…) van como claves semánticas en model_brain, NO como letras A–H.",
+    "adopted": "2026-09-14"
+  },
+  "model_brain": {
+    "identity": {
+      "vendor": "Onoma AI / OnomaAI Research (Sang Hyun Park et al.; corresponding Min Song)",
+      "family_label": "Illustrious / Illustrious-XL (familia de checkpoints base)",
+      "what_it_is": "Familia text-to-image basada en arquitectura SDXL sin cambios U-Net/dual-CLIP documentados; fine-tune a gran escala sobre Danbooru (+ datos según versión). Base «pretrain-level» / untuned para ilustración/animación. Linaje v0.1 desde Kohaku XL Beta 5.",
+      "what_it_is_not": [
+        "No es «solo tags»",
+        "No es un único checkpoint ni «el» Illustrious merge de Civitai",
+        "No es un workflow ComfyUI ni un LoRA",
+        "No es Pony / Animagine / Kohaku (aunque v0.1 parte de Kohaku β5)",
+        "No es Illustrious LU (Lumina) — otro cerebro",
+        "No son Tag Booster / Mood Enhancer / ComfyUI_Illustrious (capa producto)"
+      ]
+    },
+    "architecture": {
+      "backbone": "SDXL architecture unchanged (~2.5B params familia SDXL); U-Net + dual CLIP",
+      "text_encoders": [
+        {
+          "name": "CLIP ViT-L",
+          "inherited_from": "SDXL"
+        },
+        {
+          "name": "OpenCLIP ViT-bigG",
+          "inherited_from": "SDXL"
+        }
+      ],
+      "conditioning": [
+        "tags Danbooru + NLP (evolución por versión)",
+        "quality / year / rating modifiers",
+        "character/artist weak-probability dropout / contrastive",
+        "multi-level captions / multi-level dropout",
+        "CFG típico SDXL"
+      ],
+      "notes": "Paper admite límites de composiciones complejas y glyphs frente a T5/GLM/DiT al no cambiar arquitectura SDXL/CLIP. Resolución nativa elevada: v1.0+ 1536²; v3.x apunta 2048²."
+    },
+    "prompting": {
+      "style": "híbrido NLP + tags Danbooru; evolución v0.1 tag-first/NLP débil → v1.x híbrido → v1.1/v2.0 NLP reforzado → v3.5 NLP destacado",
+      "priority_order": [
+        "person_count",
+        "character_names",
+        "rating",
+        "general_tags",
+        "artist",
+        "score_range_rating",
+        "year_modifier"
+      ],
+      "negative_prompts": {
+        "examples_v0_1": "worst quality, comic, multiple views, bad quality, low quality, lowres, displeasing, very displeasing, bad anatomy, bad hands, scan artifacts, monochrome, greyscale, signature, twitter username, jpeg artifacts, 2koma, 4koma, guro, extra digits, fewer digits",
+        "examples_api": "worst quality, low quality, lowers, low details, bad quality, poorly drawn, bad anatomy, multiple views, bad hands, blurry, artist sign, weibo username",
+        "examples_v2_0_short": "worst quality, bad quality",
+        "note": "Ejemplos de autor, no negative obligatorio único"
+      },
+      "weighting_syntax": "REQUIERE INVESTIGACIÓN — sin spec primaria Illustrious de (tag:1.2); frontends SDXL aplican weighting = frontend no cerebro (H12)",
+      "official_formulas": [
+        "Orden entrenamiento tipo NovelAI: person count ||| character names ||| rating ||| general tags ||| artist ||| score-range rating ||| year modifier",
+        "Quality tags v0.1: worst/bad/average/good/best quality, masterpiece (quality)",
+        "Year modifiers paper Table 4: oldest (~2017) … newest (~2023)",
+        "Uso válido: inglés plano y/o tags (HF v1.0)"
+      ],
+      "notes": [
+        "Base untuned: sin estilo por defecto",
+        "Composition tags: no abusar close-up/upside-down/cowboy shot conflictivos; sugerir upper body/cowboy shot/portrait/full body",
+        "Rating tokens v2.0: explicit/questionable/sensitive/general; nsfw/sfw/r-18 etc.",
+        "Shakker v3.0 controlling tokens (contrast/brightness/…) — canonicidad H10; NO entrar en prompting oficial hasta confirmar OnomaAI",
+        "C06: apéndice multi-level captions «desde v2.0» vs Table 1 también v1.1 — sin resolver"
+      ]
+    },
+    "params_abstract": {
+      "guidance": {
+        "hf_v0_1_usage": "5–7.5",
+        "paper_b2": "5–7.5",
+        "civitai_v2_0_example": "2.5 (nota: «should be 6.5 in recent implementations»)",
+        "api_docs_example": 7.4,
+        "shakker_v3_0_recommended": 7.5
+      },
+      "steps": {
+        "hf_v0_1": "20–28",
+        "paper_b2": ">20",
+        "civitai_v2_0_example": 28,
+        "api_docs_example": 28
+      },
+      "scheduler_family": {
+        "hf_v0_1": "Euler a",
+        "paper_b2": "Euler A Discrete; DPM→img2img Euler",
+        "civitai_v2_0_example_row": "DPM++ 2S Ancestral CFG++ — recipe frontend → adapter_hints, no política única de cerebro",
+        "api_docs_example": "euler"
+      },
+      "shift": null,
+      "resolution": {
+        "v0_1_train": "~1MP / ~1024²",
+        "v1_0_native": "1536×1536; rango 512–1536",
+        "v2_0": "512–1536; aspect max 1:10/10:1; lados múltiplos de 32",
+        "paper_v1": "~2.25MP train; hasta ~4MP con pérdida; img2img pipelines hasta ~20MP claim",
+        "v3_5_announce": "high-res hasta 2048×2048",
+        "shakker_v3_0_claim": "256–2048 nativo (canonicidad H10)"
+      },
+      "seed": true,
+      "other": {}
+    },
+    "capabilities": [
+      "Base SDXL abierta orientada a ilustración con gran cobertura Danbooru + evolución NLP",
+      "Resolución nativa alta (1536² desde v1.0; claims 2K en v3.x)",
+      "Canvas untuned para LoRA/merges (no forzar aesthetic)",
+      "Control fino por quality/year/rating tags + prosa en versiones recientes",
+      "Character/artist understanding con anti-mezcla (paper)",
+      "v2.0: NLP más robusto; less multiple views/nonsense"
+    ],
+    "limitations": [
+      "Límites arquitectura SDXL/CLIP (composiciones/glyphs) admitidos por el autor",
+      "v0.1 débil en NLP largo y acciones interpoladas fuera del vocabulario tags",
+      "Base sin estilo: salidas crudas sin quality tags / fine-tune",
+      "Conflicto posible entre composition tags",
+      "Algunos checkpoints intermedios closed-source/staged",
+      "Confusión comunitaria: merges populares ≠ cerebro Illustrious",
+      "Sin control CFG sobre character tags como NovelAI weighting → posible leakage débil"
+    ],
+    "dynamic_blocks": [
+      "person_count",
+      "character_names",
+      "rating",
+      "general_tags_appearance_pose_expression",
+      "artist_tags",
+      "quality_tags",
+      "year_modifiers",
+      "nlp_prose (v1+)",
+      "composition_framing_tags",
+      "negatives_example_set"
+    ],
+    "constraints": {
+      "architecture_unchanged_sdxl": true,
+      "base_untuned_no_default_style": true,
+      "illustrious_lu_is_other_brain": true,
+      "shakker_tokens_not_official_until_confirmed": true,
+      "aspect_sides_multiple_of_32_v2": true
+    },
+    "intent_fields": [
+      "version (v0.1|v1.0|v1.1|v2.0|v3.x|v3.5)",
+      "prompt_mode (tags|nlp|hybrid)",
+      "characters",
+      "series_copyrights",
+      "appearance",
+      "pose",
+      "expression",
+      "composition",
+      "artist_or_style",
+      "quality_year_rating",
+      "negatives",
+      "resolution",
+      "cfg_steps_band",
+      "eps_vs_vpred"
+    ]
+  },
+  "version_matrix": [
+    {
+      "version_id": "v0.1",
+      "status": "open_weights",
+      "diffs_vs_family": {
+        "lineage": "Kohaku XL β5",
+        "nlp": "débil",
+        "res": "~1MP",
+        "license": "fair-ai-public"
+      },
+      "params_overrides": {
+        "sampler": "Euler a",
+        "steps": "20–28",
+        "cfg": "5–7.5"
+      },
+      "prompting_overrides": {
+        "style": "tag-first"
+      },
+      "evidence": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "version_id": "v0.1-GUIDED",
+      "status": "open_weights",
+      "diffs_vs_family": {
+        "safety": "mínima"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "version_id": "v1.0",
+      "status": "open_weights",
+      "diffs_vs_family": {
+        "native_res": "1536²",
+        "nlp_tags": "explícito",
+        "data": "~10M",
+        "knowledge": "~junio 2024"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {
+        "hybrid": true
+      },
+      "evidence": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "version_id": "v1.1",
+      "status": "open_weights",
+      "diffs_vs_family": {
+        "nlp_focus": true,
+        "character": "mejor",
+        "cutoff": "~2024-07",
+        "multi_level_captions_table1": true,
+        "elo": "1617 vs 1571"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "version_id": "v2.0",
+      "status": "open_weights",
+      "diffs_vs_family": {
+        "nlp_robust": true,
+        "data": "~20M hasta ~2024-08",
+        "res": "512–1536"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {
+        "long_nlp_examples": true
+      },
+      "evidence": [
+        "A",
+        "C",
+        "E"
+      ]
+    },
+    {
+      "version_id": "v2.0-STABLE",
+      "status": "open_weights",
+      "diffs_vs_family": {
+        "cosine_annealing_final": true
+      },
+      "params_overrides": {},
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "version_id": "v3.0-EPS",
+      "status": "open_weights",
+      "diffs_vs_family": {
+        "prediction": "EPS",
+        "claims_2048": true,
+        "open_weights_detail": "H10"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {
+        "shakker_tokens": "no canónico hasta confirmar"
+      },
+      "evidence": [
+        "A",
+        "F",
+        "H"
+      ]
+    },
+    {
+      "version_id": "v3.0-VPred",
+      "status": "open_weights",
+      "diffs_vs_family": {
+        "prediction": "VPred",
+        "open_weights_detail": "H10"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "H"
+      ]
+    },
+    {
+      "version_id": "v3.5-VPred",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "nlp": "mejor",
+        "res": "2048²",
+        "access": "plataforma/API fuerte",
+        "hf_open_unverified": "H10"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "D",
+        "F",
+        "H"
+      ]
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "illustrious-v0.1",
+      "hf_or_repo": "OnomaAIResearch/Illustrious-xl-early-release-v0",
+      "files": [],
+      "params_count": "~2.5B (familia SDXL)",
+      "license": "fair-ai-public",
+      "quantization": null,
+      "version_id": "v0.1",
+      "notes": null
+    },
+    {
+      "id": "illustrious-v1.0",
+      "hf_or_repo": "OnomaAIResearch/Illustrious-XL-v1.0",
+      "files": [],
+      "params_count": null,
+      "license": null,
+      "quantization": null,
+      "version_id": "v1.0",
+      "notes": null
+    },
+    {
+      "id": "illustrious-v1.1",
+      "hf_or_repo": "OnomaAIResearch/Illustrious-XL-v1.1",
+      "files": [],
+      "params_count": null,
+      "license": null,
+      "quantization": null,
+      "version_id": "v1.1",
+      "notes": null
+    },
+    {
+      "id": "illustrious-v2.0",
+      "hf_or_repo": "OnomaAIResearch/Illustrious-XL-v2.0",
+      "files": [],
+      "params_count": null,
+      "license": null,
+      "quantization": null,
+      "version_id": "v2.0-STABLE",
+      "notes": "HF v2.0-STABLE"
+    },
+    {
+      "id": "illustrious-v3.x",
+      "hf_or_repo": "listado illustrious-xl.ai / series HF — pesos abiertos incompletos H10",
+      "files": [],
+      "params_count": null,
+      "license": null,
+      "quantization": null,
+      "version_id": "v3.0-EPS",
+      "notes": "EPS/VPred/v3.5 detalle REQUIERE INVESTIGACIÓN"
+    }
+  ],
+  "lora_policy": {
+    "compat_matrix": [
+      {
+        "claim": "objetivo de diseño: compatibilidad LoRA/adapters hacia atrás",
+        "sources": [
+          "HF v0 update",
+          "HF v1.0"
+        ],
+        "exact_degree_by_version_pair": "REQUIERE INVESTIGACIÓN (H11)"
+      }
+    ],
+    "retrain_rules": [],
+    "scale_ranges": "REQUIERE INVESTIGACIÓN",
+    "explicit_non_brain": [
+      "Tag Booster / Mood Enhancer",
+      "ComfyUI_Illustrious nodos API",
+      "merges Civitai populares",
+      "Illustrious LU (otro cerebro)",
+      "variantes aesthetic-tuned / preference-optimized (línea aparte)"
+    ]
+  },
+  "workflow_adapter_hints": {
+    "endpoint_or_pipeline_families": [
+      "illustrious-xl.ai API",
+      "Diffusers/SDXL-compatible UIs",
+      "Civitai frontend examples",
+      "OnomaAI/ComfyUI_Illustrious (producto, no cerebro)"
+    ],
+    "abstract_to_api_fields": {
+      "prompt": "prompt",
+      "negative_prompt": "negative_prompt",
+      "sampler_example_api": "euler",
+      "steps_example_api": 28,
+      "cfg_example_api": 7.4
+    },
+    "abstract_to_node_roles": {
+      "text_encode": "dual CLIP SDXL",
+      "sample": "UNet Illustrious checkpoint",
+      "decode": "VAE SDXL"
+    },
+    "backend_notes": [
+      "Filas sampler Civitai/API concretas → aquí, no como política única de cerebro",
+      "API snippet ejemplo 256² es demo de docs, no resolución nativa",
+      "Shakker tokens no promover a prompting oficial"
+    ],
+    "do_not_embed_here": [
+      "grafos Comfy",
+      "elegir merge Civitai",
+      "Tag Booster como default",
+      "LU como Illustrious XL"
+    ]
+  },
+  "open_questions": [
+    {
+      "id": "H09",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "model_profile.json ausente antes de esta conversión."
+    },
+    {
+      "id": "H10",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Canonicidad tokens control v3 (Shakker) + pesos abiertos v3/v3.5.",
+      "impact": "version_matrix 3.x incompleta"
+    },
+    {
+      "id": "H11",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Compat LoRA exacta por par de versiones.",
+      "impact": "lora_policy"
+    },
+    {
+      "id": "H12",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Sintaxis/rangos pesos oficiales Illustrious.",
+      "impact": "No inventar (tag:1.2)"
+    },
+    {
+      "id": "H13",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "User Guide oficial JS (updates/21) no extraído.",
+      "impact": "Pose/expresión taxonomía"
+    },
+    {
+      "id": "H14",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Cobertura series/copyrights por versión.",
+      "impact": "Personajes"
+    },
+    {
+      "id": "C06",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Apéndice multi-level captions «desde v2.0» vs paper Table 1 también en v1.1.",
+      "impact": "version_matrix NLP features"
+    }
+  ]
+}

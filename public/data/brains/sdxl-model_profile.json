@@ -1,0 +1,284 @@
+{
+  "brain_id": "sdxl",
+  "family": "Stable Diffusion XL",
+  "vendor": "Stability AI",
+  "modality": "image",
+  "scope": "model_brain_only",
+  "accessed": "2026-09-14",
+  "sources": [
+    "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0",
+    "https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0",
+    "https://arxiv.org/abs/2307.01952",
+    "https://ar5iv.labs.arxiv.org/html/2307.01952",
+    "https://github.com/Stability-AI/generative-models",
+    "https://huggingface.co/docs/diffusers/main/en/using-diffusers/sdxl",
+    "https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/stable_diffusion_xl/pipeline_stable_diffusion_xl.py",
+    "https://github.com/Stability-AI/generative-models/blob/main/scripts/demo/sampling.py",
+    "/workspace/informes/sdxl-cerebro.md"
+  ],
+  "evidence_policy": {
+    "tags": {
+      "A": "oficial vendor",
+      "B": "paper",
+      "C": "HF card",
+      "D": "blog",
+      "E": "community",
+      "F": "product UI",
+      "G": "secondary",
+      "H": "REQUIERE INVESTIGACIÓN"
+    },
+    "note": "Las letras A–H son SOLO tags de evidencia. Las secciones temáticas (Identidad, Lenguaje…) van como claves semánticas en model_brain, NO como letras A–H.",
+    "adopted": "2026-09-14"
+  },
+  "model_brain": {
+    "identity": {
+      "vendor": "Stability AI",
+      "family_label": "Stable Diffusion XL base 1.0 (+ refiner opcional 1.0)",
+      "what_it_is": "LDM text-to-image con UNet ~2.6B, dual text encoder CLIP ViT-L + OpenCLIP ViT-bigG (concat penultimate → dim 2048) + pooled OpenCLIP. Refiner = LDM opcional en mismo latente (ensemble-of-experts / SDEdit).",
+      "what_it_is_not": [
+        "No es un checkpoint finetune (RealVis, Juggernaut, etc.)",
+        "No es un workflow ComfyUI/A1111 ni grafo de nodos",
+        "No es LoRA, Textual Inversion, ControlNet ni IP-Adapter",
+        "No es solo el refiner ni solo el VAE: el cerebro de generación es el base",
+        "Sintaxis de énfasis de UIs ≠ arquitectura del modelo"
+      ]
+    },
+    "architecture": {
+      "backbone": "UNet ~2.6B; transformer blocks heterogéneos [0,2,10]; channel mult. [1,2,4]; VAE propio mejorado",
+      "text_encoders": [
+        {
+          "name": "CLIP ViT-L",
+          "role": "prompt / prompt_2"
+        },
+        {
+          "name": "OpenCLIP ViT-bigG",
+          "role": "prompt_2 + pooled embedding"
+        },
+        {
+          "note": "text encoders ~817M params; contexto concatenado 2048"
+        }
+      ],
+      "conditioning": [
+        "dual text embeddings + pooled OpenCLIP",
+        "micro-conditioning size/crop/aspect (c_size, c_crop, c_ar)",
+        "classifier-free guidance",
+        "refiner aesthetic_score / negative_aesthetic_score en demos Stability (condicionamiento documentado del refiner)"
+      ],
+      "notes": "Paper Tabla 1 y §2; model cards base/refiner. Entrenamiento multi-etapa 256²→512²→multi-aspect ~1024²."
+    },
+    "prompting": {
+      "style": "lenguaje natural vía CLIP/OpenCLIP; ejemplos oficiales en prosa inglesa con descriptores de estilo/cámara/calidad",
+      "priority_order": [],
+      "negative_prompts": {
+        "supported": true,
+        "via": "CFG (guidance_scale > 1); Diffusers negative_prompt / negative_prompt_2",
+        "force_zeros_for_empty_prompt_default": true,
+        "optimal_magnitudes_by_domain": "REQUIERE INVESTIGACIÓN (H08)"
+      },
+      "weighting_syntax": "null en el cerebro — (word:1.2) es capa UI/Compel/StableSwarmUI, no del modelo",
+      "official_formulas": [],
+      "notes": [
+        "No hay plantilla oficial sujeto|estilo|calidad",
+        "Booru-style no documentado como lenguaje nativo → H07",
+        "Orden de tokens / bloques fijos vs variables: H07",
+        "Diffusers: prompt y opcionalmente prompt_2 (un prompt por encoder)"
+      ]
+    },
+    "params_abstract": {
+      "guidance": {
+        "diffusers_default": 5.0,
+        "paper_figures": 8.0,
+        "note": "C05: ambos oficiales; representar como rango documentado 5 (Diffusers) y 8 (paper), no un único «ideal»"
+      },
+      "steps": {
+        "diffusers_default": 50,
+        "model_card_ensemble_example": "n_steps=40, high_noise_frac=0.8",
+        "paper_eval": "50 DDIM"
+      },
+      "scheduler_family": {
+        "paper": "schedule discreto 1000 steps; muestreo ilustrado DDIM; offset-noise 0.05 en finetune multi-aspect; futuro EDM",
+        "diffusers": "scheduler configurable; no un único scheduler fijado en model card"
+      },
+      "shift": null,
+      "resolution": {
+        "target_area": "~1024×1024",
+        "buckets": "pares (H,W) múltiplos de 64 con pixel count ≈1024² (Appendix I); p.ej. 512×2048 … 2048×512 incluyendo 1024×1024",
+        "multi_aspect": true
+      },
+      "seed": true,
+      "other": {
+        "ensemble_denoising_cut": "denoising_end/start p.ej. 0.8; refiner en primeras ~200 escalas de ruido",
+        "guidance_rescale_diffusers_default": 0.0,
+        "crop_inference_typical": "(c_top, c_left)=(0,0)"
+      }
+    },
+    "capabilities": [
+      "Preferencia humana vs SD 1.5/2.1; base+refiner mejor que solo base",
+      "Multi-aspect nativo; micro-conditioning size/crop",
+      "VAE mejorado (PSNR/SSIM/LPIPS/rFID vs SD-VAE 1.x/2.x)",
+      "Refiner opcional mejora detalle local (fondos, caras)",
+      "Competitivo vs Midjourney v5.1 en adherencia (Appendix E; SDXL v0.9 en ese estudio)"
+    ],
+    "limitations": [
+      "No fotorealismo perfecto",
+      "Texto legible largo: débil / inconsistente",
+      "Compositionality difícil; concept bleeding",
+      "Caras/personas y manos a menudo imperfectas",
+      "Autoencoder lossy",
+      "Sesgos sociales/raciales posibles",
+      "Dos etapas cuestan VRAM/latencia",
+      "FID/CLIP en COCO no reflejan la mejora percibida"
+    ],
+    "dynamic_blocks": [
+      "sujeto, acción, atributos, relaciones espaciales",
+      "estilo, iluminación, cámara en prosa",
+      "negative concepts según fallo observado",
+      "uso o no del refiner y high_noise_frac"
+    ],
+    "constraints": {
+      "micro_conditioning_native": true,
+      "identity_persistent_not_native": true,
+      "ui_weighting_not_brain": true,
+      "finetunes_out_of_brain": true
+    },
+    "intent_fields": [
+      "prompt_text",
+      "negative_prompt",
+      "resolution_or_bucket",
+      "use_refiner",
+      "ensemble_cut",
+      "cfg_and_steps_band",
+      "seed",
+      "micro_conditioning_size_crop_aspect"
+    ]
+  },
+  "version_matrix": [
+    {
+      "version_id": "sdxl-base-1.0",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "role": "cerebro de generación principal"
+      },
+      "params_overrides": {
+        "guidance": "Diffusers def 5.0; paper figs 8.0 (C05)",
+        "steps": "def 50"
+      },
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "version_id": "sdxl-refiner-1.0",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "role": "módulo opcional ensemble; especializa ruido bajo"
+      },
+      "params_overrides": {
+        "ensemble_typical": "high_noise_frac=0.8 / denoising_end 0.8"
+      },
+      "prompting_overrides": {
+        "aesthetic_scores_in_demos": true
+      },
+      "evidence": [
+        "A",
+        "B",
+        "C"
+      ]
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "sdxl-base-1.0",
+      "hf_or_repo": "stabilityai/stable-diffusion-xl-base-1.0",
+      "files": [],
+      "params_count": "UNet ~2.6B (+ encoders ~817M)",
+      "license": null,
+      "quantization": null,
+      "version_id": "sdxl-base-1.0",
+      "notes": "solo pesos oficiales base"
+    },
+    {
+      "id": "sdxl-refiner-1.0",
+      "hf_or_repo": "stabilityai/stable-diffusion-xl-refiner-1.0",
+      "files": [],
+      "params_count": null,
+      "license": null,
+      "quantization": null,
+      "version_id": "sdxl-refiner-1.0",
+      "notes": "refiner opcional"
+    }
+  ],
+  "lora_policy": {
+    "compat_matrix": [],
+    "retrain_rules": [],
+    "scale_ranges": "fuera del cerebro base — LoRA no pertenece al cerebro SDXL",
+    "explicit_non_brain": [
+      "LoRAs",
+      "finetunes RealVis/Juggernaut/etc.",
+      "ControlNet",
+      "IP-Adapter",
+      "Textual Inversion"
+    ]
+  },
+  "workflow_adapter_hints": {
+    "endpoint_or_pipeline_families": [
+      "Diffusers StableDiffusionXLPipeline",
+      "Stability generative-models demos",
+      "UIs StableSwarmUI/A1111/Comfy (solo evidencia de sintaxis UI — no cerebro)"
+    ],
+    "abstract_to_api_fields": {
+      "prompt": "prompt",
+      "prompt_2": "prompt_2",
+      "negative_prompt": "negative_prompt",
+      "negative_prompt_2": "negative_prompt_2",
+      "guidance": "guidance_scale",
+      "steps": "num_inference_steps",
+      "ensemble": "denoising_end / denoising_start",
+      "size": "height / width",
+      "guidance_rescale": "guidance_rescale"
+    },
+    "abstract_to_node_roles": {
+      "text_encode": "CLIP-L + OpenCLIP-bigG",
+      "sample": "UNet base (+ refiner opcional)",
+      "decode": "VAE SDXL"
+    },
+    "backend_notes": [
+      "C05: CFG default 5 Diffusers vs 8 paper — ambos documentados",
+      "UI weighting (word:1.2) → adapter/UI, no model_brain",
+      "aesthetic_score del refiner en demos = condicionamiento documentado, no grafo Comfy"
+    ],
+    "do_not_embed_here": [
+      "grafos Comfy",
+      "elegir LoRA/finetune",
+      "checklist booru inventada"
+    ]
+  },
+  "open_questions": [
+    {
+      "id": "H06",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "model_profile.json ausente antes de esta conversión."
+    },
+    {
+      "id": "H07",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Booru-style / orden de tokens / poses / expresiones / lighting checklist oficial.",
+      "impact": "Control fino de Interpretación"
+    },
+    {
+      "id": "H08",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Magnitudes óptimas de negative por dominio.",
+      "impact": "Política negatives"
+    },
+    {
+      "id": "C05",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Diffusers guidance_scale default 5.0 vs paper cfg-scale 8.0 / 50 DDIM.",
+      "impact": "Default «oficial» ambiguo — ambos documentados como rango"
+    }
+  ]
+}

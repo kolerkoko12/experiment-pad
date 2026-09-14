@@ -1,0 +1,58 @@
+{
+  "byType": {
+    "scene": {
+      "obvious": ["lived-in details in the corners", "air you can almost feel"],
+      "unusual": [
+        "a clock that has stopped",
+        "one window brighter than the others",
+        "a smell of ozone just after rain"
+      ]
+    },
+    "character": {
+      "obvious": ["a private expression", "weight settled in the hips"],
+      "unusual": ["a laugh caught halfway", "eyes tracking something we cannot see", "one earring missing"]
+    },
+    "physique": {
+      "obvious": ["believable weight in the flesh", "skin catching the key light"],
+      "unusual": ["a fading bruise", "goosebumps on the forearm", "sleep lines still on the cheek"]
+    },
+    "clothing": {
+      "obvious": ["fabric with real drape", "seams catching light"],
+      "unusual": ["one button in the wrong hole", "a thread pulling at the hem", "lipstick on the cuff"]
+    },
+    "pose": {
+      "obvious": ["natural weight shift", "breath visible in the ribs"],
+      "unusual": ["fingers mid-decision", "a heel just leaving the floor", "chin arguing with the gaze"]
+    },
+    "object": {
+      "obvious": ["held like it has history", "catchlight on the surface"],
+      "unusual": ["slightly too important", "fogging with a fingerprint", "about to be set down"]
+    },
+    "action": {
+      "obvious": ["the gesture unfinished", "timing just after the peak"],
+      "unusual": ["doing it for themselves, not the lens", "almost stopping", "a second action starting"]
+    },
+    "camera": {
+      "obvious": ["focus on the nearest eye", "background falling off honestly"],
+      "unusual": ["a hair in the gate", "flare from a practical we cannot see", "the horizon a degree drunk"]
+    },
+    "lighting": {
+      "obvious": ["motivated by a visible source", "shadows that wrap"],
+      "unusual": ["a stray bounce from a phone", "one practical dying", "light as if someone just opened a door"]
+    }
+  },
+  "byOption": {
+    "moonlit-penthouse": {
+      "obvious": ["city flicker on wet glass", "cold air on bare skin"],
+      "unusual": ["a neighbor's TV tinting the railing", "sirens far below like weather"]
+    },
+    "velvet-suite": {
+      "obvious": ["lamp spill on rumpled velvet", "curtain breathing"],
+      "unusual": ["the minibar light still on", "a do-not-disturb sign hanging crooked"]
+    },
+    "35mm-cine": {
+      "obvious": ["gentle grain in the shadows", "rim just kissing the cheek"],
+      "unusual": ["the focus hunts for a breath", "a scratch on the emulsion"]
+    }
+  }
+}

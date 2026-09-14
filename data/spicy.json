@@ -1,0 +1,46 @@
+{
+  "levels": [
+    { "id": 0, "label": "Neutro", "prompt": "" },
+    {
+      "id": 1,
+      "label": "Picante 1",
+      "prompt": "charged sexual tension, suggestive but not explicit"
+    },
+    {
+      "id": 2,
+      "label": "Picante 2",
+      "prompt": "overtly sexual situation, heat in the body language, adult atmosphere"
+    },
+    {
+      "id": 3,
+      "label": "Picante 3",
+      "prompt": "explicit sexual situation, unapologetic adult content, raw desire"
+    }
+  ],
+  "exaggeration": {
+    "body": [
+      "",
+      "subtle emphasis on body volume and skin",
+      "strong body exaggeration, heightened curves and presence",
+      "extreme body exaggeration, stylized and larger-than-life anatomy"
+    ],
+    "scene": [
+      "",
+      "slightly heightened setting mood and light",
+      "dramatic scene exaggeration, denser atmosphere",
+      "extreme scenic exaggeration, operatic light and space"
+    ]
+  },
+  "extras": {
+    "futanari": {
+      "label": "Futanari (gancho)",
+      "prompt": "",
+      "hook": true
+    },
+    "fluids": {
+      "label": "Fluidos (gancho)",
+      "prompt": "",
+      "hook": true
+    }
+  }
+}

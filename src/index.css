@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", "Times New Roman", serif;
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --color-ink: #100e0c;
+  --color-paper: #f4efe6;
+  --color-background: #100e0c;
+  --color-foreground: #f4efe6;
+  --color-card: #1a1714;
+  --color-card-foreground: #f4efe6;
+  --color-popover: #161310;
+  --color-popover-foreground: #f4efe6;
+  --color-primary: #f4efe6;
+  --color-primary-foreground: #100e0c;
+  --color-secondary: #2a241e;
+  --color-secondary-foreground: #f4efe6;
+  --color-muted: #2a241e;
+  --color-muted-foreground: #b9b0a4;
+  --color-accent: #2dd4bf;
+  --color-accent-foreground: #100e0c;
+  --color-destructive: #e11d48;
+  --color-border: rgb(255 255 255 / 0.1);
+  --color-input: #221e19;
+  --color-ring: #2dd4bf;
+  --radius-lg: 1.25rem;
+  --radius-md: 0.9rem;
+  --radius-sm: 0.65rem;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+.app-shell {
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(251, 113, 133, 0.16), transparent 50%),
+    radial-gradient(900px 420px at 110% 8%, rgba(45, 212, 191, 0.12), transparent 46%),
+    linear-gradient(180deg, #161310 0%, #100e0c 40%, #0c0b09 100%);
+}
+
+.studio-main {
+  width: 100%;
+  max-width: 36rem;
+  margin-inline: auto;
+}
+
+.lora-dock {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .studio-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 36rem) 22.5rem;
+    justify-content: center;
+    gap: 1rem;
+    padding-inline: 0.75rem;
+  }
+
+  .studio-main {
+    max-width: none;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .lora-dock {
+    display: flex;
+    position: sticky;
+    top: 0.75rem;
+    height: calc(100dvh - 1.5rem);
+    border: 1px solid var(--color-border);
+    border-radius: 1.5rem;
+    background: rgba(22, 19, 16, 0.92);
+    overflow: hidden;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+}
+
+select,
+button,
+input {
+  font: inherit;
+}

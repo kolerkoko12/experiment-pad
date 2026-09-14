@@ -1,0 +1,44 @@
+{
+  "terms": [
+    {
+      "id": "lora",
+      "term": "LoRA",
+      "text": "Archivo pequeño que empuja un estilo o un cuerpo. En este panel, Incluir solo pega sus triggers en el texto; Mage tiene que tener el archivo cargado."
+    },
+    {
+      "id": "trigger",
+      "term": "Trigger",
+      "text": "Palabra o cláusula que activa el LoRA. Es lo que entra en el export, no toda la ficha."
+    },
+    {
+      "id": "keyword",
+      "term": "Keyword",
+      "text": "Etiqueta humana para copiar o buscar. A veces coincide con el trigger; a veces es más clara."
+    },
+    {
+      "id": "peso",
+      "term": "Peso",
+      "text": "Fuerza del LoRA en Mage (0–1 típico). Bajo = toque, medio = punto de partida, alto = arriesga distorsión."
+    },
+    {
+      "id": "imported",
+      "term": "Importada",
+      "text": "LoRA que marcaste como tuya (checkpoint o archivo que ya usas en Mage). Va arriba del catálogo."
+    },
+    {
+      "id": "promptbox",
+      "term": "Promptbox",
+      "text": "Caja de texto de Mage. Este modo copia el prompt en líneas, más fácil de pegar y editar allí."
+    },
+    {
+      "id": "spicy",
+      "term": "Picante",
+      "text": "Nivel de sexualidad de la situación (1–3). No cambia los bloques; añade una cláusula al export. Beta."
+    },
+    {
+      "id": "exaggeration",
+      "term": "Exageración",
+      "text": "Intensidad sobre cuerpo o escena. Los tramos grises del prompt son tocables: el color marca cuánto empujas. Beta."
+    }
+  ]
+}

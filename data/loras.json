@@ -1,0 +1,606 @@
+{
+  "version": 3,
+  "note": "source=imported|catalog. examplesUrl solo si es la ficha exacta del LoRA, nunca un índice genérico.",
+  "loras": [
+    {
+      "id": "imported-character-a",
+      "name": "Mi personaje A (importada)",
+      "placeholder": true,
+      "source": "imported",
+      "category": "Personaje",
+      "categoryColor": "#FB7185",
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus",
+        "flux"
+      ],
+      "description": "Hueco para TU LoRA de personaje ya cargada en Mage. Destaca arriba porque es importada.",
+      "keywords": [
+        "character consistency",
+        "same face"
+      ],
+      "triggers": [
+        "ohwx person"
+      ],
+      "weight": {
+        "low": 0.55,
+        "mid": 0.75,
+        "high": 0.95,
+        "notes": {
+          "low": "Si ya hay referencia de Characters.",
+          "mid": "Serie corta.",
+          "high": "Puede congelar la ropa. Baja si ignora el bloque Ropa."
+        }
+      },
+      "tip": "Sustituye el trigger ohwx por el tuyo. examplesUrl solo si tienes la ficha exacta del LoRA.",
+      "strengths": [
+        "personaje",
+        "serie"
+      ],
+      "tags": [
+        "editorial",
+        "contemporary"
+      ]
+    },
+    {
+      "id": "imported-style-look",
+      "name": "Mi look de casa (importada)",
+      "placeholder": true,
+      "source": "imported",
+      "category": "Estilo",
+      "categoryColor": "#2DD4BF",
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus"
+      ],
+      "description": "LoRA de estilo que ya usas. No es el catálogo genérico: va primero.",
+      "keywords": [
+        "house look",
+        "signature grade"
+      ],
+      "triggers": [
+        "myhouse look"
+      ],
+      "weight": {
+        "low": 0.35,
+        "mid": 0.55,
+        "high": 0.8,
+        "notes": {
+          "low": "Solo un tinte.",
+          "mid": "Look reconocible.",
+          "high": "Come el escenario."
+        }
+      },
+      "tip": "Cambia name/triggers en data/loras.json. Sin URL genérica de Civitai.",
+      "strengths": [
+        "estilo",
+        "color"
+      ],
+      "tags": [
+        "cinematic",
+        "editorial"
+      ]
+    },
+    {
+      "id": "skin-microdetail",
+      "name": "Skin micro-detail",
+      "placeholder": true,
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus"
+      ],
+      "description": "Microdetalle de piel para retratos fotoreal. No cambia el rostro: solo textura y poros.",
+      "keywords": [
+        "detailed skin",
+        "visible pores",
+        "subsurface skin"
+      ],
+      "triggers": [
+        "skindetail",
+        "detailed skin texture"
+      ],
+      "weight": {
+        "low": 0.4,
+        "mid": 0.6,
+        "high": 0.85,
+        "notes": {
+          "low": "Toque. Evita piel de plástico.",
+          "mid": "Punto de partida en Mage.",
+          "high": "Si la piel se lava. Puede marcar demasiado."
+        }
+      },
+      "tip": "No combines dos LoRAs de piel. Si ya anclaste Complexión “piel mojada”, baja a 0.45.",
+      "strengths": [
+        "retratos",
+        "fotoreal"
+      ],
+      "tags": [
+        "intimate",
+        "editorial",
+        "close",
+        "portrait"
+      ],
+      "category": "Piel",
+      "categoryColor": "#FBBF24",
+      "source": "catalog"
+    },
+    {
+      "id": "cinematic-grain",
+      "name": "Cinematic grain",
+      "placeholder": true,
+      "baseModels": [
+        "sdxl",
+        "flux"
+      ],
+      "description": "Grano de still de cine. Sirve cuando Cámara ya pide 35mm y el resultado sale digital-limpio.",
+      "keywords": [
+        "film grain",
+        "35mm still",
+        "cinema grain"
+      ],
+      "triggers": [
+        "cinematic film grain",
+        "35mm grain"
+      ],
+      "weight": {
+        "low": 0.25,
+        "mid": 0.45,
+        "high": 0.7,
+        "notes": {
+          "low": "Grano apenas visible.",
+          "mid": "Look de still sin comer detalle.",
+          "high": "Noche / flash duro. Baja si ya hay grain en Cámara."
+        }
+      },
+      "tip": "Si anclaste Cámara con grain, no subas de 0.35. En Flux el trigger funciona como prosa.",
+      "strengths": [
+        "still de cine",
+        "noche"
+      ],
+      "tags": [
+        "cinematic",
+        "night",
+        "raw"
+      ],
+      "category": "Cine",
+      "categoryColor": "#38BDF8",
+      "source": "catalog"
+    },
+    {
+      "id": "wardrobe-silk",
+      "name": "Silk / wet fabric",
+      "placeholder": true,
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus",
+        "pony-import"
+      ],
+      "description": "Tejidos mojados, seda y sheer. Útil cuando Ropa está anclada a vestido transparente o camisa empapada.",
+      "keywords": [
+        "wet silk",
+        "sheer fabric",
+        "clinging dress"
+      ],
+      "triggers": [
+        "wet silk",
+        "translucent fabric"
+      ],
+      "weight": {
+        "low": 0.45,
+        "mid": 0.65,
+        "high": 0.9,
+        "notes": {
+          "low": "Brillo de tela, sin forzar.",
+          "mid": "Seda / lluvia típica.",
+          "high": "Adulto / cling extremo. Revisa manos y pliegues."
+        }
+      },
+      "tip": "Empareja con bloques Ropa mojada. En Pony el peso alto empuja anatomía; bájalo si distorsiona.",
+      "strengths": [
+        "ropa",
+        "adulto"
+      ],
+      "tags": [
+        "sheer",
+        "water",
+        "rain",
+        "intimate",
+        "luxury"
+      ],
+      "category": "Tela",
+      "categoryColor": "#C4B5FD",
+      "source": "catalog"
+    },
+    {
+      "id": "hands-helper",
+      "name": "Hands helper",
+      "placeholder": true,
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus",
+        "flux"
+      ],
+      "description": "Apoya manos y dedos cuando el gesto es importante (vaso, cerilla, barandilla).",
+      "keywords": [
+        "detailed hands",
+        "correct fingers",
+        "natural nails"
+      ],
+      "triggers": [
+        "detailed hands",
+        "five fingers"
+      ],
+      "weight": {
+        "low": 0.3,
+        "mid": 0.5,
+        "high": 0.75,
+        "notes": {
+          "low": "Solo si Flux ya va bien.",
+          "mid": "SDXL con objeto en la mano.",
+          "high": "Casi nunca. Puede rigidizar el gesto."
+        }
+      },
+      "tip": "No sustituye un buen bloque Objeto. Ancla el objeto y deja este LoRA en medio.",
+      "strengths": [
+        "manos",
+        "objetos"
+      ],
+      "tags": [
+        "still",
+        "editorial",
+        "close"
+      ],
+      "category": "Anatomía",
+      "categoryColor": "#FB923C",
+      "source": "catalog"
+    },
+    {
+      "id": "analog-film-still",
+      "name": "Analog film still",
+      "placeholder": true,
+      "baseModels": [
+        "sdxl",
+        "chroma",
+        "flux"
+      ],
+      "description": "Look de negativo analógico: color un poco corrido, halación suave. No es un filtro Instagram.",
+      "keywords": [
+        "analog film",
+        "halation",
+        "portra color"
+      ],
+      "triggers": [
+        "analog film still",
+        "portra 400"
+      ],
+      "weight": {
+        "low": 0.35,
+        "mid": 0.55,
+        "high": 0.8,
+        "notes": {
+          "low": "Color apenas caliente.",
+          "mid": "Still de cine doméstico.",
+          "high": "Nostalgia fuerte; puede lavar negros."
+        }
+      },
+      "tip": "Combina mal con flash duro + grain alto. Elige uno de los dos looks.",
+      "strengths": [
+        "color",
+        "cine"
+      ],
+      "tags": [
+        "cinematic",
+        "editorial",
+        "day",
+        "intimate"
+      ],
+      "category": "Cine",
+      "categoryColor": "#38BDF8",
+      "source": "catalog"
+    },
+    {
+      "id": "fashion-editorial",
+      "name": "Fashion editorial",
+      "placeholder": true,
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus",
+        "krea-2",
+        "flux"
+      ],
+      "description": "Pose y luz de revista: negativo limpio, ropa como sujeto. No añade un outfit, empuja el framing.",
+      "keywords": [
+        "fashion editorial",
+        "magazine crop",
+        "vogue lighting"
+      ],
+      "triggers": [
+        "fashion editorial",
+        "magazine spread"
+      ],
+      "weight": {
+        "low": 0.4,
+        "mid": 0.6,
+        "high": 0.85,
+        "notes": {
+          "low": "Solo un recorte más limpio.",
+          "mid": "Look de moda sin disfraz.",
+          "high": "Puede ignorar escenario sucio."
+        }
+      },
+      "tip": "Ancla Cámara en tres cuartos o 85mm. Si el escenario es raw (rave, callejón), baja el peso.",
+      "strengths": [
+        "moda",
+        "editorial"
+      ],
+      "tags": [
+        "editorial",
+        "luxury",
+        "elegant",
+        "studio"
+      ],
+      "category": "Moda",
+      "categoryColor": "#FB7185",
+      "source": "catalog"
+    },
+    {
+      "id": "illustrious-line",
+      "name": "Illustrious clean line",
+      "placeholder": true,
+      "baseModels": [
+        "illustrious-import",
+        "sdxl-plus"
+      ],
+      "description": "Línea limpia y ojos nítidos para anime importado. No sirve en Flux prosa.",
+      "keywords": [
+        "clean lineart",
+        "detailed eyes",
+        "anime shading"
+      ],
+      "triggers": [
+        "masterpiece",
+        "detailed eyes",
+        "clean linework"
+      ],
+      "weight": {
+        "low": 0.4,
+        "mid": 0.7,
+        "high": 1,
+        "notes": {
+          "low": "Si el checkpoint ya es nítido.",
+          "mid": "Default anime.",
+          "high": "Solo con Adetailer; puede plastificar."
+        }
+      },
+      "tip": "Usa tags, no frases. PLACEHOLDER: sustituye name por el LoRA real de tu cuenta.",
+      "strengths": [
+        "anime",
+        "caras"
+      ],
+      "tags": [
+        "editorial",
+        "playful"
+      ],
+      "category": "Anime",
+      "categoryColor": "#A3E635",
+      "source": "catalog"
+    },
+    {
+      "id": "pony-anatomy",
+      "name": "Pony anatomy helper",
+      "placeholder": true,
+      "baseModels": [
+        "pony-import"
+      ],
+      "description": "Apoya anatomía adulta en Pony. No inyecta score tags (van en el modelo). PLACEHOLDER.",
+      "keywords": [
+        "natural anatomy",
+        "detailed body",
+        "explicit"
+      ],
+      "triggers": [
+        "score_9",
+        "natural anatomy"
+      ],
+      "weight": {
+        "low": 0.5,
+        "mid": 0.75,
+        "high": 1,
+        "notes": {
+          "low": "Si el checkpoint Pony ya es explícito.",
+          "mid": "Punto habitual de la comunidad.",
+          "high": "Distorsión fácil. Baja si hay manos raras."
+        }
+      },
+      "tip": "Solo con motor Pony. En SDXL genérico no cargará: las keywords se pegan como texto.",
+      "strengths": [
+        "adulto",
+        "anatomía"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "category": "Anatomía",
+      "categoryColor": "#FB923C",
+      "source": "catalog"
+    },
+    {
+      "id": "neon-night-grade",
+      "name": "Neon night grade",
+      "placeholder": true,
+      "baseModels": [
+        "sdxl",
+        "flux",
+        "chroma"
+      ],
+      "description": "Grado teal-magenta / neón húmedo para ciudad de noche. No inventa el escenario.",
+      "keywords": [
+        "neon grade",
+        "teal magenta",
+        "wet asphalt"
+      ],
+      "triggers": [
+        "neon night grade",
+        "cyan magenta lights"
+      ],
+      "weight": {
+        "low": 0.3,
+        "mid": 0.5,
+        "high": 0.75,
+        "notes": {
+          "low": "Solo un virado.",
+          "mid": "Lluvia + ciudad.",
+          "high": "Puede teñir piel. Baja en retrato cercano."
+        }
+      },
+      "tip": "Casa con Escenario urbano/noche. Si anclaste tungsteno íntimo, no lo uses.",
+      "strengths": [
+        "noche",
+        "color"
+      ],
+      "tags": [
+        "urban",
+        "night",
+        "rain",
+        "nightlife",
+        "cinematic"
+      ],
+      "category": "Color",
+      "categoryColor": "#2DD4BF",
+      "source": "catalog"
+    },
+    {
+      "id": "portrait-bokeh",
+      "name": "Portrait bokeh",
+      "placeholder": true,
+      "baseModels": [
+        "sdxl",
+        "flux",
+        "sdxl-plus"
+      ],
+      "description": "Fondo cremoso tipo 85mm. Complementa Cámara retrato; no sustituye la lente en el bloque.",
+      "keywords": [
+        "creamy bokeh",
+        "85mm",
+        "subject isolation"
+      ],
+      "triggers": [
+        "creamy bokeh",
+        "85mm portrait"
+      ],
+      "weight": {
+        "low": 0.3,
+        "mid": 0.5,
+        "high": 0.7,
+        "notes": {
+          "low": "Un poco de aire atrás.",
+          "mid": "Retrato clásico.",
+          "high": "Come el escenario. Evita si el set importa."
+        }
+      },
+      "tip": "Si el bloque Cámara ya dice 85mm, peso bajo. En wide/cenital no tiene sentido.",
+      "strengths": [
+        "retratos",
+        "estudio"
+      ],
+      "tags": [
+        "portrait",
+        "close",
+        "editorial",
+        "intimate"
+      ],
+      "category": "Cámara",
+      "categoryColor": "#38BDF8",
+      "source": "catalog"
+    },
+    {
+      "id": "wet-hair-rain",
+      "name": "Wet hair / rain",
+      "placeholder": true,
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus",
+        "flux",
+        "pony-import"
+      ],
+      "description": "Pelo y piel con lluvia o vapor. Refuerza escenarios de lluvia, onsen o camisa mojada.",
+      "keywords": [
+        "wet hair",
+        "rain droplets",
+        "damp skin"
+      ],
+      "triggers": [
+        "wet hair",
+        "rain soaked"
+      ],
+      "weight": {
+        "low": 0.4,
+        "mid": 0.6,
+        "high": 0.85,
+        "notes": {
+          "low": "Gotas suaves.",
+          "mid": "Lluvia creíble.",
+          "high": "Empapa todo; puede tapar cara."
+        }
+      },
+      "tip": "Ancla Escenario lluvia/vapor. No lo juntes con silk al máximo: elige un tejido dominante.",
+      "strengths": [
+        "lluvia",
+        "pelo"
+      ],
+      "tags": [
+        "rain",
+        "water",
+        "steam",
+        "intimate"
+      ],
+      "category": "Tela",
+      "categoryColor": "#C4B5FD",
+      "source": "catalog"
+    },
+    {
+      "id": "flux-detail-placeholder",
+      "name": "Flux detail (placeholder)",
+      "placeholder": true,
+      "baseModels": [
+        "flux",
+        "flux-2-dev"
+      ],
+      "description": "Recordatorio de detalle en prosa Flux. No es un archivo .safetensors: Mage puede ignorarlo.",
+      "keywords": [
+        "fine texture",
+        "natural detail",
+        "no plastic skin"
+      ],
+      "triggers": [
+        "fine natural detail",
+        "believable materials"
+      ],
+      "weight": {
+        "low": 0.2,
+        "mid": 0.4,
+        "high": 0.6,
+        "notes": {
+          "low": "Una cláusula extra.",
+          "mid": "Si Flux se ve genérico.",
+          "high": "Suele ser ruido. Acorta el prompt en su lugar."
+        }
+      },
+      "tip": "PLACEHOLDER. Cuando Mage publique LoRA Flux 2, cambia name/triggers. Hasta entonces es solo texto.",
+      "strengths": [
+        "fotoreal",
+        "materiales"
+      ],
+      "tags": [
+        "cinematic",
+        "editorial",
+        "contemporary"
+      ],
+      "category": "Detalle",
+      "categoryColor": "#F4EFE6",
+      "source": "catalog"
+    }
+  ]
+}

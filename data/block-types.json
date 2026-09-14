@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "note": "Añade un tipo aquí y su lista en options.json. La UI y el motor los recogen sin reescribir el núcleo.",
+  "types": [
+    {
+      "id": "scene",
+      "label": "Situación / Escenario",
+      "shortLabel": "Escenario",
+      "color": "#2DD4BF",
+      "weight": 1.1,
+      "order": 0,
+      "exportRole": "setting"
+    },
+    {
+      "id": "character",
+      "label": "Personaje",
+      "shortLabel": "Personaje",
+      "color": "#FB7185",
+      "weight": 1.2,
+      "order": 1,
+      "exportRole": "subject"
+    },
+    {
+      "id": "physique",
+      "label": "Complexión / Características",
+      "shortLabel": "Complexión",
+      "color": "#FBBF24",
+      "weight": 1,
+      "order": 2,
+      "exportRole": "body"
+    },
+    {
+      "id": "clothing",
+      "label": "Ropa / Estilo",
+      "shortLabel": "Ropa",
+      "color": "#C4B5FD",
+      "weight": 1,
+      "order": 3,
+      "exportRole": "wardrobe"
+    },
+    {
+      "id": "pose",
+      "label": "Pose",
+      "shortLabel": "Pose",
+      "color": "#A3E635",
+      "weight": 1,
+      "order": 4,
+      "exportRole": "pose"
+    },
+    {
+      "id": "object",
+      "label": "Objeto",
+      "shortLabel": "Objeto",
+      "color": "#FB923C",
+      "weight": 0.85,
+      "order": 5,
+      "exportRole": "prop"
+    },
+    {
+      "id": "action",
+      "label": "Acción",
+      "shortLabel": "Acción",
+      "color": "#F43F5E",
+      "weight": 1,
+      "order": 6,
+      "exportRole": "action"
+    },
+    {
+      "id": "lighting",
+      "label": "Iluminación",
+      "shortLabel": "Luz",
+      "color": "#FDE68A",
+      "weight": 0.85,
+      "order": 7,
+      "exportRole": "light"
+    },
+    {
+      "id": "camera",
+      "label": "Cámara",
+      "shortLabel": "Cámara",
+      "color": "#38BDF8",
+      "weight": 0.9,
+      "order": 8,
+      "exportRole": "camera"
+    }
+  ]
+}

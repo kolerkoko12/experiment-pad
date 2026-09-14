@@ -1,0 +1,577 @@
+{
+  "version": 1,
+  "brains": [
+    {
+      "brain_id": "flux",
+      "family": "FLUX",
+      "modality": "image",
+      "label": "FLUX (FLUX.1 / 1.1 / Tools / Kontext / Krea / FLUX.2)",
+      "negatives": {
+        "supported": false
+      },
+      "prompting_style": "lenguaje natural claro; en klein prosa obligatoria («como novelista»); FLUX.2 además JSON, hex y tipografía entre comillas",
+      "priority_order": [
+        "subject",
+        "action",
+        "style",
+        "context"
+      ],
+      "params": [
+        {
+          "id": "guidance",
+          "label": "Guidance",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "steps",
+          "label": "Steps",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "scheduler_family",
+          "label": "Scheduler Family"
+        },
+        {
+          "id": "shift",
+          "label": "Shift"
+        },
+        {
+          "id": "resolution",
+          "label": "Resolution",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "seed",
+          "label": "Seed"
+        }
+      ],
+      "modes": [
+        "i2i",
+        "t2i"
+      ],
+      "inputs_by_mode": {
+        "i2i": [
+          {
+            "id": "image_ref",
+            "kind": "image",
+            "label": "Imagen de referencia",
+            "required": true
+          },
+          {
+            "id": "character_refs",
+            "kind": "image_multi",
+            "label": "Referencias",
+            "max": 2,
+            "required": false
+          }
+        ],
+        "t2i": []
+      },
+      "dynamic_blocks": [
+        "sujeto + acción",
+        "estilo / medio",
+        "iluminación",
+        "cámara / lente / ángulo",
+        "composición + ratio",
+        "texto entre comillas",
+        "hex #RRGGBB",
+        "JSON estructurado",
+        "reemplazo positivo (anti-negativo)",
+        "etiquetas multi-ref (imagen 1 = …)",
+        "cues de grounding (solo max)",
+        "upsample on/off",
+        "Style:/Mood: al final (tip klein opcional)"
+      ],
+      "capabilities": [
+        "Alta adhesión a prompt NL (FLUX.2 / 1.1)",
+        "Edición multi-referencia y consistencia de personaje (FLUX.2 / Kontext)",
+        "Control color hex + JSON (FLUX.2)",
+        "Tipografía fuerte en flex",
+        "Rango latencia: klein sub-segundo ↔ max máxima calidad",
+        "Grounding web en max",
+        "Fotorealismo + texturas (FLUX.2; Ultra raw; Krea)",
+        "Open weights: schnell Apache, klein 4B Apache, dev/klein9B NCL"
+      ]
+    },
+    {
+      "brain_id": "illustrious",
+      "family": "Illustrious XL",
+      "modality": "image",
+      "label": "Illustrious / Illustrious-XL (familia de checkpoints base)",
+      "negatives": {
+        "supported": true,
+        "examples_v0_1": "worst quality, comic, multiple views, bad quality, low quality, lowres, displeasing, very displeasing, bad anatomy, bad hands, scan artifacts, monochrome, greyscale, signature, twitter username, jpeg artifacts, 2koma, 4koma, guro, extra digits, fewer digits",
+        "examples_api": "worst quality, low quality, lowers, low details, bad quality, poorly drawn, bad anatomy, multiple views, bad hands, blurry, artist sign, weibo username",
+        "examples_v2_0_short": "worst quality, bad quality",
+        "note": "Ejemplos de autor, no negative obligatorio único"
+      },
+      "prompting_style": "híbrido NLP + tags Danbooru; evolución v0.1 tag-first/NLP débil → v1.x híbrido → v1.1/v2.0 NLP reforzado → v3.5 NLP destacado",
+      "priority_order": [
+        "person_count",
+        "character_names",
+        "rating",
+        "general_tags",
+        "artist",
+        "score_range_rating",
+        "year_modifier"
+      ],
+      "params": [
+        {
+          "id": "guidance",
+          "label": "Guidance",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "steps",
+          "label": "Steps",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "scheduler_family",
+          "label": "Scheduler Family",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "shift",
+          "label": "Shift"
+        },
+        {
+          "id": "resolution",
+          "label": "Resolution",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "seed",
+          "label": "Seed"
+        }
+      ],
+      "modes": [
+        "t2i"
+      ],
+      "inputs_by_mode": {
+        "t2i": []
+      },
+      "dynamic_blocks": [
+        "person_count",
+        "character_names",
+        "rating",
+        "general_tags_appearance_pose_expression",
+        "artist_tags",
+        "quality_tags",
+        "year_modifiers",
+        "nlp_prose (v1+)",
+        "composition_framing_tags",
+        "negatives_example_set"
+      ],
+      "capabilities": [
+        "Base SDXL abierta orientada a ilustración con gran cobertura Danbooru + evolución NLP",
+        "Resolución nativa alta (1536² desde v1.0; claims 2K en v3.x)",
+        "Canvas untuned para LoRA/merges (no forzar aesthetic)",
+        "Control fino por quality/year/rating tags + prosa en versiones recientes",
+        "Character/artist understanding con anti-mezcla (paper)",
+        "v2.0: NLP más robusto; less multiple views/nonsense"
+      ]
+    },
+    {
+      "brain_id": "ltx",
+      "family": "LTX (LTX-Video / LTX-2 / 2.3 / 2.5)",
+      "modality": "video",
+      "label": "LTX-Video 0.9.x (silent) → LTX-2 → 2.3 → 2.5 (joint A/V)",
+      "negatives": {
+        "supported": true,
+        "open_weights_diffusers": "soportado como bloque opcional",
+        "policy": "no plantilla obligatoria única"
+      },
+      "prompting_style": "prosa cinematográfica temporal en presente; single-shot ~4–8 frases o screenplay multi-beat",
+      "priority_order": [
+        "shot",
+        "scene",
+        "action",
+        "characters",
+        "camera",
+        "audio"
+      ],
+      "params": [
+        {
+          "id": "guidance",
+          "label": "Guidance",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "steps",
+          "label": "Steps",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "scheduler_family",
+          "label": "Scheduler Family"
+        },
+        {
+          "id": "shift",
+          "label": "Shift"
+        },
+        {
+          "id": "resolution",
+          "label": "Resolution",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "duration_fps",
+          "label": "Duration Fps",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "seed",
+          "label": "Seed"
+        }
+      ],
+      "modes": [
+        "i2v",
+        "t2v"
+      ],
+      "inputs_by_mode": {
+        "i2v": [
+          {
+            "id": "image_ref",
+            "kind": "image",
+            "label": "Imagen de referencia",
+            "required": true
+          }
+        ],
+        "t2v": []
+      },
+      "dynamic_blocks": [
+        "shot_framing",
+        "subject_appearance",
+        "scene_environment",
+        "lighting",
+        "action_timeline",
+        "camera_motion",
+        "audio_ambience",
+        "audio_dialogue",
+        "temporal_markers",
+        "multishot_cuts",
+        "first_frame",
+        "last_frame",
+        "duration_hint",
+        "negative_prompt"
+      ],
+      "capabilities": [
+        "Tiempo-real / más rápida que reproducción en 0.9.x (claim HF)",
+        "Audio-vídeo joint sincronizado desde LTX-2",
+        "T2V + I2V; FLF2V / last frame",
+        "Multishot nativo en 2.5",
+        "Portrait nativo desde 2.3; I2V menos freeze/Ken Burns",
+        "Control cámara vía prompt + enum API",
+        "Distilled 8 steps CFG=1",
+        "Auto-duration 2.5 + prompt enhancer Gemma 4",
+        "API hasta 4K (multi-stage producto)"
+      ]
+    },
+    {
+      "brain_id": "sd35",
+      "family": "Stable Diffusion 3.5",
+      "modality": "image",
+      "label": "Stable Diffusion 3.5 (Large / Large Turbo / Medium)",
+      "negatives": {
+        "supported": true,
+        "policy": "API negative_prompt opcional (advanced, ≤10000 chars). Diffusers ignora negative si guidance_scale < 1. GitHub sd3_infer.py usa neg_cond vacío. Ejemplos oficiales a menudo negative vacío.",
+        "effective_when_cfg_gt_1": true
+      },
+      "prompting_style": "lenguaje natural / prosa descriptiva (oraciones o párrafos)",
+      "priority_order": [],
+      "params": [
+        {
+          "id": "guidance",
+          "label": "Guidance",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "steps",
+          "label": "Steps",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "scheduler_family",
+          "label": "Scheduler Family",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "shift",
+          "label": "Shift"
+        },
+        {
+          "id": "resolution",
+          "label": "Resolution",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "seed",
+          "label": "Seed"
+        }
+      ],
+      "modes": [
+        "t2i"
+      ],
+      "inputs_by_mode": {
+        "t2i": []
+      },
+      "dynamic_blocks": [
+        "sujeto(s) principal(es) y atributos",
+        "acción / pose / interacción",
+        "relaciones espaciales",
+        "escena / entorno / fondo",
+        "composición / encuadre (prosa si se pide)",
+        "cámara / lente / DOF (solo si intención)",
+        "iluminación / color / atmósfera",
+        "estilo / medio",
+        "texto en imagen (cadena exacta; no omitir T5)",
+        "negativos / exclusiones (advanced; CFG>1)",
+        "aspect ratio / resolución objetivo",
+        "variante (Large / Turbo / Medium)",
+        "semilla / reproducibilidad vs exploración",
+        "modo t2i vs i2i (strength)",
+        "longitud prompt / tokens T5 (Medium >256)"
+      ],
+      "capabilities": [
+        "Prompt adherence y tipografía (Large)",
+        "Prompts largos/complejos vía triple encoder",
+        "Spatial reasoning / compositional elements (línea SD3)",
+        "Estilos versátiles (3D, foto, pintura, line art)",
+        "Large Turbo few-step (~4) ADD",
+        "Medium consumer HW (~9.9 GB VRAM excl. encoders) + multi-res + SLG",
+        "QK-normalization facilita fine-tuning"
+      ]
+    },
+    {
+      "brain_id": "sdxl",
+      "family": "Stable Diffusion XL",
+      "modality": "image",
+      "label": "Stable Diffusion XL base 1.0 (+ refiner opcional 1.0)",
+      "negatives": {
+        "supported": true,
+        "via": "CFG (guidance_scale > 1); Diffusers negative_prompt / negative_prompt_2",
+        "force_zeros_for_empty_prompt_default": true,
+        "optimal_magnitudes_by_domain": "REQUIERE INVESTIGACIÓN (H08)"
+      },
+      "prompting_style": "lenguaje natural vía CLIP/OpenCLIP; ejemplos oficiales en prosa inglesa con descriptores de estilo/cámara/calidad",
+      "priority_order": [],
+      "params": [
+        {
+          "id": "guidance",
+          "label": "Guidance",
+          "default": 5.0,
+          "recommended": 5.0,
+          "notes": null
+        },
+        {
+          "id": "steps",
+          "label": "Steps",
+          "default": 50,
+          "recommended": 50,
+          "notes": null
+        },
+        {
+          "id": "scheduler_family",
+          "label": "Scheduler Family",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "shift",
+          "label": "Shift"
+        },
+        {
+          "id": "resolution",
+          "label": "Resolution",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "seed",
+          "label": "Seed"
+        }
+      ],
+      "modes": [
+        "t2i"
+      ],
+      "inputs_by_mode": {
+        "t2i": []
+      },
+      "dynamic_blocks": [
+        "sujeto, acción, atributos, relaciones espaciales",
+        "estilo, iluminación, cámara en prosa",
+        "negative concepts según fallo observado",
+        "uso o no del refiner y high_noise_frac"
+      ],
+      "capabilities": [
+        "Preferencia humana vs SD 1.5/2.1; base+refiner mejor que solo base",
+        "Multi-aspect nativo; micro-conditioning size/crop",
+        "VAE mejorado (PSNR/SSIM/LPIPS/rFID vs SD-VAE 1.x/2.x)",
+        "Refiner opcional mejora detalle local (fondos, caras)",
+        "Competitivo vs Midjourney v5.1 en adherencia (Appendix E; SDXL v0.9 en ese estudio)"
+      ]
+    },
+    {
+      "brain_id": "wan",
+      "family": "Wan / Tongyi Wanxiang (万相)",
+      "modality": "video",
+      "label": "Wan (Wan2.1/2.2 open-source ≠ API Model Studio 2.5/2.6/2.7)",
+      "negatives": {
+        "supported": true,
+        "api": "input.negative_prompt max 500 (2.7)",
+        "diffusers_examples": "artefactos — F, no único oficial"
+      },
+      "prompting_style": "fórmulas temporales Model Studio: Entity + Scene + Motion (+ Aesthetic + Stylization); multi-shot con timestamps",
+      "priority_order": [
+        "entity",
+        "scene",
+        "motion",
+        "aesthetic",
+        "stylization",
+        "sound",
+        "multi_shot_timeline"
+      ],
+      "params": [
+        {
+          "id": "guidance",
+          "label": "Guidance",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "steps",
+          "label": "Steps",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "scheduler_family",
+          "label": "Scheduler Family",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "shift",
+          "label": "Shift",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "resolution",
+          "label": "Resolution",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "duration_fps",
+          "label": "Duration Fps",
+          "default": null,
+          "recommended": null,
+          "notes": null
+        },
+        {
+          "id": "seed",
+          "label": "Seed"
+        }
+      ],
+      "modes": [
+        "i2v",
+        "r2v",
+        "t2v"
+      ],
+      "inputs_by_mode": {
+        "i2v": [
+          {
+            "id": "image_ref",
+            "kind": "image",
+            "label": "Imagen de referencia",
+            "required": true
+          },
+          {
+            "id": "video_ref",
+            "kind": "video",
+            "label": "Vídeo de referencia",
+            "required": false
+          }
+        ],
+        "r2v": [
+          {
+            "id": "image_ref",
+            "kind": "image",
+            "label": "Imagen de referencia",
+            "required": false
+          },
+          {
+            "id": "character_refs",
+            "kind": "image_multi",
+            "label": "Referencias de personaje",
+            "max": 3,
+            "required": false
+          }
+        ],
+        "t2v": []
+      },
+      "dynamic_blocks": [
+        "entity",
+        "scene",
+        "motion",
+        "camera",
+        "lighting_composition_style",
+        "sound_voice_sfx_bgm",
+        "multi_shot_timeline",
+        "r2v_refs",
+        "flf_anchors",
+        "continuation_clip",
+        "driving_audio",
+        "negative_prompt",
+        "prompt_extend"
+      ],
+      "capabilities": [
+        "OS 2.1/2.2 Apache-2.0: T2V/I2V/FLF2V/VACE; MoE/TI2V/S2V/Animate",
+        "API 2.6/2.7 oficiales: hasta 15s, 30 fps, 1080P, audio sync, multi-shot, R2V",
+        "Wan2.7: continuation first_clip, first+last, driving_audio, videoedit NL, prompt 5000 chars",
+        "Prompt guide estructurado temporal",
+        "Texto visual CN+EN en OS",
+        "Control cámara/estética vía vocabulario oficial del guide"
+      ]
+    }
+  ]
+}

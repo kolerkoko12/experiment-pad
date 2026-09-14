@@ -1,0 +1,479 @@
+{
+  "brain_id": "ltx",
+  "family": "LTX (LTX-Video / LTX-2 / 2.3 / 2.5)",
+  "vendor": "Lightricks",
+  "modality": "video",
+  "scope": "model_brain_only",
+  "accessed": "2026-09-14",
+  "sources": [
+    "https://huggingface.co/Lightricks/LTX-Video",
+    "https://huggingface.co/Lightricks/LTX-2",
+    "https://huggingface.co/Lightricks/LTX-2.3",
+    "https://huggingface.co/Lightricks/LTX-2.5",
+    "https://huggingface.co/Lightricks/LTX-2.5-Diffusers",
+    "https://github.com/Lightricks/LTX-Video",
+    "https://github.com/Lightricks/LTX-2",
+    "https://arxiv.org/abs/2501.00103",
+    "https://arxiv.org/html/2601.03233v1",
+    "https://docs.ltx.io/llms.txt",
+    "https://docs.ltx.io/models/ltx-2-3.md",
+    "https://docs.ltx.io/models/ltx-2-5.md",
+    "https://docs.ltx.io/api-documentation/implementation-guides/prompting-guide",
+    "https://docs.ltx.io/api-documentation/api-reference/video-generation/text-to-video.md",
+    "/workspace/informes/ltx-cerebro-14pts.md",
+    "/workspace/informes/ltx-research-dump.md"
+  ],
+  "evidence_policy": {
+    "tags": {
+      "A": "oficial vendor",
+      "B": "paper",
+      "C": "HF card",
+      "D": "blog",
+      "E": "community",
+      "F": "product UI",
+      "G": "secondary",
+      "H": "REQUIERE INVESTIGACIÓN"
+    },
+    "note": "Las letras A–H son SOLO tags de evidencia. Las secciones temáticas (Identidad, Lenguaje…) van como claves semánticas en model_brain, NO como letras A–H.",
+    "adopted": "2026-09-14"
+  },
+  "model_brain": {
+    "identity": {
+      "vendor": "Lightricks",
+      "family_label": "LTX-Video 0.9.x (silent) → LTX-2 → 2.3 → 2.5 (joint A/V)",
+      "what_it_is": "Familia DiT de generación de vídeo. Desarrollo primario actual: monorepo LTX-2. Recomendado actual: LTX-2.5 (22B) con multishot nativo, DiffVAE, Gemma 4 12B, duration head opcional.",
+      "what_it_is_not": [
+        "No es workflow ComfyUI / LTX Desktop como definición del modelo",
+        "No es IC-LoRA depth/pose/canny, Dub-It, upscalers spatial/temporal (companions)",
+        "No es checkpoints cuantizados/mix de terceros como «el» LTX",
+        "0.9.x no tiene audio nativo (no confundir marketing LTX-2+ en READMEs antiguos — C12)",
+        "Prompt enhancer Gemma es opcional de producto, no obligatorio del cerebro"
+      ]
+    },
+    "architecture": {
+      "backbone": "DiT. LTX-2: dual-stream asimétrico ~14B vídeo + ~5B audio (paper); HF etiqueta 19B. LTX-2.3/2.5: 22B. 0.9.x: ~2B–13B silent.",
+      "text_encoders": [
+        {
+          "family": "LTX-2",
+          "encoder": "Gemma 3 + timing tokens"
+        },
+        {
+          "family": "LTX-2.5",
+          "encoder": "Gemma 4 12B"
+        }
+      ],
+      "conditioning": [
+        "prompt temporal presente",
+        "I2V / first-last frames",
+        "audio joint desde LTX-2",
+        "camera_motion API",
+        "multishot 2.5"
+      ],
+      "notes": "Audio → 24 kHz stereo (paper LTX-2). VAE: Video-VAE 0.9.x (1:192 paper); redesigned 2.3; DiffVAE 2.5."
+    },
+    "prompting": {
+      "style": "prosa cinematográfica temporal en presente; single-shot ~4–8 frases o screenplay multi-beat",
+      "priority_order": [
+        "shot",
+        "scene",
+        "action",
+        "characters",
+        "camera",
+        "audio"
+      ],
+      "negative_prompts": {
+        "open_weights_diffusers": "soportado como bloque opcional",
+        "policy": "no plantilla obligatoria única"
+      },
+      "weighting_syntax": null,
+      "temporal_rules": {
+        "tense": "presente",
+        "flow": "cronológico beginning→end",
+        "markers": [
+          "Initially…",
+          "A moment later…",
+          "Simultaneously…",
+          "A beat of silence",
+          "she pauses"
+        ],
+        "multishot_2_5": "nombrar el corte en prosa; re-establecer framing; continuidad identidad/audio; preferir 2–4 shots",
+        "duration_predictor_2_5": "no estira lo no escrito — pedir pausas o fijar duration",
+        "ltxv_0_9": "≤~200 words; Guidance 3–3.5; steps 20–30 velocidad / 40+ calidad"
+      },
+      "official_formulas": [
+        "1 Establish the Shot",
+        "2 Set the Scene",
+        "3 Describe the Action",
+        "4 Define Character(s) — emoción vía señales físicas",
+        "5 Camera Movement(s)",
+        "6 Audio — diálogo entre comillas + idioma/acento"
+      ],
+      "notes": [
+        "No pegar prompts de otros modelos con tag syntax sin reescribir",
+        "Dub-It (companion): [Speaker] is speaking [Language/Accent], saying: \"[Dialogue]\" — EN/FR/ES/DE/RU; single speaker beta",
+        "I2V: imagen ancla «qué hay»; prompt prioriza motion+camera"
+      ]
+    },
+    "params_abstract": {
+      "guidance": {
+        "dev_tip": 4.0,
+        "distilled": 1.0,
+        "ltxv_0_9": "3–3.5",
+        "audio_guidance_example_2_5_distilled": 1.0
+      },
+      "steps": {
+        "dev_tip": 40,
+        "distilled": 8,
+        "stage2_distilled": 3,
+        "ltxv_0_9": "20–30 velocidad / 40+ calidad"
+      },
+      "scheduler_family": "Diffusers / open-weights LTX-2.x (stg_scale / modality scales documentados paper)",
+      "shift": null,
+      "resolution": {
+        "open_weights": "width/height divisibles por 32",
+        "api": "720p / 1080p / 1440p / 4K (landscape y portrait)",
+        "ltxv_0_9_default_tip": "1216×704 @ 30 FPS; best <720×1280 / <257 frames",
+        "portrait_native_from_2_3": "hasta 1080×1920",
+        "native_4k_vs_multistage": "REQUIERE INVESTIGACIÓN (H22)"
+      },
+      "duration_fps": {
+        "num_frames_constraint": "% 8 == 1; tip. 121; omitir → duration head (2.5)",
+        "local_fps_tip": 24.0,
+        "api_fps": "optional def 24; permite 24/25/48/50 según matriz",
+        "api_fast_duration": "hasta 20s en 720p/1080p @ 24/25; high-res y 48/50 → tip. 6/8/10s",
+        "api_pro_duration": "tip. 6, 8, 10 s en 720p–4K",
+        "paper_ltx2_continuous": "hasta ~20s A/V",
+        "github_announce_oct_2025": "hasta 10s — C07 vs paper/API ~20s",
+        "max_frames_local_vs_api": "REQUIERE INVESTIGACIÓN (H21)",
+        "ltxv_0_9_8_claim": "hasta «60 seconds» claim GitHub"
+      },
+      "seed": true,
+      "other": {
+        "generate_audio_default": true,
+        "last_frame_uri_incompatible_with_auto_duration": true,
+        "camera_motion_enum": [
+          "dolly_in",
+          "dolly_out",
+          "dolly_left",
+          "dolly_right",
+          "jib_up",
+          "jib_down",
+          "static",
+          "focus_shift"
+        ]
+      }
+    },
+    "capabilities": [
+      "Tiempo-real / más rápida que reproducción en 0.9.x (claim HF)",
+      "Audio-vídeo joint sincronizado desde LTX-2",
+      "T2V + I2V; FLF2V / last frame",
+      "Multishot nativo en 2.5",
+      "Portrait nativo desde 2.3; I2V menos freeze/Ken Burns",
+      "Control cámara vía prompt + enum API",
+      "Distilled 8 steps CFG=1",
+      "Auto-duration 2.5 + prompt enhancer Gemma 4",
+      "API hasta 4K (multi-stage producto)"
+    ],
+    "limitations": [
+      "Sin factual info; puede amplificar sesgos; match imperfecto de prompt",
+      "Estilo de prompting influye mucho; puede generar contenido inapropiado",
+      "Audio sin speech a menudo peor calidad (cards 2/2.3)",
+      "Paper LTX-2: idiomas uneven; multi-speaker confunde quién habla; >~20s drift/sync; sin world-model",
+      "On-screen text imperfecto (mejorado 2.5, no garantizado); física caótica → artefactos",
+      "LoRAs 2→2.3 reentrenar; retake/extend/reframe en docs ligados a 2.3-pro, no matrix 2.5",
+      "Fast vs Pro pesos internos no documentados (H20)",
+      "0.9.x: sin audio joint; límites res/frames; prompts en inglés"
+    ],
+    "dynamic_blocks": [
+      "shot_framing",
+      "subject_appearance",
+      "scene_environment",
+      "lighting",
+      "action_timeline",
+      "camera_motion",
+      "audio_ambience",
+      "audio_dialogue",
+      "temporal_markers",
+      "multishot_cuts",
+      "first_frame",
+      "last_frame",
+      "duration_hint",
+      "negative_prompt"
+    ],
+    "constraints": {
+      "frames_mod_8_eq_1": true,
+      "resolution_mod_32": true,
+      "distilled_cfg": 1,
+      "last_frame_no_auto_duration": true,
+      "retake_extend_not_in_2_5_matrix": true
+    },
+    "intent_fields": [
+      "intent_mode (T2V/I2V/first-last/extend/multishot/audio)",
+      "variant (0.9.x|2|2.3|2.5)",
+      "quality_tier (fast|pro) si managed",
+      "subject",
+      "scene",
+      "lighting",
+      "action_timeline",
+      "camera",
+      "audio",
+      "continuity",
+      "resolution",
+      "duration",
+      "fps",
+      "negative"
+    ]
+  },
+  "version_matrix": [
+    {
+      "version_id": "ltxv-0.9.x",
+      "status": "legacy",
+      "diffs_vs_family": {
+        "audio_joint": false,
+        "params": "~2B–13B"
+      },
+      "params_overrides": {
+        "guidance": "3–3.5",
+        "steps": "20–30 / 40+",
+        "best": "<720×1280 / <257 frames"
+      },
+      "prompting_overrides": {
+        "language": "inglés",
+        "max_words_tip": "~200"
+      },
+      "evidence": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "version_id": "ltx-2",
+      "status": "legacy",
+      "diffs_vs_family": {
+        "audio_joint": true,
+        "params_hf": "19B",
+        "encoder": "Gemma 3"
+      },
+      "params_overrides": {
+        "distilled": "8 steps CFG=1"
+      },
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "version_id": "ltx-2.3",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "params": "22B",
+        "portrait_native": true,
+        "api": "ltx-2-3-fast/pro",
+        "editing_pro": "retake/extend/reframe"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "B",
+        "F"
+      ]
+    },
+    {
+      "version_id": "ltx-2.5",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "multishot": true,
+        "auto_duration": true,
+        "encoder": "Gemma 4 12B",
+        "vae": "DiffVAE",
+        "api": "ltx-2-5-fast/pro",
+        "no_retake_extend_in_matrix": true
+      },
+      "params_overrides": {},
+      "prompting_overrides": {
+        "multishot_cuts": true
+      },
+      "evidence": [
+        "A",
+        "C",
+        "F"
+      ]
+    },
+    {
+      "version_id": "api-ltx-2-fast-pro",
+      "status": "deprecated",
+      "diffs_vs_family": {
+        "replaced_by": "2.3/2.5 fast/pro"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {},
+      "evidence": [
+        "B",
+        "F"
+      ]
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "ltx-video-0.9.x",
+      "hf_or_repo": "Lightricks/LTX-Video",
+      "files": [],
+      "params_count": "~2B–13B según hito",
+      "license": null,
+      "quantization": null,
+      "version_id": "ltxv-0.9.x",
+      "notes": "silent T2V/I2V"
+    },
+    {
+      "id": "ltx-2-19b-dev",
+      "hf_or_repo": "Lightricks/LTX-2",
+      "files": [
+        "ltx-2-19b-dev / fp8 / fp4 / distilled"
+      ],
+      "params_count": "19B (HF); ~14B+5B paper",
+      "license": null,
+      "quantization": "fp8/fp4 variants",
+      "version_id": "ltx-2",
+      "notes": "upscalers spatial/temporal x2 = companions no cerebro"
+    },
+    {
+      "id": "ltx-2.3-22b-dev",
+      "hf_or_repo": "Lightricks/LTX-2.3",
+      "files": [
+        "ltx-2.3-22b-dev",
+        "distilled / distilled-1.1",
+        "upscalers"
+      ],
+      "params_count": "22B",
+      "license": null,
+      "quantization": null,
+      "version_id": "ltx-2.3",
+      "notes": null
+    },
+    {
+      "id": "ltx-2.5",
+      "hf_or_repo": "Lightricks/LTX-2.5",
+      "files": [],
+      "params_count": "22B",
+      "license": null,
+      "quantization": null,
+      "version_id": "ltx-2.5",
+      "notes": "también LTX-2.5-Diffusers; Fast/Pro internos H20"
+    }
+  ],
+  "lora_policy": {
+    "compat_matrix": [
+      {
+        "from": "LTX-2",
+        "to": "LTX-2.3",
+        "rule": "requieren reentrenamiento (FAQ oficial)"
+      },
+      {
+        "from": "LTX-2.3",
+        "to": "LTX-2.5",
+        "rule": "large majority OK sin cambios (HF); validar en producción"
+      }
+    ],
+    "retrain_rules": [
+      "LoRAs LTX-2 → 2.3: reentrenar"
+    ],
+    "scale_ranges": "REQUIERE INVESTIGACIÓN",
+    "explicit_non_brain": [
+      "IC-LoRA depth/pose/canny",
+      "Dub-It",
+      "HDR IC-LoRA",
+      "upscalers spatial/temporal",
+      "Comfy nodes / int8-convrot packs",
+      "IC-LoRA oficiales HF 2.3/2.5 vs solo producto — H23"
+    ]
+  },
+  "workflow_adapter_hints": {
+    "endpoint_or_pipeline_families": [
+      "API ltx-2-5-fast / ltx-2-5-pro",
+      "API ltx-2-3-fast / ltx-2-3-pro",
+      "API ltx-2-fast / ltx-2-pro (deprecated)",
+      "Diffusers LTX-2.x",
+      "GitHub LTX-2 / LTX-Video configs"
+    ],
+    "abstract_to_api_fields": {
+      "prompt": "prompt",
+      "model": "model (ltx-2-5-fast|pro etc.)",
+      "duration": "duration (nullable solo 2.5 auto)",
+      "resolution": "resolution",
+      "fps": "fps",
+      "generate_audio": "generate_audio",
+      "camera_motion": "camera_motion enum",
+      "last_frame": "last_frame_uri"
+    },
+    "abstract_to_node_roles": {
+      "text_encode": "Gemma 3/4 según versión",
+      "sample": "DiT (+ distilled path)",
+      "decode": "VAE / DiffVAE",
+      "audio": "joint audio stream LTX-2+"
+    },
+    "backend_notes": [
+      "C07: anuncio GitHub Oct 2025 «10s» vs paper/API ~20s",
+      "Matriz duración/FPS/res API 2.3 y 2.5 — capa adapter + params_abstract",
+      "Fast vs Pro: IDs API conocidos; diferencia checkpoint interna H20"
+    ],
+    "do_not_embed_here": [
+      "Comfy graphs",
+      "IC-LoRA recipes",
+      "upscaler stages como prompt",
+      "pipeline multi-stage sigmas como semántica de usuario"
+    ]
+  },
+  "open_questions": [
+    {
+      "id": "H18",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "model_profile.json ausente antes de esta conversión."
+    },
+    {
+      "id": "H19",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Fechas exactas release 2.3 / 2.5 (~2026-03-05 / ~2026-08-11 secundarias).",
+      "impact": "version_matrix temporal"
+    },
+    {
+      "id": "H20",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Diferencia checkpoint interna Fast vs Pro.",
+      "impact": "quality_tier"
+    },
+    {
+      "id": "H21",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Max frames estables open-weights vs API 20s.",
+      "impact": "duration local"
+    },
+    {
+      "id": "H22",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "«Native 4K» entrenamiento vs multi-stage API.",
+      "impact": "resolución nativa"
+    },
+    {
+      "id": "H23",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "IC-LoRA oficiales HF 2.3/2.5 vs solo producto.",
+      "impact": "lora_policy companions"
+    },
+    {
+      "id": "C07",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Anuncio GitHub LTX-2 Oct 2025 «hasta 10s» vs paper/matriz API «hasta ~20s».",
+      "impact": "Cap duración comunicada vs operable"
+    },
+    {
+      "id": "C12",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "README antiguo LTX-Video mezcla claims audio/4K/50fps de LTX-2+ con línea 0.9.x.",
+      "impact": "Riesgo si bot lee README crudo"
+    }
+  ]
+}

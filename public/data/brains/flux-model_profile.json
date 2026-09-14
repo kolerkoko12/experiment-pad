@@ -1,0 +1,573 @@
+{
+  "brain_id": "flux",
+  "family": "FLUX",
+  "vendor": "Black Forest Labs",
+  "modality": "image",
+  "scope": "model_brain_only",
+  "accessed": "2026-09-14",
+  "sources": [
+    "https://docs.bfl.ai/guides/prompting_summary",
+    "https://docs.bfl.ai/guides/prompting_guide_flux2",
+    "https://docs.bfl.ai/guides/prompting_guide_t2i_negative",
+    "https://docs.bfl.ai/flux_2/flux2_overview",
+    "https://docs.bfl.ai/flux_2/flux2_text_to_image",
+    "https://docs.bfl.ai/flux_2/flux2_image_editing",
+    "https://docs.bfl.ai/quick_start/generating_images",
+    "https://api.bfl.ai/openapi.json",
+    "https://github.com/black-forest-labs/flux",
+    "https://github.com/black-forest-labs/flux2",
+    "https://huggingface.co/black-forest-labs/FLUX.1-dev",
+    "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
+    "https://huggingface.co/black-forest-labs/FLUX.1-Kontext-dev",
+    "https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev",
+    "https://huggingface.co/black-forest-labs/FLUX.2-dev",
+    "https://arxiv.org/abs/2506.15742",
+    "/workspace/informes/flux-cerebro-completo.md"
+  ],
+  "evidence_policy": {
+    "tags": {
+      "A": "oficial vendor",
+      "B": "paper",
+      "C": "HF card",
+      "D": "blog",
+      "E": "community",
+      "F": "product UI",
+      "G": "secondary",
+      "H": "REQUIERE INVESTIGACIÓN"
+    },
+    "note": "Las letras A–H son SOLO tags de evidencia. Las secciones temáticas (Identidad, Lenguaje…) van como claves semánticas en model_brain, NO como letras A–H.",
+    "adopted": "2026-09-14"
+  },
+  "model_brain": {
+    "identity": {
+      "vendor": "Black Forest Labs",
+      "family_label": "FLUX (FLUX.1 / 1.1 / Tools / Kontext / Krea / FLUX.2)",
+      "what_it_is": "Familia de generación/edición de imagen basada en flow matching. Cerebro de producción actual recomendado: FLUX.2 (pro/flex/max/klein/dev).",
+      "what_it_is_not": [
+        "No diseña workflows ni elige LoRAs ni fija checkpoints de terceros",
+        "No soporta negative prompts nativos en API BFL",
+        "No define weighting (word:1.2) oficial BFL",
+        "Tools Fill/Expand/Erase/VTO/Video son capacidades de producto/endpoint — marcar alcance; no mezclar con defaults T2I base sin flag",
+        "Stub flux-cerebro.md no es el cerebro (usar flux-cerebro-completo.md)"
+      ]
+    },
+    "architecture": {
+      "backbone": "Flow matching; FLUX.1: hybrid multimodal + parallel DiT ~12B (dev). FLUX.2: variantes klein 4B/9B, pro/flex/max, dev ~32B (blog).",
+      "text_encoders": [
+        {
+          "family": "FLUX.1",
+          "encoders": "CLIP+T5"
+        },
+        {
+          "family": "FLUX.2 pro/max/flex/dev",
+          "encoders": "Mistral-Small-3.2-24B"
+        },
+        {
+          "family": "FLUX.2 klein",
+          "encoders": "Qwen3"
+        }
+      ],
+      "conditioning": [
+        "prompt NL",
+        "multi-ref input images (según variante)",
+        "JSON estructurado FLUX.2",
+        "hex colors",
+        "quoted typography"
+      ],
+      "notes": "Resolución FLUX.1 ~0.1–2.0 MP; FLUX.2 múltiplos de 16, máx ~4MP, recom. ≤2MP. Kontext ~1MP."
+    },
+    "prompting": {
+      "style": "lenguaje natural claro; en klein prosa obligatoria («como novelista»); FLUX.2 además JSON, hex y tipografía entre comillas",
+      "priority_order": [
+        "subject",
+        "action",
+        "style",
+        "context"
+      ],
+      "negative_prompts": false,
+      "weighting_syntax": null,
+      "official_formulas": [
+        "Plantilla componentes BFL: tipo de imagen → sujeto → lugar → estilo → cámara → iluminación → colores → efecto → elementos adicionales",
+        "JSON FLUX.2: scene, subjects[{description,position,action}], style, color_palette, lighting, mood, background, composition, camera{angle,lens,depth_of_field,…}",
+        "Positive reframing obligatorio (no «without X»)"
+      ],
+      "notes": [
+        "Longitud práctica FLUX.2: short 10–30 / medium 30–80 / long 80–300+; hasta 32K tokens en docs; más palabras ≠ mejor",
+        "Tipografía: comillas + ubicación + estilo de fuente; flex especializado",
+        "Hex #RRGGBB ligado a objeto concreto",
+        "Upsampling: pro/max ON (disable_pup); flex prompt_upsampling def true; klein ninguno",
+        "Kontext/edición: decir qué cambia; preservar explícitamente; verbos concretos",
+        "Multilingüe soportado; inglés suele ser más preciso",
+        "Evitar spam quality tokens; máx 1–2 cues de realismo",
+        "Diffusers FLUX.1: negative_prompt solo si true_cfg_scale>1 — no camino BFL API",
+        "(word:1.2) en API BFL como texto literal → empírico H03"
+      ]
+    },
+    "params_abstract": {
+      "guidance": {
+        "flux2_flex": "1.5–10 def 5",
+        "flux1_dev_api": "1.5–5 def 3",
+        "flux2_pro_max_klein_api": "no expuesto (distilled/fixed)",
+        "fill_expand": "1.5–100 def 60 (escala distinta a Dev — no reutilizar)",
+        "schnell_local": "guidance_scale=0.0"
+      },
+      "steps": {
+        "flux2_flex": "1–50 def 50",
+        "flux1_dev_api": "1–50 def 28",
+        "flux2_klein": "distilled ~4 (no expuesto API)",
+        "schnell_local": "1–4",
+        "fill_expand": "15–50 def 50",
+        "flux2_pro_max_api": "no expuesto"
+      },
+      "scheduler_family": "flow matching (familia)",
+      "shift": null,
+      "resolution": {
+        "flux2": "múltiplos de 16; máx ~4MP; recom. ≤2MP; W/H min 64; default 0 → H02",
+        "flux1_dev": "W/H 256–1440 ×32 def 1024×768",
+        "ultra": "aspect_ratio (def 16:9); hasta ~4MP",
+        "kontext": "aspect_ratio ~1MP"
+      },
+      "seed": "seed para reproducibilidad",
+      "other": {
+        "safety_tolerance_flux2": "0–5 def 2",
+        "safety_tolerance_flux1_kontext": "0–6",
+        "upsample_pro_max": "ON por defecto",
+        "upsample_klein": "ausente",
+        "multi_ref": "≤4 klein; ≤8 API / ≤10 playground (pro/flex/max)"
+      }
+    },
+    "capabilities": [
+      "Alta adhesión a prompt NL (FLUX.2 / 1.1)",
+      "Edición multi-referencia y consistencia de personaje (FLUX.2 / Kontext)",
+      "Control color hex + JSON (FLUX.2)",
+      "Tipografía fuerte en flex",
+      "Rango latencia: klein sub-segundo ↔ max máxima calidad",
+      "Grounding web en max",
+      "Fotorealismo + texturas (FLUX.2; Ultra raw; Krea)",
+      "Open weights: schnell Apache, klein 4B Apache, dev/klein9B NCL"
+    ],
+    "limitations": [
+      "Sin negative prompts nativos API BFL",
+      "Sin weighting oficial (word:1.2)",
+      "pro/max/klein API: sin knobs steps/guidance (solo flex)",
+      "klein: sin upsample → prompts cortos insuficientes",
+      "Kontext ~1MP; legado frente a FLUX.2",
+      "Upsample por defecto en pro/max puede alterar prompts cortos/literales",
+      "Depth/Canny API deprecados",
+      "Schnell / FLUX.2 [dev] no hosted en OpenAPI actual",
+      "Moderación safety_tolerance / Request/Content Moderated",
+      "Multi-turn excesivo en Kontext → artefactos"
+    ],
+    "dynamic_blocks": [
+      "sujeto + acción",
+      "estilo / medio",
+      "iluminación",
+      "cámara / lente / ángulo",
+      "composición + ratio",
+      "texto entre comillas",
+      "hex #RRGGBB",
+      "JSON estructurado",
+      "reemplazo positivo (anti-negativo)",
+      "etiquetas multi-ref (imagen 1 = …)",
+      "cues de grounding (solo max)",
+      "upsample on/off",
+      "Style:/Mood: al final (tip klein opcional)"
+    ],
+    "constraints": {
+      "no_native_negatives_bfl_api": true,
+      "positive_reframing_required": true,
+      "resolution_flux2_multiple_of": 16,
+      "resolution_flux1_dev_multiple_of": 32,
+      "recommended_default_variant": "flux-2-pro-preview"
+    },
+    "intent_fields": [
+      "task",
+      "quality_tier",
+      "reproducibility",
+      "prompt_text",
+      "exact_prompt",
+      "references",
+      "mask",
+      "canvas",
+      "detail_control",
+      "natural_look",
+      "remix_strength",
+      "seed",
+      "safety",
+      "output_format",
+      "grounding",
+      "expand_px"
+    ]
+  },
+  "version_matrix": [
+    {
+      "version_id": "flux2-pro",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "upsample": "ON (disable_pup)",
+        "multi_ref": "≤8 API",
+        "steps_guidance_api": false
+      },
+      "params_overrides": {},
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "F"
+      ]
+    },
+    {
+      "version_id": "flux2-max",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "grounding": true,
+        "upsample": "ON"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "F"
+      ]
+    },
+    {
+      "version_id": "flux2-flex",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "exposes_steps_guidance": true,
+        "typography_focus": true
+      },
+      "params_overrides": {
+        "steps": "1–50 def 50",
+        "guidance": "1.5–10 def 5",
+        "prompt_upsampling": true
+      },
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "F"
+      ]
+    },
+    {
+      "version_id": "flux2-klein",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "no_upsample": true,
+        "multi_ref": "≤4",
+        "encoder": "Qwen3",
+        "distilled_steps": "~4"
+      },
+      "params_overrides": {
+        "steps_guidance_api": false
+      },
+      "prompting_overrides": {
+        "style": "prosa obligatoria"
+      },
+      "evidence": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "version_id": "flux2-dev",
+      "status": "open_weights",
+      "diffs_vs_family": {
+        "hosted_api": false,
+        "params_blog": "~32B"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "version_id": "flux1-dev",
+      "status": "legacy",
+      "diffs_vs_family": {
+        "encoder": "CLIP+T5",
+        "api": "/v1/flux-dev"
+      },
+      "params_overrides": {
+        "steps": "def 28",
+        "guidance": "def 3",
+        "safety": "0–6"
+      },
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "F"
+      ]
+    },
+    {
+      "version_id": "flux1-schnell",
+      "status": "open_weights",
+      "diffs_vs_family": {
+        "hosted_openapi": false,
+        "license": "Apache-2.0"
+      },
+      "params_overrides": {
+        "steps": "1–4",
+        "guidance_scale": 0.0,
+        "max_sequence_length": "≤256"
+      },
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "C",
+        "G"
+      ]
+    },
+    {
+      "version_id": "flux1.1-pro",
+      "status": "legacy",
+      "diffs_vs_family": {
+        "faster_than_flux1_pro": "~6×"
+      },
+      "params_overrides": {
+        "steps_guidance_api": false,
+        "safety": "0–6"
+      },
+      "prompting_overrides": {},
+      "evidence": [
+        "A"
+      ]
+    },
+    {
+      "version_id": "flux1.1-ultra",
+      "status": "legacy",
+      "diffs_vs_family": {
+        "up_to_4mp": true,
+        "raw": true
+      },
+      "params_overrides": {
+        "aspect_ratio_def": "16:9",
+        "image_prompt_strength": "0–1 def 0.1"
+      },
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "F"
+      ]
+    },
+    {
+      "version_id": "flux1-kontext",
+      "status": "legacy",
+      "diffs_vs_family": {
+        "role": "T2I+edit unificado; previous-gen; recomendar FLUX.2"
+      },
+      "params_overrides": {
+        "~1MP": true,
+        "safety": "0–6"
+      },
+      "prompting_overrides": {
+        "edit": "decir qué cambia; preservar"
+      },
+      "evidence": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "version_id": "flux1-krea-dev",
+      "status": "open_weights",
+      "diffs_vs_family": {
+        "aesthetic": "anti AI look / fotorealismo opinionado"
+      },
+      "params_overrides": {},
+      "prompting_overrides": {},
+      "evidence": [
+        "A"
+      ]
+    },
+    {
+      "version_id": "flux1-tools-fill-expand",
+      "status": "api_only",
+      "diffs_vs_family": {
+        "guidance_scale_different": "def 60"
+      },
+      "params_overrides": {
+        "steps": "15–50 def 50",
+        "guidance": "1.5–100 def 60"
+      },
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "F"
+      ]
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "flux1-dev",
+      "hf_or_repo": "black-forest-labs/FLUX.1-dev",
+      "files": [],
+      "params_count": "~12B",
+      "license": "NCL",
+      "quantization": null,
+      "version_id": "flux1-dev",
+      "notes": "open-weight guidance-distilled"
+    },
+    {
+      "id": "flux1-schnell",
+      "hf_or_repo": "black-forest-labs/FLUX.1-schnell",
+      "files": [],
+      "params_count": null,
+      "license": "Apache-2.0",
+      "quantization": null,
+      "version_id": "flux1-schnell",
+      "notes": "local; no OpenAPI BFL hosted"
+    },
+    {
+      "id": "flux1-kontext-dev",
+      "hf_or_repo": "black-forest-labs/FLUX.1-Kontext-dev",
+      "files": [],
+      "params_count": null,
+      "license": null,
+      "quantization": null,
+      "version_id": "flux1-kontext",
+      "notes": null
+    },
+    {
+      "id": "flux1-krea-dev",
+      "hf_or_repo": "black-forest-labs/FLUX.1-Krea-dev",
+      "files": [],
+      "params_count": null,
+      "license": null,
+      "quantization": null,
+      "version_id": "flux1-krea-dev",
+      "notes": null
+    },
+    {
+      "id": "flux2-dev",
+      "hf_or_repo": "black-forest-labs/FLUX.2-dev",
+      "files": [],
+      "params_count": "~32B (blog)",
+      "license": null,
+      "quantization": null,
+      "version_id": "flux2-dev",
+      "notes": "sin API hosted pública"
+    },
+    {
+      "id": "flux2-klein",
+      "hf_or_repo": "BFL klein open weights (4B/9B citados)",
+      "files": [],
+      "params_count": "4B/9B",
+      "license": "4B Apache; 9B NCL (según informe)",
+      "quantization": null,
+      "version_id": "flux2-klein",
+      "notes": "H04 inventario sistemático incompleto"
+    }
+  ],
+  "lora_policy": {
+    "compat_matrix": [],
+    "retrain_rules": [],
+    "scale_ranges": "fuera de alcance del cerebro (no elige LoRAs)",
+    "explicit_non_brain": [
+      "LoRAs de terceros",
+      "finetune endpoints producto (conflicto deprecated vs live — C10)"
+    ]
+  },
+  "workflow_adapter_hints": {
+    "endpoint_or_pipeline_families": [
+      "/v1/flux-2-* (pro/max/flex/klein)",
+      "/v1/flux-dev",
+      "/v1/flux-pro-1.1",
+      "/v1/flux-pro-1.1-ultra",
+      "/v1/flux-pro-1.0-fill",
+      "/v1/flux-pro-1.0-expand",
+      "Kontext pro/max",
+      "Diffusers pipeline_flux (local)"
+    ],
+    "abstract_to_api_fields": {
+      "prompt": "prompt",
+      "exact_prompt_no_upsample": "disable_pup=true | prompt_upsampling=false",
+      "references": "input_image … input_image_8 (≤4 klein)",
+      "canvas": "width/height | aspect_ratio",
+      "detail_control": "steps + guidance (solo flex / flux-dev)",
+      "natural_look": "raw=true (Ultra)",
+      "remix_strength": "image_prompt_strength",
+      "seed": "seed",
+      "safety": "safety_tolerance",
+      "output_format": "jpeg|png|webp",
+      "image_prompt_redux": "image_prompt"
+    },
+    "abstract_to_node_roles": {
+      "text_encode": "CLIP+T5 | Mistral | Qwen3 según familia",
+      "sample": "flow matching",
+      "decode": "VAE familia"
+    },
+    "backend_notes": [
+      "C08: Kontext default output OpenAPI png vs guías a veces jpeg",
+      "C09: /v1/flux-pro listado quick_start pero ausente OpenAPI actual",
+      "C10: finetune endpoints notes deprecated vs schema live",
+      "Fill/Expand guidance def 60 — escala distinta a Dev",
+      "Negaciones del usuario → reescribir a positivo (no campo negative)"
+    ],
+    "do_not_embed_here": [
+      "grafos Comfy",
+      "elegir LoRA",
+      "mezclar Tools/Video como T2I sin flag de alcance"
+    ]
+  },
+  "open_questions": [
+    {
+      "id": "H01",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "model_profile.json ausente antes de esta conversión (esqueleto en anexo).",
+      "impact": "Consumo máquina por Interpretación/Adapter"
+    },
+    {
+      "id": "H02",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Default real cuando width/height=0 en FLUX.2.",
+      "impact": "Canvas por defecto indeterminado"
+    },
+    {
+      "id": "H03",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Comportamiento empírico (word:1.2) en API BFL.",
+      "impact": "Evitar asumir weighting"
+    },
+    {
+      "id": "H04",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Inventario checkpoint/files open-weights sistemático incompleto.",
+      "impact": "Capa checkpoints"
+    },
+    {
+      "id": "H05",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Alcance Tools/Video vs cerebro T2I — decisión de producto.",
+      "impact": "Evitar mezclar modalities sin flag"
+    },
+    {
+      "id": "C08",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Kontext default output OpenAPI png vs guías jpeg.",
+      "impact": "Adapter output_format"
+    },
+    {
+      "id": "C09",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "/v1/flux-pro en quick_start vs ausente en OpenAPI actual.",
+      "impact": "Catálogo endpoints"
+    },
+    {
+      "id": "C10",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Finetune endpoints: notes deprecated vs schema live.",
+      "impact": "Política producto/adapter"
+    },
+    {
+      "id": "flux-materials-ontology",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Ontología formal de «materiales» no documentada."
+    },
+    {
+      "id": "flux-max-launch-date",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Fecha exacta lanzamiento solo [max]."
+    }
+  ]
+}

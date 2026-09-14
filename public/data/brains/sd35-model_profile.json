@@ -1,0 +1,448 @@
+{
+  "brain_id": "sd35",
+  "family": "Stable Diffusion 3.5",
+  "vendor": "Stability AI",
+  "modality": "image",
+  "scope": "model_brain_only",
+  "accessed": "2026-09-14",
+  "sources": [
+    "https://stability.ai/news-updates/introducing-stable-diffusion-3-5",
+    "https://stability.ai/news-updates/sd3-5-large-controlnets",
+    "https://stability.ai/news-updates/stable-diffusion-3-medium",
+    "https://stability.ai/news-updates/stable-diffusion-3-research-paper",
+    "https://stability.ai/license",
+    "https://platform.stability.ai/docs/api-reference#tag/Generate/paths/~1v2beta~1stable-image~1generate~1sd3/post",
+    "https://huggingface.co/stabilityai/stable-diffusion-3.5-large",
+    "https://huggingface.co/stabilityai/stable-diffusion-3.5-large-turbo",
+    "https://huggingface.co/stabilityai/stable-diffusion-3.5-medium",
+    "https://huggingface.co/stabilityai/stable-diffusion-3.5-controlnets",
+    "https://huggingface.co/collections/stabilityai/stable-diffusion-35",
+    "https://huggingface.co/blog/sd3-5",
+    "https://huggingface.co/blog/sd3",
+    "https://huggingface.co/docs/diffusers/en/api/pipelines/stable_diffusion/stable_diffusion_3",
+    "https://github.com/Stability-AI/sd3.5",
+    "https://github.com/Stability-AI/sd3.5/blob/main/sd3_infer.py",
+    "https://arxiv.org/abs/2403.03206",
+    "/workspace/informes/sd35-cerebro.md",
+    "/workspace/informes/sd35-model_profile.json"
+  ],
+  "evidence_policy": {
+    "tags": {
+      "A": "oficial vendor",
+      "B": "paper",
+      "C": "HF card",
+      "D": "blog",
+      "E": "community",
+      "F": "product UI",
+      "G": "secondary",
+      "H": "REQUIERE INVESTIGACIÓN"
+    },
+    "note": "Las letras A–H son SOLO tags de evidencia. Las secciones temáticas (Identidad, Lenguaje…) van como claves semánticas en model_brain, NO como letras A–H.",
+    "adopted": "2026-09-14"
+  },
+  "model_brain": {
+    "identity": {
+      "vendor": "Stability AI",
+      "family_label": "Stable Diffusion 3.5 (Large / Large Turbo / Medium)",
+      "what_it_is": "Familia oficial Stability AI de generación de imagen MMDiT/MMDiT-X + QK-normalization con tres text encoders fijos (CLIP-L, OpenCLIP-G, T5-XXL).",
+      "what_it_is_not": [
+        "No es un workflow ComfyUI/A1111 ni grafo de nodos",
+        "No es un LoRA, Textual Inversion ni checkpoint finetune de terceros",
+        "No es ControlNet: ControlNets oficiales Canny/Depth/Blur para Large son companions opcionales, no el cerebro T2I",
+        "No es solo la API ni solo Diffusers: el cerebro es la familia de pesos + encoders",
+        "Sintaxis de énfasis de UIs ≠ arquitectura del modelo"
+      ]
+    },
+    "architecture": {
+      "backbone": "Large/Turbo: MMDiT + QK-normalization; Turbo = Large destilado con ADD. Medium: MMDiT-X + QK-normalization (mixed-resolution 256→512→768→1024→1440).",
+      "text_encoders": [
+        {
+          "name": "CLIP-L",
+          "id": "CLIP-ViT/L",
+          "context_tokens": 77
+        },
+        {
+          "name": "CLIP-G",
+          "id": "OpenCLIP-ViT/G",
+          "context_tokens": 77
+        },
+        {
+          "name": "T5-XXL",
+          "id": "T5-XXL",
+          "context_tokens_train": "77/256 según etapa",
+          "diffusers_max_sequence_length_default": 256,
+          "diffusers_examples_long": 512,
+          "note": "Quitar T5: leve pérdida adherencia, caída fuerte tipografía"
+        }
+      ],
+      "conditioning": [
+        "triple text encoder",
+        "classifier-free guidance",
+        "rectified flow / FlowMatchEulerDiscreteScheduler + shift"
+      ],
+      "notes": "Paper base arXiv:2403.03206. C04 Medium dual-attn 12 vs self-attn 13. C02 Large 8.1B vs HF 8B. C03 Medium 2.5B vs HF 2B."
+    },
+    "prompting": {
+      "style": "lenguaje natural / prosa descriptiva (oraciones o párrafos)",
+      "priority_order": [],
+      "negative_prompts": {
+        "policy": "API negative_prompt opcional (advanced, ≤10000 chars). Diffusers ignora negative si guidance_scale < 1. GitHub sd3_infer.py usa neg_cond vacío. Ejemplos oficiales a menudo negative vacío.",
+        "effective_when_cfg_gt_1": true
+      },
+      "weighting_syntax": "REQUIERE INVESTIGACIÓN — si (word:weight) aplica en endpoint /sd3 igual que Ultra/Core",
+      "official_formulas": [],
+      "notes": [
+        "API: prompt fuerte y descriptivo (elementos, colores, sujetos)",
+        "Ejemplos oficiales HF en prosa inglesa; tipografía con texto exacto",
+        "Prompts poco específicos → más incertidumbre (blog SD3.5)",
+        "Capacidades línea SD3: spatial reasoning, compositional elements, actions, styles",
+        "Booru/tag soup y quality tags vs prosa: REQUIERE INVESTIGACIÓN",
+        "Orden de bloques en el string: no prescrito oficialmente",
+        "Token caps: CLIP 77; T5 default Diffusers 256 (ej. 512)"
+      ]
+    },
+    "params_abstract": {
+      "guidance": {
+        "large": "rango 3.5–4.5 (Diffusers); GitHub 4.5; API cfg_scale default 4 rango 1–10",
+        "large_turbo": "banda 0–1 (C01: Diffusers 0.0 vs GitHub/blog/API 1.0 — ambas oficiales; ramificar por backend; no CFG alto)",
+        "medium": "card 4.5; GitHub 5.0; SLG cfg 4.0; API default 4"
+      },
+      "steps": {
+        "large": "28–40",
+        "large_turbo": "4 (tip. 4–8 HF blog)",
+        "medium": "40–50"
+      },
+      "scheduler_family": {
+        "diffusers": "FlowMatchEulerDiscreteScheduler + shift",
+        "github_sampler_large_medium": "dpmpp_2m",
+        "github_sampler_turbo": "euler"
+      },
+      "shift": 3.0,
+      "resolution": {
+        "large": "~1 MP; tip. 1024×1024",
+        "large_turbo": "~1 MP; límites self-host: REQUIERE INVESTIGACIÓN",
+        "medium": "0.25–2 MP; train hasta 1440"
+      },
+      "seed": "variación entre seeds intencional",
+      "other": {
+        "slg_medium": "layers [7,8,9], scale 2.5, start 0.01, end 0.20, cfg 4.0",
+        "api_no_expose_steps": true
+      }
+    },
+    "capabilities": [
+      "Prompt adherence y tipografía (Large)",
+      "Prompts largos/complejos vía triple encoder",
+      "Spatial reasoning / compositional elements (línea SD3)",
+      "Estilos versátiles (3D, foto, pintura, line art)",
+      "Large Turbo few-step (~4) ADD",
+      "Medium consumer HW (~9.9 GB VRAM excl. encoders) + multi-res + SLG",
+      "QK-normalization facilita fine-tuning"
+    ],
+    "limitations": [
+      "Prompts vagos → incertidumbre / variación estética intencional",
+      "Medium: artefactos borde si T5 >256; data ≠ Large",
+      "Sin T5: tipografía se degrada",
+      "Out-of-scope: representaciones factuales de personas/eventos",
+      "Filtros Acceptable Use / moderación API",
+      "VRAM Large puede requerir offload; VRAM oficial Large/Turbo no tabulada",
+      "Expresiones faciales sin eval oficial",
+      "Compositionality fina solo-texto limitada vs ControlNets companion"
+    ],
+    "dynamic_blocks": [
+      "sujeto(s) principal(es) y atributos",
+      "acción / pose / interacción",
+      "relaciones espaciales",
+      "escena / entorno / fondo",
+      "composición / encuadre (prosa si se pide)",
+      "cámara / lente / DOF (solo si intención)",
+      "iluminación / color / atmósfera",
+      "estilo / medio",
+      "texto en imagen (cadena exacta; no omitir T5)",
+      "negativos / exclusiones (advanced; CFG>1)",
+      "aspect ratio / resolución objetivo",
+      "variante (Large / Turbo / Medium)",
+      "semilla / reproducibilidad vs exploración",
+      "modo t2i vs i2i (strength)",
+      "longitud prompt / tokens T5 (Medium >256)"
+    ],
+    "constraints": {
+      "turbo_cfg_band": "0–1",
+      "negatives_ignored_if_guidance_lt_1": true,
+      "medium_t5_tokens_soft_limit": 256,
+      "shift_public_models": 3.0,
+      "controlnets_not_brain": true
+    },
+    "intent_fields": [
+      "variant (large|large_turbo|medium)",
+      "prompt_text",
+      "negative_prompt (solo si CFG>1)",
+      "resolution_or_aspect",
+      "seed",
+      "mode (t2i|i2i)",
+      "typography_exact_string",
+      "slg_on (medium)"
+    ]
+  },
+  "version_matrix": [
+    {
+      "version_id": "large",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "role": "máxima calidad y prompt adherence"
+      },
+      "params_overrides": {
+        "guidance": "3.5–4.5 (API def 4)",
+        "steps": "28–40",
+        "sampler_github": "dpmpp_2m",
+        "shift": 3.0,
+        "resolution": "~1 MP",
+        "negatives_effective": true
+      },
+      "prompting_overrides": {},
+      "evidence": [
+        "A",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "version_id": "large_turbo",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "role": "few-step ADD",
+        "cfg_branch_C01": "0.0 Diffusers vs 1.0 GitHub/blog/API"
+      },
+      "params_overrides": {
+        "guidance": "0–1 (ramificar por backend; C01)",
+        "steps": "4 (tip 4–8)",
+        "sampler_github": "euler",
+        "shift": 3.0,
+        "negatives_effective": false
+      },
+      "prompting_overrides": {
+        "negatives": "irrelevantes si guidance_scale < 1"
+      },
+      "evidence": [
+        "A",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "version_id": "medium",
+      "status": "recommended",
+      "diffs_vs_family": {
+        "arch": "MMDiT-X",
+        "slg": true
+      },
+      "params_overrides": {
+        "guidance": "4.5–5 (API def 4; SLG cfg 4.0)",
+        "steps": "40–50",
+        "sampler_github": "dpmpp_2m",
+        "shift": 3.0,
+        "resolution": "0.25–2 MP",
+        "slg": {
+          "layers": [
+            7,
+            8,
+            9
+          ],
+          "scale": 2.5,
+          "start": 0.01,
+          "end": 0.2
+        }
+      },
+      "prompting_overrides": {
+        "t5_caution": "evitar >256 tokens"
+      },
+      "evidence": [
+        "A",
+        "C",
+        "D"
+      ]
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "sd35-large",
+      "hf_or_repo": "stabilityai/stable-diffusion-3.5-large",
+      "files": [
+        "sd3_large.safetensors / Diffusers"
+      ],
+      "params_count": "blog ~8.1B; HF 8B (C02)",
+      "license": "Stability AI Community License (<1M USD revenue comercial gratis; Enterprise si >1M)",
+      "quantization": null,
+      "version_id": "large",
+      "notes": "pesos oficiales Large"
+    },
+    {
+      "id": "sd35-large-turbo",
+      "hf_or_repo": "stabilityai/stable-diffusion-3.5-large-turbo",
+      "files": [
+        "sd3_large_turbo.safetensors"
+      ],
+      "params_count": "8B (HF); destilada ADD",
+      "license": "Stability AI Community License",
+      "quantization": null,
+      "version_id": "large_turbo",
+      "notes": null
+    },
+    {
+      "id": "sd35-medium",
+      "hf_or_repo": "stabilityai/stable-diffusion-3.5-medium",
+      "files": [
+        "sd3.5_medium.safetensors"
+      ],
+      "params_count": "blog ~2.5B; HF 2B (C03)",
+      "license": "Stability AI Community License",
+      "quantization": null,
+      "version_id": "medium",
+      "notes": null
+    }
+  ],
+  "lora_policy": {
+    "compat_matrix": [],
+    "retrain_rules": [],
+    "scale_ranges": "REQUIERE INVESTIGACIÓN — no documentado como política primaria en el expediente",
+    "explicit_non_brain": [
+      "ControlNets oficiales Canny/Depth/Blur (Large 8B) — companions",
+      "LoRAs y finetunes de terceros"
+    ]
+  },
+  "workflow_adapter_hints": {
+    "endpoint_or_pipeline_families": [
+      "Stability API /v2beta/stable-image/generate/sd3",
+      "Diffusers StableDiffusion3Pipeline",
+      "GitHub Stability-AI/sd3.5"
+    ],
+    "abstract_to_api_fields": {
+      "prompt": "prompt",
+      "negative_prompt": "negative_prompt",
+      "guidance": "cfg_scale",
+      "aspect_ratio": "aspect_ratio",
+      "style_preset": "style_preset",
+      "seed": "seed",
+      "mode_i2i": "strength"
+    },
+    "api_aspect_ratios": [
+      "16:9",
+      "1:1",
+      "21:9",
+      "2:3",
+      "3:2",
+      "4:5",
+      "5:4",
+      "9:16",
+      "9:21"
+    ],
+    "abstract_to_node_roles": {
+      "text_encode": "CLIP-L + CLIP-G + T5-XXL",
+      "sample": "flow-match / dpmpp_2m|euler según variante",
+      "decode": "VAE SD3.5"
+    },
+    "backend_notes": [
+      "C01 Turbo: Diffusers guidance_scale=0.0 vs GitHub/API/blog=1.0 — ramificar",
+      "API no expone steps al cliente",
+      "style_preset y aspect_ratio son capa API, no arquitectura DiT",
+      "Licencia Community: comercial gratis si ingresos anuales < 1M USD"
+    ],
+    "do_not_embed_here": [
+      "grafos ComfyUI",
+      "instalar custom nodes",
+      "elegir LoRA concreta",
+      "ControlNet como default del cerebro"
+    ]
+  },
+  "open_questions": [
+    {
+      "id": "C01",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Large Turbo guidance_scale=0.0 (Diffusers) vs CFG 1.0 (GitHub/HF blog/API). Ambas oficiales; no unificar.",
+      "impact": "Adapter Turbo debe ramificar por backend"
+    },
+    {
+      "id": "C02",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Large ~8.1B (blog) vs HF 8B.",
+      "impact": "Inventario / naming"
+    },
+    {
+      "id": "C03",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Medium ~2.5B (blog) vs HF 2B.",
+      "impact": "Inventario / naming"
+    },
+    {
+      "id": "C04",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Medium dual-attention 12 capas vs self-attention 13 (card).",
+      "impact": "Arquitectura inconsistente"
+    },
+    {
+      "id": "H15-res",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Píxeles exactos por aspect_ratio API; límites self-host Turbo."
+    },
+    {
+      "id": "H15-vram",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "VRAM oficial Large y Large Turbo."
+    },
+    {
+      "id": "H15-encoders",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Fusión detallada triple-encoder / negatives por encoder."
+    },
+    {
+      "id": "H15-controlnets",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Compat ControlNets con Large Turbo; ControlNets Medium 2B."
+    },
+    {
+      "id": "H15-prompting",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Guía oficial prompt engineering; quality tags vs prosa; orden cláusulas; checklist cámara/luz."
+    },
+    {
+      "id": "H15-weighting",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Si (word:weight) aplica en /sd3 igual que Ultra."
+    },
+    {
+      "id": "H15-faces",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Expresiones faciales sin eval oficial."
+    },
+    {
+      "id": "H15-troubleshoot",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Troubleshooting oversaturation / CFG alto."
+    },
+    {
+      "id": "H15-clipskip",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Clip skip como control de usuario."
+    },
+    {
+      "id": "H15-metrics",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Métricas cuantitativas blog no transcritas."
+    },
+    {
+      "id": "H15-add-paper",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "URL canónica paper ADD."
+    },
+    {
+      "id": "H15-finetunes",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "Inventario fine-tunes oficiales posteriores a ControlNets."
+    },
+    {
+      "id": "H16",
+      "label": "REQUIERE INVESTIGACIÓN",
+      "detail": "lora_policy no modelado: escalas y compat.",
+      "impact": "Fine-tunes / escalas"
+    }
+  ]
+}

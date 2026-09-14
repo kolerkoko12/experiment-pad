@@ -1,0 +1,852 @@
+{
+  "version": 1,
+  "note": "Cada opción tiene prompt en inglés (export), label en español (UI), weight y tags de compatibilidad. Añade opciones sin tocar el motor.",
+  "options": {
+    "scene": [
+      {
+        "id": "moonlit-penthouse",
+        "label": "Ático bajo la luna, ciudad de neón",
+        "prompt": "moonlit penthouse terrace at night, rain-slick glass, neon city far below",
+        "weight": 1.2,
+        "tags": ["urban", "night", "rain", "luxury", "cinematic", "intimate"]
+      },
+      {
+        "id": "steam-bathhouse",
+        "label": "Baños de mármol con vapor",
+        "prompt": "steam-filled marble bathhouse, wet stone, soft shafts of daylight through high windows",
+        "weight": 1.15,
+        "tags": ["interior", "water", "steam", "day", "intimate", "ritual"]
+      },
+      {
+        "id": "med-villa",
+        "label": "Terraza de villa mediterránea",
+        "prompt": "sun-bleached Mediterranean villa terrace, limewashed walls, olive trees, hard noon light",
+        "weight": 1.05,
+        "tags": ["day", "sun", "luxury", "nature", "editorial"]
+      },
+      {
+        "id": "abandoned-greenhouse",
+        "label": "Invernadero abandonado al anochecer",
+        "prompt": "abandoned greenhouse at dusk, cracked glass, overgrown ferns, fogging panes",
+        "weight": 1.1,
+        "tags": ["nature", "dusk", "ruin", "cinematic", "raw"]
+      },
+      {
+        "id": "velvet-suite",
+        "label": "Suite de hotel, una sola lámpara",
+        "prompt": "velvet hotel suite lit by a single warm lamp, rumpled sheets, city glow through sheer curtains",
+        "weight": 1.2,
+        "tags": ["interior", "night", "luxury", "intimate", "editorial"]
+      },
+      {
+        "id": "blue-hour-river",
+        "label": "Río en el bosque, hora azul",
+        "prompt": "forest river at blue hour, wet rocks, cold mist, last light on the water",
+        "weight": 1,
+        "tags": ["nature", "water", "dusk", "cinematic", "raw"]
+      },
+      {
+        "id": "rooftop-pool",
+        "label": "Piscina infinity en azotea",
+        "prompt": "rooftop infinity pool above a night city, black water, scattered reflections",
+        "weight": 1.1,
+        "tags": ["urban", "night", "water", "luxury", "cinematic"]
+      },
+      {
+        "id": "candle-library",
+        "label": "Biblioteca a la luz de velas",
+        "prompt": "candlelit library with tall windows, dust in the air, dark wood and gold titles",
+        "weight": 0.95,
+        "tags": ["interior", "night", "ritual", "elegant", "cinematic"]
+      },
+      {
+        "id": "desert-camp",
+        "label": "Campamento en el desierto",
+        "prompt": "desert camp under a hard moon, canvas, sand, a single kerosene lamp",
+        "weight": 0.9,
+        "tags": ["nature", "night", "raw", "ritual"]
+      },
+      {
+        "id": "north-loft",
+        "label": "Loft de artista, luz norte",
+        "prompt": "artist loft with cool north light, stained drop cloths, large unfinished canvases",
+        "weight": 1,
+        "tags": ["interior", "day", "studio", "editorial", "raw"]
+      },
+      {
+        "id": "neon-laundry",
+        "label": "Lavandería de neón, ya cerrado",
+        "prompt": "neon laundromat after closing, fluorescent pink and green, empty machines humming",
+        "weight": 0.95,
+        "tags": ["urban", "night", "nightlife", "raw", "playful"]
+      },
+      {
+        "id": "yacht-storm",
+        "label": "Camarote de yate, tormenta fuera",
+        "prompt": "yacht cabin during a storm, porthole rain, teak and brass, listing shadows",
+        "weight": 0.9,
+        "tags": ["interior", "water", "rain", "luxury", "intimate", "night"]
+      },
+      {
+        "id": "cathedral-ruin",
+        "label": "Ruinas de catedral con hiedra",
+        "prompt": "overgrown cathedral ruin, broken rose window, ivy and pale afternoon light",
+        "weight": 1,
+        "tags": ["ruin", "day", "ritual", "cinematic", "elegant"]
+      },
+      {
+        "id": "fashion-backstage",
+        "label": "Backstage de un desfile",
+        "prompt": "fashion-show backstage, racks of clothes, bare bulbs, haze and hurried glamour",
+        "weight": 1.05,
+        "tags": ["interior", "studio", "editorial", "nightlife", "playful"]
+      },
+      {
+        "id": "snow-onsen",
+        "label": "Aguas termales en la nieve",
+        "prompt": "outdoor hot spring in falling snow, black rocks, steam, pine silhouettes",
+        "weight": 1.1,
+        "tags": ["nature", "water", "steam", "snow", "intimate", "ritual"]
+      },
+      {
+        "id": "jazz-cellar",
+        "label": "Club de jazz subterráneo",
+        "prompt": "underground jazz club, low amber light, smoke texture, wet bar top",
+        "weight": 0.95,
+        "tags": ["interior", "night", "nightlife", "cinematic", "intimate"]
+      },
+      {
+        "id": "gold-greenhouse",
+        "label": "Invernadero a la hora dorada",
+        "prompt": "glass greenhouse at golden hour, citrus trees, warm flare on wet leaves",
+        "weight": 1.05,
+        "tags": ["nature", "day", "sun", "editorial", "elegant"]
+      },
+      {
+        "id": "warehouse-rave",
+        "label": "Rave en almacén, humo y strobes",
+        "prompt": "warehouse rave, haze, strobes, concrete and sweat-slick floors",
+        "weight": 0.85,
+        "tags": ["urban", "night", "nightlife", "raw", "motion"]
+      }
+    ],
+    "character": [
+      {
+        "id": "athletic-woman",
+        "label": "Mujer atlética, unos 28",
+        "prompt": "athletic woman in her late 20s, confident gaze, rain-damp hairline",
+        "weight": 1.2,
+        "tags": ["athletic", "feminine", "contemporary"]
+      },
+      {
+        "id": "statuesque-man",
+        "label": "Hombre esbelto, sienes plateadas",
+        "prompt": "statuesque man with silver temples, late 40s, quiet intensity",
+        "weight": 1,
+        "tags": ["statuesque", "masculine", "elegant"]
+      },
+      {
+        "id": "androgynous-model",
+        "label": "Modelo andrógine, sien rapada",
+        "prompt": "androgynous fashion model, shaved temple, sharp cheekbones, unreadable mouth",
+        "weight": 1.1,
+        "tags": ["androgynous", "editorial", "contemporary"]
+      },
+      {
+        "id": "curvy-freckled",
+        "label": "Mujer curvilínea, pecas",
+        "prompt": "curvy woman with freckled shoulders, warm eyes, unhurried presence",
+        "weight": 1.15,
+        "tags": ["soft", "feminine", "intimate"]
+      },
+      {
+        "id": "lean-dancer",
+        "label": "Bailarinx enjuto, pelo corto",
+        "prompt": "lean dancer with cropped hair, long neck, precise hands",
+        "weight": 1.05,
+        "tags": ["athletic", "androgynous", "motion"]
+      },
+      {
+        "id": "soft-bear",
+        "label": "Hombre suave, barba cuidada",
+        "prompt": "soft-bodied man with a well-kept beard, kind mouth, heavy-lidded eyes",
+        "weight": 0.95,
+        "tags": ["soft", "masculine", "intimate"]
+      },
+      {
+        "id": "petite-pixie",
+        "label": "Mujer menuda, corte pixie",
+        "prompt": "petite woman with a pixie cut, bright stare, small decisive gestures",
+        "weight": 1,
+        "tags": ["petite", "feminine", "playful"]
+      },
+      {
+        "id": "tall-nonbinary",
+        "label": "Persona alta, joyas mínimas",
+        "prompt": "tall nonbinary person, minimal gold jewelry, calm and slightly dangerous ease",
+        "weight": 1,
+        "tags": ["statuesque", "androgynous", "elegant"]
+      },
+      {
+        "id": "sun-weathered",
+        "label": "Mujer curtida por el sol, 50",
+        "prompt": "sun-weathered woman around 50, silver-streaked hair, lined smiling eyes",
+        "weight": 0.9,
+        "tags": ["statuesque", "feminine", "raw"]
+      },
+      {
+        "id": "pretty-boy",
+        "label": "Chico de belleza extraña, 24",
+        "prompt": "pretty young man, 24, long lashes, a little arrogant, undone collar energy",
+        "weight": 1.05,
+        "tags": ["petite", "masculine", "editorial"]
+      },
+      {
+        "id": "bodybuilder-woman",
+        "label": "Mujer culturista, mirada baja",
+        "prompt": "muscular woman bodybuilder, veins quiet under skin, lowered thoughtful gaze",
+        "weight": 0.95,
+        "tags": ["athletic", "feminine", "raw"]
+      },
+      {
+        "id": "twin-energy",
+        "label": "Dos figuras casi gemelas",
+        "prompt": "two near-twin figures standing close, same bone structure, slightly different mouths",
+        "weight": 0.7,
+        "tags": ["editorial", "playful", "cinematic"],
+        "incompatibleTags": []
+      },
+      {
+        "id": "masked-guest",
+        "label": "Invitado con media máscara",
+        "prompt": "guest in a delicate half-mask, visible mouth, formal and a little wrong",
+        "weight": 0.85,
+        "tags": ["elegant", "ritual", "nightlife"]
+      },
+      {
+        "id": "wet-swimmer",
+        "label": "Nadadorx recién salidx",
+        "prompt": "fresh-from-the-water swimmer, dripping, goggles pushed into wet hair",
+        "weight": 1.05,
+        "tags": ["athletic", "water", "contemporary"]
+      }
+    ],
+    "physique": [
+      {
+        "id": "toned-olive",
+        "label": "Tono atlética, piel oliva, pelo mojado",
+        "prompt": "toned physique, olive skin, short wet hair, defined collarbones, faint tan lines",
+        "weight": 1.2,
+        "tags": ["athletic", "water", "contemporary"]
+      },
+      {
+        "id": "soft-curves",
+        "label": "Curvas suaves, pecas, pelo rojo",
+        "prompt": "soft full curves, freckled chest, loose red hair, warm skin",
+        "weight": 1.15,
+        "tags": ["soft", "intimate", "feminine"]
+      },
+      {
+        "id": "marble-pale",
+        "label": "Pálida como mármol, cicatriz en la ceja",
+        "prompt": "pale statuesque body, cool undertone, thin scar through one eyebrow, visible ribs",
+        "weight": 1,
+        "tags": ["statuesque", "elegant", "raw"]
+      },
+      {
+        "id": "compact-strong",
+        "label": "Cuerpo compacto y fuerte",
+        "prompt": "compact powerful body, thick thighs, strong hands, cropped dark hair",
+        "weight": 1.05,
+        "tags": ["athletic", "petite", "raw"]
+      },
+      {
+        "id": "long-dancer",
+        "label": "Líneas de bailarín, venas finas",
+        "prompt": "long dancer lines, taut calves, fine veins on the forearms, shaved nape",
+        "weight": 1.1,
+        "tags": ["athletic", "motion", "editorial"]
+      },
+      {
+        "id": "soft-belly",
+        "label": "Vientre suave, vello dorado",
+        "prompt": "soft belly, golden body hair, relaxed shoulders, sleep-warm skin",
+        "weight": 1.1,
+        "tags": ["soft", "intimate", "day"]
+      },
+      {
+        "id": "tattooed-back",
+        "label": "Espalda tatuada, hombros anchos",
+        "prompt": "broad shoulders, full-back tattoo of moths and script, cropped tank tan lines",
+        "weight": 1,
+        "tags": ["athletic", "raw", "nightlife"]
+      },
+      {
+        "id": "androgynous-plane",
+        "label": "Planos andróginos, joya en la oreja",
+        "prompt": "androgynous planes, small chest, long fingers, a single pearl earring",
+        "weight": 1,
+        "tags": ["androgynous", "elegant", "editorial"]
+      },
+      {
+        "id": "sun-freckle",
+        "label": "Piel tostada, pecas densas",
+        "prompt": "sun-darkened skin, dense freckles, salt-dried hair, a bruise fading on the hip",
+        "weight": 1,
+        "tags": ["raw", "sun", "nature"]
+      },
+      {
+        "id": "luxe-groomed",
+        "label": "Piel cuidada, uñas de charol",
+        "prompt": "highly groomed skin, glossy manicure, subtle highlighter, expensive ease",
+        "weight": 0.95,
+        "tags": ["elegant", "luxury", "editorial"]
+      },
+      {
+        "id": "wet-goosebumps",
+        "label": "Piel mojada, carne de gallina",
+        "prompt": "wet skin, raised goosebumps, droplets along the spine, flushed ears",
+        "weight": 1.15,
+        "tags": ["water", "intimate", "steam"]
+      },
+      {
+        "id": "mature-lines",
+        "label": "Cuerpo maduro, líneas de expresión",
+        "prompt": "mature body, expression lines, silver hair at the temples, unapologetic posture",
+        "weight": 0.9,
+        "tags": ["statuesque", "elegant", "raw"]
+      },
+      {
+        "id": "explicit-anatomy",
+        "label": "Anatomía adulta, desnudo claro",
+        "prompt": "adult nude, explicit natural anatomy, uncensored, tasteful lighting on skin",
+        "weight": 0.85,
+        "tags": ["nude", "intimate", "raw"]
+      }
+    ],
+    "clothing": [
+      {
+        "id": "sheer-black-dress",
+        "label": "Vestido negro transparente, mojado",
+        "prompt": "sheer black evening dress clinging with rain, visible lingerie beneath",
+        "weight": 1.2,
+        "tags": ["sheer", "formal", "rain", "intimate", "nightlife"]
+      },
+      {
+        "id": "silk-robe",
+        "label": "Bata de seda entreabierta",
+        "prompt": "open silk robe slipping off one shoulder, nothing rushed underneath",
+        "weight": 1.15,
+        "tags": ["sheer", "intimate", "luxury", "interior"]
+      },
+      {
+        "id": "wet-shirt",
+        "label": "Camisa blanca empapada",
+        "prompt": "white shirt soaked through, translucent, sleeves rolled, belt undone",
+        "weight": 1.15,
+        "tags": ["sheer", "water", "contemporary", "intimate"]
+      },
+      {
+        "id": "tailored-undone",
+        "label": "Traje sastre deshecho",
+        "prompt": "tailored dark suit, jacket off, tie loose, shirt half unbuttoned",
+        "weight": 1.05,
+        "tags": ["formal", "elegant", "nightlife"]
+      },
+      {
+        "id": "lingerie-set",
+        "label": "Conjunto de lencería oscura",
+        "prompt": "dark lingerie set, strap details, garter, worn like clothing not costume",
+        "weight": 1.1,
+        "tags": ["sheer", "intimate", "editorial"]
+      },
+      {
+        "id": "nude-jewelry",
+        "label": "Desnudo con joyas solamente",
+        "prompt": "nude except for gold jewelry, a chain at the waist, wet skin catching light",
+        "weight": 1.05,
+        "tags": ["nude", "intimate", "luxury", "water"]
+      },
+      {
+        "id": "leather-coat",
+        "label": "Abrigo de cuero sobre piel",
+        "prompt": "long black leather coat worn open over bare skin, boots, nothing else rushed",
+        "weight": 1,
+        "tags": ["fetish-lite", "nightlife", "raw"]
+      },
+      {
+        "id": "linen-summer",
+        "label": "Lino arrugado de verano",
+        "prompt": "wrinkled linen shirt and shorts, unbuttoned, salt stains, bare feet",
+        "weight": 1,
+        "tags": ["casual", "sun", "nature", "day"]
+      },
+      {
+        "id": "harness-knit",
+        "label": "Arnés fino sobre punto",
+        "prompt": "fine leather harness over a fine-knit sweater, fashion not costume",
+        "weight": 0.95,
+        "tags": ["fetish-lite", "editorial", "contemporary"]
+      },
+      {
+        "id": "towel-only",
+        "label": "Solo una toalla de hotel",
+        "prompt": "hotel towel slung low, steam-damp, a second towel in the hair",
+        "weight": 1.05,
+        "tags": ["intimate", "steam", "interior", "water"]
+      },
+      {
+        "id": "red-carpet",
+        "label": "Vestido de alfombra, abertura alta",
+        "prompt": "red-carpet gown with a high slit, structured bodice, old-hollywood shine",
+        "weight": 0.95,
+        "tags": ["formal", "elegant", "luxury", "editorial"]
+      },
+      {
+        "id": "club-mesh",
+        "label": "Malla de club y botas",
+        "prompt": "club mesh top, low waistband, heavy boots, sweat-shine",
+        "weight": 0.9,
+        "tags": ["nightlife", "sheer", "motion", "raw"]
+      },
+      {
+        "id": "kimono-yukata",
+        "label": "Yukata entreabierto, húmedo",
+        "prompt": "damp yukata slipping open at the chest, simple sash, wet hem",
+        "weight": 1,
+        "tags": ["ritual", "water", "steam", "intimate"]
+      },
+      {
+        "id": "practice-wrap",
+        "label": "Ropa de ensayo, cintas",
+        "prompt": "dance practice clothes, wrapped ribs, worn leather slippers, chalk dust",
+        "weight": 0.9,
+        "tags": ["motion", "studio", "athletic"]
+      }
+    ],
+    "pose": [
+      {
+        "id": "recline-lounge",
+        "label": "Reclinada, una rodilla alzada",
+        "prompt": "reclining on a lounge, one knee raised, weight on an elbow, unhurried",
+        "weight": 1.2,
+        "tags": ["still", "intimate", "editorial"]
+      },
+      {
+        "id": "over-shoulder",
+        "label": "Mirada por encima del hombro",
+        "prompt": "looking back over one shoulder, spine slightly twisted, mouth almost a smile",
+        "weight": 1.15,
+        "tags": ["still", "editorial", "cinematic"]
+      },
+      {
+        "id": "window-kneel",
+        "label": "De rodillas en la ventana",
+        "prompt": "kneeling at a window, palms on the glass, forehead nearly touching the pane",
+        "weight": 1.05,
+        "tags": ["still", "intimate", "interior"]
+      },
+      {
+        "id": "contrapposto",
+        "label": "Contrapposto clásico",
+        "prompt": "classic contrapposto stand, one hip out, hands empty, museum-calm",
+        "weight": 1,
+        "tags": ["still", "elegant", "editorial"]
+      },
+      {
+        "id": "arch-bed",
+        "label": "Arco en la cama",
+        "prompt": "arched back on a bed, throat exposed, sheets kicked down",
+        "weight": 1.1,
+        "tags": ["intimate", "still", "interior"]
+      },
+      {
+        "id": "walk-camera",
+        "label": "Caminando hacia cámara",
+        "prompt": "walking toward camera, mid-stride, coat opening with the movement",
+        "weight": 1.05,
+        "tags": ["motion", "editorial", "cinematic"]
+      },
+      {
+        "id": "crouch-ready",
+        "label": "En cuclillas, alerta",
+        "prompt": "low crouch, fingertips on the floor, alert and cat-quiet",
+        "weight": 0.9,
+        "tags": ["motion", "raw", "tension"]
+      },
+      {
+        "id": "float-water",
+        "label": "Flotando de espaldas",
+        "prompt": "floating on their back in dark water, arms loose, face just above the surface",
+        "weight": 1,
+        "tags": ["water", "still", "cinematic"]
+      },
+      {
+        "id": "perch-rail",
+        "label": "Sentada en la barandilla",
+        "prompt": "perched on a railing, one heel hooked, city drop behind",
+        "weight": 1.05,
+        "tags": ["urban", "tension", "editorial"]
+      },
+      {
+        "id": "mirror-lean",
+        "label": "Apoyada en el espejo",
+        "prompt": "leaning into a mirror, checking a mouth, other hand in hair",
+        "weight": 1,
+        "tags": ["interior", "editorial", "playful"]
+      },
+      {
+        "id": "hands-up",
+        "label": "Manos en la nuca",
+        "prompt": "hands laced behind the head, elbows wide, ribcage lifted",
+        "weight": 1.1,
+        "tags": ["still", "intimate", "athletic"]
+      },
+      {
+        "id": "seat-astride",
+        "label": "A horcajadas en la silla",
+        "prompt": "sitting astride a chair back, chin on crossed arms, bored and magnetic",
+        "weight": 1,
+        "tags": ["still", "playful", "nightlife"]
+      }
+    ],
+    "object": [
+      {
+        "id": "crystal-tumbler",
+        "label": "Vaso de cristal bajo",
+        "prompt": "heavy crystal tumbler with two fingers of amber liquor",
+        "weight": 1.1,
+        "tags": ["luxury", "nightlife", "intimate"]
+      },
+      {
+        "id": "wet-umbrella",
+        "label": "Paraguas empapado",
+        "prompt": "collapsed rain-soaked black umbrella dripping on the floor",
+        "weight": 1,
+        "tags": ["rain", "urban", "night"]
+      },
+      {
+        "id": "orchid",
+        "label": "Orquídea cortada",
+        "prompt": "a single cut orchid, stem still wet, held loosely",
+        "weight": 1,
+        "tags": ["elegant", "editorial", "ritual"]
+      },
+      {
+        "id": "vintage-camera",
+        "label": "Cámara telemétrica vieja",
+        "prompt": "vintage rangefinder camera hanging from a worn strap",
+        "weight": 0.95,
+        "tags": ["editorial", "studio", "cinematic"]
+      },
+      {
+        "id": "cigarette",
+        "label": "Cigarrillo a medio fumar",
+        "prompt": "half-smoked cigarette, thin trail of smoke, ash about to fall",
+        "weight": 0.9,
+        "tags": ["nightlife", "raw", "cinematic"],
+        "incompatibleTags": ["steam"]
+      },
+      {
+        "id": "pearl-clutch",
+        "label": "Clutch de perlas",
+        "prompt": "small pearl clutch, clasp undone, lipstick mark on the rim",
+        "weight": 0.95,
+        "tags": ["luxury", "elegant", "nightlife"]
+      },
+      {
+        "id": "motorcycle-helmet",
+        "label": "Casco de moto en la cadera",
+        "prompt": "scuffed motorcycle helmet hooked on one hip",
+        "weight": 0.85,
+        "tags": ["urban", "raw", "motion"]
+      },
+      {
+        "id": "silk-sheet",
+        "label": "Sábana de seda en la mano",
+        "prompt": "fist of silk sheet, the rest spilling out of frame",
+        "weight": 1.05,
+        "tags": ["intimate", "interior", "luxury"]
+      },
+      {
+        "id": "blade-ceremonial",
+        "label": "Cuchillo ceremonial",
+        "prompt": "ceremonial knife with an inlaid handle, held flat, not threatening",
+        "weight": 0.7,
+        "tags": ["ritual", "tension", "elegant"]
+      },
+      {
+        "id": "paperback",
+        "label": "Libro de bolsillo doblado",
+        "prompt": "dog-eared paperback held open with a thumb, a line underlined",
+        "weight": 0.95,
+        "tags": ["interior", "still", "day"]
+      },
+      {
+        "id": "headphones",
+        "label": "Auriculares grandes",
+        "prompt": "oversized headphones, cable tangled, one earcup pushed off",
+        "weight": 0.85,
+        "tags": ["contemporary", "nightlife", "playful"]
+      },
+      {
+        "id": "wine-mouth",
+        "label": "Copa tinto, marca en el borde",
+        "prompt": "smear of red wine on a glass rim, matching stain at the mouth",
+        "weight": 1,
+        "tags": ["intimate", "luxury", "nightlife"]
+      },
+      {
+        "id": "nothing",
+        "label": "Sin objeto (manos vacías)",
+        "prompt": "empty hands, no props",
+        "weight": 0.8,
+        "tags": ["still", "editorial"]
+      }
+    ],
+    "action": [
+      {
+        "id": "look-city",
+        "label": "Mirar la ciudad",
+        "prompt": "looking out over the city, wind at the lashes",
+        "weight": 1.15,
+        "tags": ["urban", "still", "cinematic"]
+      },
+      {
+        "id": "catch-rain",
+        "label": "Atrapar la lluvia en los labios",
+        "prompt": "catching rain on the lips, chin tipped up",
+        "weight": 1.1,
+        "tags": ["rain", "intimate", "playful"]
+      },
+      {
+        "id": "unbutton",
+        "label": "Desabrochar sin prisa",
+        "prompt": "unbuttoning slowly, watching the camera, unhurried",
+        "weight": 1.1,
+        "tags": ["intimate", "still", "editorial"]
+      },
+      {
+        "id": "light-match",
+        "label": "Encender una cerilla",
+        "prompt": "striking a match, face lit from below for a second",
+        "weight": 1,
+        "tags": ["night", "cinematic", "ritual"]
+      },
+      {
+        "id": "step-water",
+        "label": "Salir del agua",
+        "prompt": "stepping out of the water, a sheet of it falling off the body",
+        "weight": 1.15,
+        "tags": ["water", "motion", "intimate"]
+      },
+      {
+        "id": "whisper",
+        "label": "Susurrar a alguien fuera de cuadro",
+        "prompt": "whispering to someone just out of frame, almost smiling",
+        "weight": 1,
+        "tags": ["intimate", "cinematic", "tension"]
+      },
+      {
+        "id": "read-letter",
+        "label": "Leer una carta",
+        "prompt": "reading a letter, the paper slightly shaking, jaw tight",
+        "weight": 0.95,
+        "tags": ["still", "cinematic", "interior"]
+      },
+      {
+        "id": "apply-lipstick",
+        "label": "Pintarse la boca",
+        "prompt": "putting on lipstick in a bad mirror, concentrating, a little smear",
+        "weight": 1,
+        "tags": ["editorial", "playful", "interior"]
+      },
+      {
+        "id": "tie-sash",
+        "label": "Atarse el fajín",
+        "prompt": "tying a sash or belt, looking down, the gesture intimate",
+        "weight": 1,
+        "tags": ["ritual", "still", "intimate"]
+      },
+      {
+        "id": "laugh-exhale",
+        "label": "Reírse por la nariz",
+        "prompt": "a private exhale of a laugh, eyes almost closed",
+        "weight": 1.05,
+        "tags": ["playful", "intimate", "still"]
+      },
+      {
+        "id": "reach-lens",
+        "label": "Tocar el lente",
+        "prompt": "reaching toward the lens as if to cover it, playful and close",
+        "weight": 0.95,
+        "tags": ["playful", "close", "editorial"]
+      },
+      {
+        "id": "hold-breath",
+        "label": "Contener la respiración",
+        "prompt": "holding a breath, chest still, a drop of water paused on the lip",
+        "weight": 1.05,
+        "tags": ["tension", "intimate", "water"]
+      }
+    ],
+    "camera": [
+      {
+        "id": "35mm-cine",
+        "label": "35mm cine, poca profundidad",
+        "prompt": "35mm cinematic, shallow depth of field, rim light, subtle film grain",
+        "weight": 1.25,
+        "tags": ["cinematic", "close"]
+      },
+      {
+        "id": "85mm-portrait",
+        "label": "85mm retrato",
+        "prompt": "85mm portrait lens, compressed background, creamy bokeh, eye-level",
+        "weight": 1.2,
+        "tags": ["portrait", "editorial", "close"]
+      },
+      {
+        "id": "low-angle",
+        "label": "Ángulo bajo, heroico",
+        "prompt": "low angle, slight hero tilt, architecture towering behind",
+        "weight": 1,
+        "tags": ["wide", "cinematic", "urban"]
+      },
+      {
+        "id": "overhead",
+        "label": "Cenital, como plano mapa",
+        "prompt": "overhead shot, body arranged in the frame like a still life",
+        "weight": 0.95,
+        "tags": ["wide", "editorial", "still"]
+      },
+      {
+        "id": "dutch",
+        "label": "Ángulo holandés",
+        "prompt": "dutch angle, uneasy horizon, neon smear",
+        "weight": 0.85,
+        "tags": ["cinematic", "nightlife", "tension"]
+      },
+      {
+        "id": "harsh-flash",
+        "label": "Flash duro, directo",
+        "prompt": "harsh on-camera flash, hard shadow, raw snapshot glamour",
+        "weight": 1,
+        "tags": ["raw", "nightlife", "editorial"]
+      },
+      {
+        "id": "golden-back",
+        "label": "Contraluz dorado",
+        "prompt": "golden-hour backlight, hair halo, lens flare controlled",
+        "weight": 1.1,
+        "tags": ["sun", "day", "editorial"]
+      },
+      {
+        "id": "anamorphic",
+        "label": "Anamórfico, flares azules",
+        "prompt": "anamorphic widescreen, blue horizontal flares, cinematic letterbox feel",
+        "weight": 1.05,
+        "tags": ["cinematic", "night", "widescreen"]
+      },
+      {
+        "id": "macro-skin",
+        "label": "Macro de piel y agua",
+        "prompt": "tight macro on skin and water, pores and droplets, intimate crop",
+        "weight": 1,
+        "tags": ["close", "intimate", "water"]
+      },
+      {
+        "id": "three-quarter",
+        "label": "Tres cuartos, editorial",
+        "prompt": "three-quarter fashion crop, clean negative space, magazine lighting",
+        "weight": 1.1,
+        "tags": ["editorial", "portrait", "threequarter"]
+      },
+      {
+        "id": "security-cam",
+        "label": "Cámara de seguridad, grano",
+        "prompt": "high grain security-camera angle from a corner, slightly wrong color",
+        "weight": 0.7,
+        "tags": ["raw", "urban", "night"]
+      },
+      {
+        "id": "tungsten-intimate",
+        "label": "Tungsteno íntimo",
+        "prompt": "warm tungsten practicals only, intimate exposure, shadows kept",
+        "weight": 1.15,
+        "tags": ["intimate", "interior", "night", "cinematic"]
+      }
+    ],
+    "lighting": [
+      {
+        "id": "rim-teal",
+        "label": "Rim teal, clave suave",
+        "prompt": "soft key from camera left, teal rim, motivated practicals",
+        "weight": 1.1,
+        "tags": ["cinematic", "night", "urban"]
+      },
+      {
+        "id": "window-shaft",
+        "label": "Haz de ventana",
+        "prompt": "single window shaft, dust in the beam, deep falloff",
+        "weight": 1.1,
+        "tags": ["interior", "day", "cinematic"]
+      },
+      {
+        "id": "neon-split",
+        "label": "Neón partido magenta/cyan",
+        "prompt": "split neon, magenta camera-right, cyan camera-left, wet bounce",
+        "weight": 1.05,
+        "tags": ["nightlife", "night", "urban", "rain"]
+      },
+      {
+        "id": "candle-warm",
+        "label": "Velas y tungsteno bajo",
+        "prompt": "candle and low tungsten, warm skin, shadows kept brown",
+        "weight": 1,
+        "tags": ["intimate", "interior", "night", "ritual"]
+      },
+      {
+        "id": "hard-noon",
+        "label": "Sol duro de mediodía",
+        "prompt": "hard noon sun, short shadows, bleached highlights",
+        "weight": 0.95,
+        "tags": ["day", "sun", "editorial"]
+      },
+      {
+        "id": "overcast-soft",
+        "label": "Nublado suave, sin dirección",
+        "prompt": "overcast softbox sky, almost no shadow, pale color",
+        "weight": 0.9,
+        "tags": ["day", "nature", "editorial"]
+      },
+      {
+        "id": "flash-on-camera",
+        "label": "Flash en cámara, crudo",
+        "prompt": "on-camera flash, hard shadow on the wall, raw glamour",
+        "weight": 0.95,
+        "tags": ["raw", "nightlife", "editorial"]
+      },
+      {
+        "id": "steam-diffuse",
+        "label": "Difusa por vapor",
+        "prompt": "light diffused through steam, glow without a hard edge",
+        "weight": 1.05,
+        "tags": ["steam", "water", "intimate"]
+      },
+      {
+        "id": "moon-hard",
+        "label": "Luna dura, un solo lado",
+        "prompt": "hard moonlight from above, silver skin, crushed blacks",
+        "weight": 1,
+        "tags": ["night", "cinematic", "nature"]
+      },
+      {
+        "id": "golden-wrap",
+        "label": "Dorado envolvente",
+        "prompt": "golden-hour wrap, warm bounce from below, long shadows",
+        "weight": 1.1,
+        "tags": ["sun", "day", "editorial", "nature"]
+      }
+    ]
+  }
+}

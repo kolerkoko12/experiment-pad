@@ -1,0 +1,32 @@
+{
+  "defaultPlanId": "proPlus",
+  "helpUrl": "https://www.mage.space/membership",
+  "assistantUrl": "https://www.mage.space/",
+  "analysisStubUrl": "https://www.mage.space/",
+  "plans": [
+    {
+      "id": "free",
+      "name": "Free / Basic",
+      "maxLoras": 1,
+      "note": "1 LoRA. Honestamente: Mage recorta slots en el plan bajo."
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "maxLoras": 2,
+      "note": "Hasta 2 LoRAs. Sube a Pro Plus para 5."
+    },
+    {
+      "id": "proPlus",
+      "name": "Pro Plus",
+      "maxLoras": 5,
+      "note": "Hasta 5 LoRAs (Koko). El motor también puede recortar (p. ej. Flux 2 = 0 archivos)."
+    },
+    {
+      "id": "max",
+      "name": "Max",
+      "maxLoras": 5,
+      "note": "5 LoRAs, mismo techo de slots que Pro Plus."
+    }
+  ]
+}
