@@ -1,6 +1,9 @@
 /**
  * Comfy Cloud txt2img proxy.
  * API key is read ONLY from env (COMFY_CLOUD_API_KEY). Client body/headers are ignored.
+ *
+ * LoRA weights are NEVER downloaded to the client. The Function loads files that
+ * already exist on Comfy Cloud via LoraLoader (selection metadata only).
  */
 
 const DEFAULT_BASE = 'https://cloud.comfy.org'
@@ -11,6 +14,9 @@ const DEFAULT_STEPS = 28
 const POLL_BUDGET_MS = 10_000
 const POLL_INTERVAL_MS = 1_400
 const MAX_BASE64_BYTES = 4_500_000
+const MAX_LORAS = 3
+const OBJECT_INFO_TIMEOUT_MS = 2_500
+const LORA_CATALOG_TTL_MS = 60_000
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -21,6 +27,63 @@ const CORS = {
 
 const DONE = new Set(['success', 'completed', 'complete'])
 const FAILED = new Set(['error', 'failed', 'cancelled', 'canceled'])
+
+const FAMILY_CHECKPOINTS = {
+  illustrious: 'Illustrious-XL-sdxl.safetensors',
+  sdxl: 'realvisxlV50_v50Bakedvae.safetensors',
+  flux: 'flux1-dev-fp8.safetensors',
+}
+
+const FAMILY_ENV_KEYS = {
+  illustrious: 'COMFY_CHECKPOINT_ILLUSTRIOUS',
+  sdxl: 'COMFY_CHECKPOINT_SDXL',
+  flux: 'COMFY_CHECKPOINT_FLUX',
+}
+
+const FAMILY_SAMPLING = {
+  illustrious: { cfg: 6, sampler: 'euler', scheduler: 'normal' },
+  sdxl: { cfg: 5, sampler: 'euler', scheduler: 'normal' },
+  flux: { cfg: 3.5, sampler: 'euler', scheduler: 'simple' },
+  default: { cfg: 7, sampler: 'euler', scheduler: 'normal' },
+}
+
+const SAMPLERS = new Set([
+  'euler',
+  'euler_ancestral',
+  'heun',
+  'heunpp2',
+  'dpm_2',
+  'dpm_2_ancestral',
+  'lms',
+  'dpm_fast',
+  'dpm_adaptive',
+  'dpmpp_2s_ancestral',
+  'dpmpp_sde',
+  'dpmpp_sde_gpu',
+  'dpmpp_2m',
+  'dpmpp_2m_sde',
+  'dpmpp_2m_sde_gpu',
+  'dpmpp_3m_sde',
+  'ddim',
+  'uni_pc',
+  'uni_pc_bh2',
+  'lcm',
+  'deis',
+])
+
+const SCHEDULERS = new Set([
+  'normal',
+  'karras',
+  'exponential',
+  'sgm_uniform',
+  'simple',
+  'ddim_uniform',
+  'beta',
+  'linear_quadratic',
+  'kl_optimal',
+])
+
+let loraCatalogCache = { at: 0, names: null }
 
 /**
  * Core handler used by Netlify, Vite dev middleware, and smoke tests.
@@ -65,7 +128,7 @@ export async function handleComfyGenerate(event) {
           message: 'Falta promptId para seguir la generación.',
         })
       }
-      return await pollAndResolve({ baseUrl, apiKey, promptId, env })
+      return await pollAndResolve({ baseUrl, apiKey, promptId, extra: {} })
     }
 
     const parsed = parseJsonBody(event.body)
@@ -81,20 +144,10 @@ export async function handleComfyGenerate(event) {
       })
     }
 
-    const width = clampDim(payload.width, DEFAULT_WIDTH)
-    const height = clampDim(payload.height, DEFAULT_HEIGHT)
-    const steps = clampInt(payload.steps, DEFAULT_STEPS, 1, 80)
-    const negative = String(payload.negative_prompt ?? '').trim()
-    const checkpoint = String(env.COMFY_CHECKPOINT || '').trim() || DEFAULT_CHECKPOINT
-
-    const workflow = buildTxt2ImgWorkflow({
-      prompt,
-      negative,
-      width,
-      height,
-      steps,
-      checkpoint,
-    })
+    const knownLoras = await getKnownLoraNames(baseUrl, apiKey)
+    const plan = planComfyJob(payload, env, knownLoras)
+    const workflow = buildTxt2ImgWorkflow(plan)
+    const extra = publicPlanMeta(plan)
 
     const submitted = await comfyFetch(`${baseUrl}/api/prompt`, apiKey, {
       method: 'POST',
@@ -109,6 +162,7 @@ export async function handleComfyGenerate(event) {
         ok: false,
         error: 'upstream',
         message: 'Comfy Cloud aceptó el envío pero no devolvió promptId.',
+        ...extra,
       })
     }
 
@@ -118,13 +172,14 @@ export async function handleComfyGenerate(event) {
         ok: false,
         error: 'upstream',
         promptId,
+        ...extra,
         message: spanishUpstream(
-          `El flujo no es válido (checkpoint «${checkpoint}»). Revisa COMFY_CHECKPOINT.`,
+          `El flujo no es válido (checkpoint «${plan.checkpoint}»). Revisa cerebro / COMFY_CHECKPOINT / LoRAs.`,
         ),
       })
     }
 
-    return await pollAndResolve({ baseUrl, apiKey, promptId, env })
+    return await pollAndResolve({ baseUrl, apiKey, promptId, extra })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     return json(502, {
@@ -154,6 +209,228 @@ export async function handler(event) {
     statusCode: result.statusCode,
     headers: result.headers,
     body: result.body,
+  }
+}
+
+/**
+ * Map POST body + env to a txt2img plan. Pure (no network).
+ * @param {Record<string, unknown>} payload
+ * @param {NodeJS.ProcessEnv | Record<string, string | undefined>} env
+ * @param {Set<string> | null} knownLoraNames
+ */
+export function planComfyJob(payload, env = {}, knownLoraNames = null) {
+  const warnings = []
+  const brainId = String(payload.brainId ?? payload.brain_id ?? '').trim()
+  const familyRaw = String(payload.family ?? '').trim()
+  const familyId = resolveFamilyId(brainId, familyRaw)
+
+  const prompt = String(payload.prompt ?? '').trim()
+  const negative = String(payload.negative_prompt ?? payload.negative ?? '').trim()
+  const width = clampDim(payload.width, DEFAULT_WIDTH)
+  const height = clampDim(payload.height, DEFAULT_HEIGHT)
+  const steps = clampInt(payload.steps, DEFAULT_STEPS, 1, 80)
+
+  const envForce = sanitizeFilename(env.COMFY_CHECKPOINT)
+  const clientCkpt = sanitizeFilename(payload.checkpoint)
+  const familyCkpt = familyCheckpoint(familyId, env)
+
+  let checkpoint
+  if (envForce) {
+    checkpoint = envForce
+  } else if (clientCkpt) {
+    checkpoint = clientCkpt
+  } else if (familyCkpt) {
+    checkpoint = familyCkpt
+  } else if (brainId || familyRaw) {
+    checkpoint = familyCheckpoint('sdxl', env) || FAMILY_CHECKPOINTS.sdxl
+    warnings.push(
+      `El cerebro «${brainId || familyRaw}» no tiene checkpoint mapeado. Se usa SDXL realista.`,
+    )
+  } else {
+    checkpoint = DEFAULT_CHECKPOINT
+  }
+
+  const sampling = FAMILY_SAMPLING[familyId] || FAMILY_SAMPLING.default
+  const cfg = clampCfg(payload.cfg ?? payload.guidance, sampling.cfg)
+  const sampler = sanitizeChoice(payload.sampler ?? payload.sampler_name, SAMPLERS, sampling.sampler)
+  const scheduler = sanitizeChoice(payload.scheduler, SCHEDULERS, sampling.scheduler)
+
+  if (payload.sampler && !SAMPLERS.has(String(payload.sampler))) {
+    warnings.push(`Sampler «${payload.sampler}» no es válido. Se usa «${sampler}».`)
+  }
+  if (payload.scheduler && !SCHEDULERS.has(String(payload.scheduler))) {
+    warnings.push(`Scheduler «${payload.scheduler}» no es válido. Se usa «${scheduler}».`)
+  }
+
+  const stacked = normalizeLoraStack(payload.loras, knownLoraNames)
+  warnings.push(...stacked.warnings)
+
+  if (knownLoraNames === null && Array.isArray(payload.loras) && payload.loras.length > 0) {
+    warnings.push(
+      'No se pudo comprobar el catálogo de LoRAs en Comfy Cloud. Se envían los nombres tal cual.',
+    )
+  }
+
+  return {
+    prompt,
+    negative,
+    width,
+    height,
+    steps,
+    checkpoint,
+    familyId,
+    brainId,
+    cfg,
+    sampler,
+    scheduler,
+    loras: stacked.applied,
+    warnings,
+  }
+}
+
+export function resolveFamilyId(brainId, family) {
+  const raw = `${brainId || ''} ${family || ''}`.toLowerCase().replace(/[_-]+/g, ' ')
+  if (/\billustrious\b/.test(raw) || /\billu\b/.test(raw)) return 'illustrious'
+  if (/\bflux\b/.test(raw)) return 'flux'
+  if (/\bsdxl\b/.test(raw) || /realvis/.test(raw) || /realista/.test(raw)) return 'sdxl'
+  return ''
+}
+
+export function familyCheckpoint(familyId, env = {}) {
+  if (!familyId) return ''
+  const envName = FAMILY_ENV_KEYS[familyId]
+  const fromEnv = envName ? sanitizeFilename(env[envName]) : ''
+  return fromEnv || FAMILY_CHECKPOINTS[familyId] || ''
+}
+
+export function normalizeLoraStack(raw, knownNames = null) {
+  const warnings = []
+  const applied = []
+  const seen = new Set()
+  const list = Array.isArray(raw) ? raw : []
+
+  for (const item of list) {
+    if (applied.length >= MAX_LORAS) {
+      warnings.push('Solo se apilan 3 LoRAs en Comfy Cloud. El resto se omitió.')
+      break
+    }
+    if (!item || typeof item !== 'object') continue
+    const name = sanitizeFilename(item.name ?? item.lora_name ?? item.comfyName ?? item.comfyFile)
+    if (!name) {
+      const hint = String(item.name ?? item.lora_name ?? '').trim()
+      if (hint) {
+        warnings.push(`Se ignoró «${hint.slice(0, 80)}»: no es un lora_name de Comfy Cloud.`)
+      }
+      continue
+    }
+    if (seen.has(name)) continue
+    if (knownNames && !knownNames.has(name)) {
+      warnings.push(
+        `La LoRA «${name}» no está en Comfy Cloud. Se omitió (solo texto / falta en Comfy).`,
+      )
+      continue
+    }
+    seen.add(name)
+    const strength_model = clampStrength(
+      item.strength_model ?? item.weight ?? item.strength,
+      0.7,
+    )
+    const strength_clip = clampStrength(
+      item.strength_clip ?? item.strength_model ?? item.weight ?? item.strength,
+      strength_model,
+    )
+    applied.push({ name, strength_model, strength_clip })
+  }
+
+  return { applied, warnings }
+}
+
+export function buildTxt2ImgWorkflow(plan) {
+  const seed = Number.isFinite(Number(plan.seed))
+    ? Number(plan.seed)
+    : Math.floor(Math.random() * 2 ** 32)
+  const loras = Array.isArray(plan.loras) ? plan.loras : []
+
+  const graph = {
+    '4': {
+      class_type: 'CheckpointLoaderSimple',
+      inputs: { ckpt_name: plan.checkpoint },
+    },
+    '5': {
+      class_type: 'EmptyLatentImage',
+      inputs: { width: plan.width, height: plan.height, batch_size: 1 },
+    },
+  }
+
+  let modelRef = ['4', 0]
+  let clipRef = ['4', 1]
+  loras.forEach((lora, index) => {
+    const id = String(10 + index)
+    graph[id] = {
+      class_type: 'LoraLoader',
+      inputs: {
+        lora_name: lora.name,
+        strength_model: lora.strength_model,
+        strength_clip: lora.strength_clip,
+        model: modelRef,
+        clip: clipRef,
+      },
+    }
+    modelRef = [id, 0]
+    clipRef = [id, 1]
+  })
+
+  graph['6'] = {
+    class_type: 'CLIPTextEncode',
+    inputs: { text: plan.prompt, clip: clipRef },
+  }
+  graph['7'] = {
+    class_type: 'CLIPTextEncode',
+    inputs: { text: plan.negative || '', clip: clipRef },
+  }
+  graph['3'] = {
+    class_type: 'KSampler',
+    inputs: {
+      seed,
+      steps: plan.steps,
+      cfg: plan.cfg,
+      sampler_name: plan.sampler,
+      scheduler: plan.scheduler,
+      denoise: 1,
+      model: modelRef,
+      positive: ['6', 0],
+      negative: ['7', 0],
+      latent_image: ['5', 0],
+    },
+  }
+  graph['8'] = {
+    class_type: 'VAEDecode',
+    inputs: { samples: ['3', 0], vae: ['4', 2] },
+  }
+  graph['9'] = {
+    class_type: 'SaveImage',
+    inputs: { filename_prefix: 'control-experimental', images: ['8', 0] },
+  }
+
+  return graph
+}
+
+export function extractLoraNames(data) {
+  const node = data?.LoraLoader ?? data
+  const combo = node?.input?.required?.lora_name
+  if (!Array.isArray(combo) || combo.length === 0) return null
+  const list = Array.isArray(combo[0]) ? combo[0] : combo
+  const names = list.filter((item) => typeof item === 'string' && item.trim())
+  return names.length > 0 ? new Set(names) : null
+}
+
+function publicPlanMeta(plan) {
+  return {
+    checkpoint: plan.checkpoint,
+    family: plan.familyId || undefined,
+    brainId: plan.brainId || undefined,
+    lorasApplied: plan.loras.map((lora) => lora.name),
+    warnings: plan.warnings,
   }
 }
 
@@ -193,17 +470,18 @@ function parseJsonBody(raw) {
   }
 }
 
-async function pollAndResolve({ baseUrl, apiKey, promptId }) {
+async function pollAndResolve({ baseUrl, apiKey, promptId, extra }) {
   const deadline = Date.now() + POLL_BUDGET_MS
   let status = 'pending'
   let errorMessage = ''
+  const meta = extra && typeof extra === 'object' ? extra : {}
 
   while (Date.now() < deadline) {
     const response = await fetch(`${baseUrl}/api/job/${encodeURIComponent(promptId)}/status`, {
       headers: { 'X-API-Key': apiKey, Accept: 'application/json' },
     })
     const mapped = mapComfyHttp(response.status)
-    if (mapped) return json(mapped.status, mapped.body)
+    if (mapped) return json(mapped.status, { ...mapped.body, ...meta })
 
     if (response.status === 404) {
       await sleep(POLL_INTERVAL_MS)
@@ -216,6 +494,7 @@ async function pollAndResolve({ baseUrl, apiKey, promptId }) {
         ok: false,
         error: 'upstream',
         promptId,
+        ...meta,
         message: spanishUpstream(text) || `Comfy Cloud respondió ${response.status} al consultar el job.`,
       })
     }
@@ -231,6 +510,7 @@ async function pollAndResolve({ baseUrl, apiKey, promptId }) {
         ok: true,
         promptId,
         status: 'completed',
+        ...meta,
         ...image.payload,
       })
     }
@@ -241,6 +521,7 @@ async function pollAndResolve({ baseUrl, apiKey, promptId }) {
         error: 'job_failed',
         promptId,
         status,
+        ...meta,
         message: errorMessage
           ? `La generación falló en Comfy Cloud: ${errorMessage}`
           : 'La generación falló en Comfy Cloud.',
@@ -255,6 +536,7 @@ async function pollAndResolve({ baseUrl, apiKey, promptId }) {
     pending: true,
     promptId,
     status,
+    ...meta,
     message: 'Sigue en cola o generando. Vuelve a consultar con promptId.',
   })
 }
@@ -380,49 +662,39 @@ function firstImage(outputs) {
   return null
 }
 
-function buildTxt2ImgWorkflow({ prompt, negative, width, height, steps, checkpoint }) {
-  const seed = Math.floor(Math.random() * 2 ** 32)
-  return {
-    '4': {
-      class_type: 'CheckpointLoaderSimple',
-      inputs: { ckpt_name: checkpoint },
-    },
-    '5': {
-      class_type: 'EmptyLatentImage',
-      inputs: { width, height, batch_size: 1 },
-    },
-    '6': {
-      class_type: 'CLIPTextEncode',
-      inputs: { text: prompt, clip: ['4', 1] },
-    },
-    '7': {
-      class_type: 'CLIPTextEncode',
-      inputs: { text: negative, clip: ['4', 1] },
-    },
-    '3': {
-      class_type: 'KSampler',
-      inputs: {
-        seed,
-        steps,
-        cfg: 7,
-        sampler_name: 'euler',
-        scheduler: 'normal',
-        denoise: 1,
-        model: ['4', 0],
-        positive: ['6', 0],
-        negative: ['7', 0],
-        latent_image: ['5', 0],
-      },
-    },
-    '8': {
-      class_type: 'VAEDecode',
-      inputs: { samples: ['3', 0], vae: ['4', 2] },
-    },
-    '9': {
-      class_type: 'SaveImage',
-      inputs: { filename_prefix: 'control-experimental', images: ['8', 0] },
-    },
+async function getKnownLoraNames(baseUrl, apiKey) {
+  if (loraCatalogCache.names && Date.now() - loraCatalogCache.at < LORA_CATALOG_TTL_MS) {
+    return loraCatalogCache.names
   }
+  const names = await fetchKnownLoraNames(baseUrl, apiKey)
+  if (names && names.size > 0) {
+    loraCatalogCache = { at: Date.now(), names }
+    return names
+  }
+  return null
+}
+
+async function fetchKnownLoraNames(baseUrl, apiKey) {
+  const urls = [`${baseUrl}/api/object_info/LoraLoader`, `${baseUrl}/api/object_info`]
+  for (const url of urls) {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), OBJECT_INFO_TIMEOUT_MS)
+    try {
+      const response = await fetch(url, {
+        headers: { 'X-API-Key': apiKey, Accept: 'application/json' },
+        signal: controller.signal,
+      })
+      if (!response.ok) continue
+      const data = await response.json().catch(() => null)
+      const names = extractLoraNames(data)
+      if (names && names.size > 0) return names
+    } catch {
+      /* timeout or network — try next */
+    } finally {
+      clearTimeout(timer)
+    }
+  }
+  return null
 }
 
 async function comfyFetch(url, apiKey, init = {}) {
@@ -494,8 +766,11 @@ function mapComfyHttp(status) {
 function spanishUpstream(text) {
   const raw = String(text || '').slice(0, 280)
   if (!raw) return ''
+  if (/lora/i.test(raw) && /not found|missing|does not exist|invalid/i.test(raw)) {
+    return 'Comfy Cloud no encontró una LoRA. El iPad no descarga pesos: el archivo tiene que existir en la cuenta.'
+  }
   if (/checkpoint|ckpt/i.test(raw)) {
-    return 'Comfy Cloud no encontró el checkpoint. Define COMFY_CHECKPOINT con un archivo que exista en tu cuenta.'
+    return 'Comfy Cloud no encontró el checkpoint. Define COMFY_CHECKPOINT o elige un cerebro mapeado (Illustrious / SDXL / FLUX).'
   }
   return raw
 }
@@ -512,6 +787,22 @@ function normalizeBase(url) {
   return String(url || DEFAULT_BASE).trim().replace(/\/+$/, '') || DEFAULT_BASE
 }
 
+function sanitizeFilename(value) {
+  const name = String(value ?? '').trim()
+  if (!name) return ''
+  if (name.length > 180) return ''
+  if (/[\\/]/.test(name) || name.includes('..') || /https?:/i.test(name) || name.includes(':')) {
+    return ''
+  }
+  return name
+}
+
+function sanitizeChoice(value, allowed, fallback) {
+  const name = String(value ?? '').trim()
+  if (allowed.has(name)) return name
+  return fallback
+}
+
 function clampDim(value, fallback) {
   const n = Number(value)
   if (!Number.isFinite(n)) return fallback
@@ -523,6 +814,18 @@ function clampInt(value, fallback, min, max) {
   const n = Number(value)
   if (!Number.isFinite(n)) return fallback
   return Math.min(max, Math.max(min, Math.round(n)))
+}
+
+function clampCfg(value, fallback) {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return fallback
+  return Math.min(30, Math.max(0.1, n))
+}
+
+function clampStrength(value, fallback) {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return fallback
+  return Math.min(2, Math.max(-2, n))
 }
 
 function guessMime(filename) {

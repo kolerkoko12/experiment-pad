@@ -9,6 +9,7 @@ type ExportBarProps = {
   disabled: boolean
   generating: boolean
   error: string | null
+  warnings?: string[]
   resultSrc: string | null
   onDirect: () => void
   onPromptbox: () => void
@@ -20,6 +21,7 @@ export function ExportBar({
   disabled,
   generating,
   error,
+  warnings,
   resultSrc,
   onDirect,
   onPromptbox,
@@ -37,6 +39,13 @@ export function ExportBar({
         <p className="rounded-2xl border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-[13px] leading-snug text-rose-100">
           {error}
         </p>
+      ) : null}
+      {warnings && warnings.length > 0 ? (
+        <ul className="space-y-1 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-[13px] leading-snug text-amber-100">
+          {warnings.map((warning) => (
+            <li key={warning}>{warning}</li>
+          ))}
+        </ul>
       ) : null}
       {resultSrc ? (
         <figure className="overflow-hidden rounded-2xl border border-teal-400/25 bg-black/30">
@@ -69,9 +78,9 @@ export function ExportBar({
       <p className="flex items-start gap-1 pb-1 text-[11px] leading-snug text-muted-foreground">
         <GlossaryTip term={termById(catalog.glossary, 'promptbox')} />
         <span>
-          <strong className="text-paper/70">Generar</strong> envía Prompt Final (o el ensamblado) a
-          Comfy Cloud. Directo / Promptbox solo copian. La clave no viaja en el iPad: vive en
-          Netlify.
+          <strong className="text-paper/70">Generar</strong> envía Prompt Final, cerebro y nombres
+          de LoRA a Comfy Cloud. Los pesos .safetensors no se bajan al iPad: LoraLoader los carga
+          en el servidor. Directo / Promptbox solo copian. La clave vive en Netlify.
         </span>
       </p>
     </div>

@@ -9,8 +9,44 @@ Site histórico: [control-experimental-comfy.netlify.app](https://control-experi
 Para que vuelva la Function:
 
 1. Publica con el repo **conectado a git** en Netlify (site `control-experimental-comfy`) **o** `netlify deploy --build` (no arrastres solo `dist`).
-2. Variables de entorno del site (nunca en el cliente ni en el repo): `COMFY_CLOUD_API_KEY` (obligatoria). Opcionales: `COMFY_BASE_URL` (default `https://cloud.comfy.org`), `COMFY_CHECKPOINT`.
-3. Tras el deploy: `POST /.netlify/functions/comfy-generate` (o `/api/comfy-generate`) debe devolver JSON, no HTML.
+2. Variables de entorno del site (nunca en el cliente ni en el repo): `COMFY_CLOUD_API_KEY` (obligatoria). Opcionales: `COMFY_BASE_URL` (default `https://cloud.comfy.org`), `COMFY_CHECKPOINT` (fuerza un checkpoint y gana al mapa de cerebros). Por familia, si renombras archivos en Cloud: `COMFY_CHECKPOINT_ILLUSTRIOUS`, `COMFY_CHECKPOINT_SDXL`, `COMFY_CHECKPOINT_FLUX`.
+3. Tras el deploy: `POST /.netlify/functions/comfy-generate` (o `/api/comfy-generate`) debe devolver JSON, no HTML. Un cambio de Function **exige** `netlify deploy --build` o un deploy git; Drop de `dist/` no actualiza `comfy-generate`.
+
+### Cerebro → checkpoint (Comfy Cloud)
+
+La Function elige el checkpoint según `brainId` / `family` del POST (salvo `COMFY_CHECKPOINT`):
+
+| Cerebro | Checkpoint |
+| --- | --- |
+| Illustrious | `Illustrious-XL-sdxl.safetensors` |
+| SDXL realista | `realvisxlV50_v50Bakedvae.safetensors` |
+| FLUX | `flux1-dev-fp8.safetensors` |
+| Otros (LTX, Wan, SD3.5…) | RealVis SDXL + aviso en español |
+
+Sampler/CFG por defecto si el cliente no manda `cfg` / `sampler` / `scheduler`: Illustrious cfg 6 euler/normal; SDXL cfg 5 euler/normal; FLUX cfg 3.5 euler/simple.
+
+### LoRAs (pesos solo en Cloud)
+
+El iPad **nunca** descarga `.safetensors`. Generar manda metadatos: `{ name, strength_model, strength_clip }` donde `name` es el `lora_name` exacto de Comfy Cloud. La Function apila hasta 3 nodos `LoraLoader`. Si un nombre no existe en `object_info`, se omite con aviso («solo texto / falta en Comfy») y el resto del job sigue.
+
+Hoy el catálogo mapea **Skin micro-detail** a:
+
+- Illustrious → `illustrious-realistic_skin_texture_style.safetensors`
+- SDXL → `sdxl-realistic_skin_texture_style_xl_detailed_skin_flux1d_illu.safetensors`
+- FLUX → `flux1-realistic_skin_texture_style_xl_detailed_skin_flux1d_illu.safetensors`
+
+Placeholders sin archivo Cloud (`ohwx`, `casca`, `myhouse`, grain, silk…) siguen siendo trigger-only. La UI lo dice.
+
+### FLUX (limitación)
+
+Illustrious y SDXL + `LoraLoader` es el camino sólido. FLUX usa el **mismo** grafo `CheckpointLoaderSimple` + `KSampler` (checkpoint `flux1-dev-fp8.safetensors`, cfg bajo, euler/simple). No hay DualCLIP / UNETLoader / FluxGuidance todavía; si tu cuenta exige ese grafo, el job puede fallar o verse distinto. Triggers de LoRA en el prompt no sustituyen pesos reales.
+
+### Redeploy (Function)
+
+1. Commit + push a la rama que Netlify construye, **o** `netlify deploy --build` (no arrastres solo `dist`).
+2. Confirma `COMFY_CLOUD_API_KEY` en Site settings → Environment variables.
+3. En el iPad: recarga forzada / reinstala PWA para pillar el bundle nuevo.
+4. Humo local: `npm run smoke:comfy` (no llama a Cloud) y `npm run build`.
 
 En local, `npm run dev` sirve el mismo endpoint. Sin clave verás el error 503 en español.
 
@@ -52,7 +88,7 @@ iPad-first PWA: colored prompt blocks, lock/anchor, constrained randomness, Mage
 5. Pasa a **Control** para editar a mano los bloques desanclados.
 6. **Generar** envía Prompt Final a Comfy Cloud. **Directo** o **Promptbox** copian el prompt.
 7. Cambia motor y **plan** (cuotas). Pega un análisis del helper si quieres mapear a bloques.
-8. **LoRAs:** importadas primero; incluye solo las elegidas; tope = min(motor, plan).
+8. **LoRAs:** importadas primero; incluye las que tengan archivo en Comfy (badge verde) o solo trigger (ámbar: «falta en Comfy»). Tope visual = min(motor, plan); los pesos los carga la Function.
 9. **Picante / Exageración (beta):** sliders y tramos de color en el prompt.
 
 ### Añadir a pantalla de inicio (PWA)
@@ -71,7 +107,7 @@ Archivos en `/data` (se sirven en `/data/…`):
 | `data/options.json` | Listas de opciones + `weight` + `tags` de compatibilidad. |
 | `data/models.json` | Motores Mage, tips, `maxLoras`. |
 | `data/mage.json` | Planes / cuotas, URLs de ayuda y stubs. |
-| `data/loras.json` | LoRAs: `source` imported/catalog, categoría, pesos, `examplesUrl` solo si es la ficha exacta. |
+| `data/loras.json` | LoRAs: `source` imported/catalog, categoría, pesos, `comfyByBrain`/`comfyName` = archivo en Comfy Cloud (nunca URL), `examplesUrl` solo si es la ficha exacta. |
 | `data/glossary.json` | Textos del `?`. |
 | `data/spicy.json` | Niveles picante / exageración / ganchos extra. |
 | `data/micro-variations.json` | 2 obvias + pool inusual rotatorio. |
@@ -143,5 +179,5 @@ API real de Mage, overlay flotante, scrape Civitai, shaman, vídeo continuo, aff
 - `data/brains-ui-pack.json` — cerebros FLUX / Illustrious / SDXL / SD3.5 / LTX / Wan.
 - `data/brains/*-model_profile.json` — perfiles completos (referencia; la UI usa el pack).
 - Un solo shell: el cerebro seleccionado muestra/oculta negative, params, modos y uploads.
-- Referencias (image_ref / video_ref / character_refs): UI-ready con objectURL; el adaptador de refs/base64 sigue siendo un lote aparte. **Generar** ya manda prompt + negative/width/height/steps a `comfy-generate`.
+- Referencias (image_ref / video_ref / character_refs): UI-ready con objectURL; el adaptador de refs/base64 sigue siendo un lote aparte. **Generar** manda prompt + negative/width/height/steps + `brainId`/`family` + LoRAs (`lora_name` + strength). Los `.safetensors` no viajan al iPad.
 - `mage.json` sigue cargando (planes/cuotas legado) sin romper el build.

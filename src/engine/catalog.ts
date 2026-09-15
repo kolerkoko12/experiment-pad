@@ -62,7 +62,29 @@ function normalizeLora(raw: LorasFile['loras'][number]): LoraDef {
     strengths: raw.strengths ?? [],
     tags: raw.tags ?? [],
     examplesUrl: url && !generic ? url : undefined,
+    comfyName: cleanComfyFilename(raw.comfyName),
+    comfyFile: cleanComfyFilename(raw.comfyFile),
+    comfyByBrain: normalizeComfyByBrain(raw.comfyByBrain),
   }
+}
+
+function cleanComfyFilename(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined
+  const name = value.trim()
+  if (!name || name === 'null') return undefined
+  if (/[\\/]/.test(name) || name.includes('..') || /https?:/i.test(name)) return undefined
+  return name
+}
+
+function normalizeComfyByBrain(raw: unknown): Record<string, string> | undefined {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined
+  const out: Record<string, string> = {}
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    const name = cleanComfyFilename(value)
+    const brain = key.trim().toLowerCase()
+    if (name && brain) out[brain] = name
+  }
+  return Object.keys(out).length > 0 ? out : undefined
 }
 
 async function fetchJson<T>(url: string): Promise<T> {

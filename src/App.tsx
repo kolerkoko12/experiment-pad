@@ -18,10 +18,16 @@ import { SpicyBar } from '@/components/SpicyBar'
 import { TemplateDialog } from '@/components/TemplateDialog'
 import { Button } from '@/components/ui/button'
 import {
+  findBrain,
+  findLora,
+  generationSamplerFromBrain,
   generationSizeFromBrain,
   loadBrains,
   loraKeywordText,
   promptPhraseDelta,
+  resolveLoraComfyName,
+  selectedComfyLoras,
+  selectedTextOnlyLoras,
   suggestModelIdForBrain,
   type Block,
   type BrainUiPack,
@@ -42,6 +48,7 @@ export default function App() {
   const [brainState, setBrainState] = useState<BrainPanelState | null>(null)
   const [comfyBusy, setComfyBusy] = useState(false)
   const [comfyError, setComfyError] = useState<string | null>(null)
+  const [comfyWarnings, setComfyWarnings] = useState<string[]>([])
   const [comfyImage, setComfyImage] = useState<string | null>(null)
   const comfyAbort = useRef<AbortController | null>(null)
 
@@ -150,9 +157,21 @@ export default function App() {
     comfyAbort.current = controller
     setComfyBusy(true)
     setComfyError(null)
+    setComfyWarnings([])
     flash('Enviando a Comfy Cloud…')
     try {
+      const brain = brainPack && brainState ? findBrain(brainPack, brainState.brainId) : undefined
       const size = generationSizeFromBrain(brainState?.params)
+      const sampling = generationSamplerFromBrain(brainState?.params)
+      const loras = studio.catalog
+        ? selectedComfyLoras(studio.state, studio.catalog, brainState?.brainId)
+        : []
+      const textOnly = studio.catalog
+        ? selectedTextOnlyLoras(studio.state, studio.catalog, brainState?.brainId)
+        : []
+      const localWarnings = textOnly.map(
+        (lora) => `«${lora.name}» no está en Comfy Cloud: solo texto / falta en Comfy.`,
+      )
       const result = await generateWithComfy(
         {
           prompt,
@@ -160,14 +179,28 @@ export default function App() {
           width: size.width,
           height: size.height,
           steps: size.steps,
+          cfg: size.cfg,
+          sampler: sampling.sampler,
+          scheduler: sampling.scheduler,
+          brainId: brainState?.brainId || undefined,
+          family: brain?.family,
+          loras,
         },
         {
           signal: controller.signal,
           onStatus: (message) => flash(message),
         },
       )
+      const warnings = [...localWarnings, ...result.warnings]
+      setComfyWarnings(warnings)
       setComfyImage(result.imageSrc)
-      flash('Imagen lista')
+      flash(
+        warnings.length > 0
+          ? 'Imagen lista (con avisos de LoRA)'
+          : result.lorasApplied?.length
+            ? `Imagen lista · ${result.lorasApplied.length} LoRA en Cloud`
+            : 'Imagen lista',
+      )
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return
       if (err instanceof Error && err.name === 'AbortError') return
@@ -360,6 +393,7 @@ export default function App() {
                 disabled={studio.empty && !brainState?.promptFinal?.trim()}
                 generating={comfyBusy}
                 error={comfyError}
+                warnings={comfyWarnings}
                 resultSrc={comfyImage}
                 onDirect={() => {
                   void copyText(
@@ -384,6 +418,7 @@ export default function App() {
           catalog={studio.catalog}
           state={studio.state}
           model={studio.selectedModel}
+          brainId={brainState?.brainId}
           recommendedIds={studio.recommendedLoras.map((lora) => lora.id)}
           open={loraOpen}
           onClose={() => setLoraOpen(false)}
@@ -393,7 +428,13 @@ export default function App() {
               flash('Tope de LoRAs. Quita una o sube de plan (upsell).')
               return 'blocked'
             }
-            flash('LoRA incluida · el ensamblado se actualizó')
+            const lora = studio.catalog ? findLora(studio.catalog, id) : undefined
+            const cloudName = lora ? resolveLoraComfyName(lora, brainState?.brainId) : null
+            flash(
+              cloudName
+                ? `LoRA incluida · Comfy cargará ${cloudName}`
+                : 'LoRA incluida · solo texto / falta en Comfy',
+            )
             return 'ok'
           }}
           onRemove={(id) => {

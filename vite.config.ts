@@ -95,7 +95,14 @@ function readRequestBody(req: IncomingMessage): Promise<string> {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  for (const key of ['COMFY_CLOUD_API_KEY', 'COMFY_BASE_URL', 'COMFY_CHECKPOINT']) {
+  for (const key of [
+    'COMFY_CLOUD_API_KEY',
+    'COMFY_BASE_URL',
+    'COMFY_CHECKPOINT',
+    'COMFY_CHECKPOINT_FLUX',
+    'COMFY_CHECKPOINT_SDXL',
+    'COMFY_CHECKPOINT_ILLUSTRIOUS',
+  ]) {
     if (env[key] && !process.env[key]) process.env[key] = env[key]
   }
 

@@ -9,9 +9,11 @@ import {
   isAtLoraLimit,
   isOverLoraLimit,
   loraFitsModel,
+  loraIsOnComfy,
   loraKeywordText,
   loraTriggerText,
   lorasByCategory,
+  resolveLoraComfyName,
   selectedLoras,
 } from '@/engine'
 import { cn } from '@/lib/utils'
@@ -20,6 +22,7 @@ type LoraPanelProps = {
   catalog: Catalog
   state: PromptState
   model: MageModel | undefined
+  brainId?: string
   recommendedIds: string[]
   open: boolean
   onClose: () => void
@@ -52,6 +55,7 @@ function LoraPanelBody({
   catalog,
   state,
   model,
+  brainId,
   recommendedIds,
   showClose,
   onClose,
@@ -100,8 +104,12 @@ function LoraPanelBody({
           )}
         >
           {selected.length} incluidas
-          {max > 0 ? ` / ${max} slots` : ' · este motor no lista archivos LoRA'}
+          {max > 0 ? ` / ${max} slots` : ' · Comfy Cloud carga los archivos mapeados'}
           {over ? ' · LÍMITE: sube de plan o quita una.' : includedGreen ? ' · ok' : ''}
+        </p>
+        <p className="mt-2 text-[12px] leading-snug text-paper/50">
+          Generar carga los pesos en Comfy Cloud (LoraLoader). El iPad solo manda el nombre del
+          archivo, nunca el .safetensors.
         </p>
         {model?.loraNote ? (
           <p className="mt-1 text-[12px] text-muted-foreground">{model.loraNote}</p>
@@ -138,6 +146,7 @@ function LoraPanelBody({
                   style={{ background: lora.categoryColor }}
                 >
                   {lora.name}
+                  {loraIsOnComfy(lora, brainId) ? '' : ' · texto'}
                 </button>
               ))
             )}
@@ -145,7 +154,7 @@ function LoraPanelBody({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-3">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-3 pb-28">
         {groups.map((group) => (
           <section key={group.category}>
             <h3 className="mb-2 flex items-center gap-2 text-[12px] font-semibold tracking-wide uppercase">
@@ -160,7 +169,9 @@ function LoraPanelBody({
                   included={state.selectedLoraIds.includes(lora.id)}
                   expanded={expandedId === lora.id || state.selectedLoraIds.includes(lora.id) && expandedId === lora.id}
                   recommended={recommended.has(lora.id)}
-                  fits={loraFitsModel(lora, state.selectedModelId)}
+                  fits={loraFitsModel(lora, state.selectedModelId) || loraIsOnComfy(lora, brainId)}
+                  onComfy={loraIsOnComfy(lora, brainId)}
+                  comfyFile={resolveLoraComfyName(lora, brainId)}
                   glossary={catalog.glossary}
                   onToggleExpand={() => setExpandedId((id) => (id === lora.id ? null : lora.id))}
                   onCopy={() => onCopyKeywords(lora)}
@@ -182,6 +193,8 @@ function LoraCard({
   expanded,
   recommended,
   fits,
+  onComfy,
+  comfyFile,
   glossary,
   onToggleExpand,
   onCopy,
@@ -193,6 +206,8 @@ function LoraCard({
   expanded: boolean
   recommended: boolean
   fits: boolean
+  onComfy: boolean
+  comfyFile: string | null
   glossary: Catalog['glossary']
   onToggleExpand: () => void
   onCopy: () => void
@@ -225,11 +240,44 @@ function LoraCard({
         </div>
         <h3 className="mt-1 text-[16px] text-paper">{lora.name}</h3>
         <p className="mt-1 line-clamp-2 text-[13px] text-paper/70">{lora.description}</p>
+        <p className="mt-1.5 text-[11px] leading-snug">
+          {onComfy ? (
+            <span className="text-emerald-200/90">Comfy Cloud · pesos en el servidor</span>
+          ) : (
+            <span className="text-amber-200/90">solo texto / falta en Comfy</span>
+          )}
+        </p>
       </button>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <Button type="button" size="sm" variant="outline" onClick={onCopy}>
+          <Copy />
+          Copiar keywords
+        </Button>
+        {included ? (
+          <Button type="button" size="sm" variant="secondary" onClick={onRemove}>
+            <Trash2 />
+            Quitar
+          </Button>
+        ) : (
+          <Button type="button" size="sm" onClick={onInclude}>
+            <Plus />
+            Incluir en el prompt
+          </Button>
+        )}
+      </div>
       {rich ? (
         <>
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {lora.placeholder ? (
+            {onComfy ? (
+              <span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[10px] text-emerald-100">
+                Comfy Cloud
+              </span>
+            ) : (
+              <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] text-amber-200">
+                solo texto / falta en Comfy
+              </span>
+            )}
+            {lora.placeholder && !onComfy ? (
               <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] text-amber-200">
                 Placeholder
               </span>
@@ -256,6 +304,17 @@ function LoraCard({
             <WeightChip tone="mid" label="Medio" value={lora.weight.mid} note={lora.weight.notes.mid} />
             <WeightChip tone="high" label="Alto" value={lora.weight.high} note={lora.weight.notes.high} />
           </div>
+          {onComfy && comfyFile ? (
+            <p className="mt-2 text-[11px] break-all text-emerald-100/80">
+              Generar carga <span className="font-medium">{comfyFile}</span> en el servidor. No se
+              descarga al iPad.
+            </p>
+          ) : (
+            <p className="mt-2 text-[11px] text-amber-200/90">
+              No hay archivo en Comfy Cloud para este cerebro. Incluir solo pega el trigger al
+              prompt.
+            </p>
+          )}
           <p className="mt-2 text-[12px] text-muted-foreground">{lora.tip}</p>
           {lora.examplesUrl ? (
             <a
@@ -272,23 +331,6 @@ function LoraCard({
           )}
         </>
       ) : null}
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <Button type="button" size="sm" variant="outline" onClick={onCopy}>
-          <Copy />
-          Copiar keywords
-        </Button>
-        {included ? (
-          <Button type="button" size="sm" variant="secondary" onClick={onRemove}>
-            <Trash2 />
-            Quitar
-          </Button>
-        ) : (
-          <Button type="button" size="sm" onClick={onInclude}>
-            <Plus />
-            Incluir en el prompt
-          </Button>
-        )}
-      </div>
     </article>
   )
 }
