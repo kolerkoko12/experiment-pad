@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "note": "source=imported|catalog. examplesUrl solo si es la ficha exacta. comfyName/comfyByBrain = lora_name exacto en Comfy Cloud (nunca una URL de descarga). Sin archivo Cloud = solo trigger.",
   "loras": [
     {
@@ -608,6 +608,610 @@
       "category": "Detalle",
       "categoryColor": "#F4EFE6",
       "source": "catalog"
+    },
+    {
+      "id": "nsfw-master",
+      "name": "NSFW MASTER",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "LoRA Flux NSFW MASTER (Shopon_Skp). Desbloquea desnudo / explícito en Flux. Peso típico ~0.8. No hay archivo Cloud mapeado.",
+      "keywords": [
+        "nsfw",
+        "nude",
+        "flux nsfw master",
+        "realistic"
+      ],
+      "triggers": [
+        "nsfw"
+      ],
+      "weight": {
+        "low": 0.5,
+        "mid": 0.8,
+        "high": 1.0,
+        "notes": {
+          "low": "Toque. Si el checkpoint ya es explícito.",
+          "mid": "Punto de la ficha (~0.8).",
+          "high": "Marca fuerte. Baja si deforma cara o anatomía."
+        }
+      },
+      "tip": "Revisa en Cloud un SKP-NSFW_Master_* (Krea/Z-Image) o NSFW_master.safetensors (Flux v1). Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "adulto",
+        "fotoreal",
+        "desnudo"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/667086/nsfw-master"
+    },
+    {
+      "id": "aidma-nsfw-unlock",
+      "name": "aidmaNSFWunlock (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "FLUX NSFW unlock (AIDigitalMediaAgency). Afloja el sesgo SFW de Flux. La ficha no exige trigger; el autor lista aidmaNSFWunlock.",
+      "keywords": [
+        "nsfw unlock",
+        "flux nsfw",
+        "nude"
+      ],
+      "triggers": [],
+      "weight": {
+        "low": 0.5,
+        "mid": 0.8,
+        "high": 0.9,
+        "notes": {
+          "low": "Desbloqueo suave.",
+          "mid": "0.7–0.9 como pide la ficha / el uso habitual.",
+          "high": "1.0 máximo de la ficha. Puede extrañar caras."
+        }
+      },
+      "tip": "Desbloquea NSFW en Flux ~0.7–0.9 (ficha 0.5–1.0). Trigger opcional de la ficha: aidmaNSFWunlock. No lo metemos en triggers para no forzar el token. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "adulto",
+        "fotoreal"
+      ],
+      "tags": [
+        "nude",
+        "intimate"
+      ],
+      "examplesUrl": "https://civitai.com/models/674027/flux-nsfw-unlock"
+    },
+    {
+      "id": "nsfw-pov-aio-sdxl",
+      "name": "NSFW POV All In One SDXL",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus"
+      ],
+      "description": "POV adulto All-in-One para SDXL (rchrd). 19 categorías de trigger. Una categoría por generación. Versión full 0.5–0.8; mini 0.8–1.0.",
+      "keywords": [
+        "pov",
+        "nsfw",
+        "sex",
+        "sdxl"
+      ],
+      "triggers": [
+        "blowjob",
+        "doggy style",
+        "riding cowgirl",
+        "handjob",
+        "threesome",
+        "undressing"
+      ],
+      "weight": {
+        "low": 0.5,
+        "mid": 0.65,
+        "high": 0.8,
+        "notes": {
+          "low": "Full version, escena suave.",
+          "mid": "0.5–0.8 full (empieza ~0.6).",
+          "high": "Mini 74MB o si no marca. Watermarks: baja peso o negative watermark."
+        }
+      },
+      "tip": "Una categoría de trigger cada vez, fuerza 0.5–0.8 (full). No mezcles 4 poses. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "adulto",
+        "pov",
+        "sexo"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/144203/nsfw-pov-all-in-one-sdxl-realisticanimewd14-74mb-version-available"
+    },
+    {
+      "id": "cruzflesh-hyper-penis",
+      "name": "CruzFlesh Hyper penis (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "CruzFlesh Hyper / male explicit para Flux Dev. Anatomía masculina hiper. Peso ficha ~0.7–1.0.",
+      "keywords": [
+        "hyper penis",
+        "naked man",
+        "cruzflesh",
+        "male nsfw"
+      ],
+      "triggers": [
+        "Hyper penis",
+        "erect penis",
+        "hanging penis",
+        "a naked man"
+      ],
+      "weight": {
+        "low": 0.55,
+        "mid": 0.8,
+        "high": 1.0,
+        "notes": {
+          "low": "Menos distorsión.",
+          "mid": "0.7–1 según ficha V2.",
+          "high": "Hiper fuerte. Puede comer el resto del cuerpo."
+        }
+      },
+      "tip": "Flux: prosa + estos tags. No inventamos comfyName (en Civitai el Flux V2 se llama Flux_Dev_Hyper_Penis_V2.safetensors; confirma el nombre en Cloud). Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "adulto",
+        "anatomía",
+        "masculino"
+      ],
+      "tags": [
+        "nude",
+        "raw",
+        "intimate"
+      ],
+      "examplesUrl": "https://civitai.com/models/226478"
+    },
+    {
+      "id": "cruzflesh-big-penis",
+      "name": "CruzFlesh Big penis (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "Erect Man Flux Dev — Big Penis (CruzFlesh). Frontales de hombre erecto. “a naked man” es tag importante.",
+      "keywords": [
+        "penis",
+        "naked man",
+        "erection",
+        "cruzflesh"
+      ],
+      "triggers": [
+        "penis",
+        "a naked man",
+        "erection"
+      ],
+      "weight": {
+        "low": 0.55,
+        "mid": 0.75,
+        "high": 1.0,
+        "notes": {
+          "low": "Si ya hay anatomía en el prompt.",
+          "mid": "Medio de la ficha (1–0.55).",
+          "high": "Más tamaño; puede olvidar la colocación — prueba “penis between legs”."
+        }
+      },
+      "tip": "Empieza en medio (≈0.75). Tag clave: a naked man. Sin comfyName Cloud. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "adulto",
+        "anatomía",
+        "masculino"
+      ],
+      "tags": [
+        "nude",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/721126"
+    },
+    {
+      "id": "futa-penis-klein",
+      "name": "Futa penis Klein (Flux.2)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "Futanari Penis para Flux.2 Klein 9B (Degenerator123). Dataset fotoreal. Evita la palabra futanari: no está en el captioning.",
+      "keywords": [
+        "woman with a penis",
+        "futa",
+        "photoreal"
+      ],
+      "triggers": [
+        "woman with a penis"
+      ],
+      "weight": {
+        "low": 0.7,
+        "mid": 1.0,
+        "high": 1.0,
+        "notes": {
+          "low": "Si ya hay otra LoRA de anatomía.",
+          "mid": "Ficha: strength 1 en Klein 9B distilled.",
+          "high": "No subas por encima de 1."
+        }
+      },
+      "tip": "Usa “woman with a penis”. Evita la palabra futanari (el modelo la confunde). Entrenado en Flux.2 Klein 9B, no Flux.1 Dev clásico. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "adulto",
+        "anatomía",
+        "futa"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/2324280"
+    },
+    {
+      "id": "futa-erect-bulge-flux",
+      "name": "Futa erect bulge (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "Large erect penis bulge futanari for FLUX (ElectronLibre). Bulto erecto bajo ropa. Caption en prosa; trigger de ficha: Erect penis bulge.",
+      "keywords": [
+        "erect penis bulge",
+        "bulge",
+        "clothes"
+      ],
+      "triggers": [
+        "ERECT PENIS BULGE"
+      ],
+      "weight": {
+        "low": 0.6,
+        "mid": 0.85,
+        "high": 1.0,
+        "notes": {
+          "low": "Bulto sutil.",
+          "mid": "Punto habitual.",
+          "high": "Ropa muy tensa; puede tapar cara si no la pides."
+        }
+      },
+      "tip": "Trigger de ficha: Erect penis bulge. Describe la ropa. Detalla la cara en el prompt (dataset con caras tapadas). Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "adulto",
+        "ropa",
+        "futa"
+      ],
+      "tags": [
+        "intimate",
+        "sheer"
+      ],
+      "examplesUrl": "https://civitai.com/models/1525521"
+    },
+    {
+      "id": "futa-flaccid-flux",
+      "name": "Futa flaccid (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "Futanari with large flaccid penis for FLUX (ElectronLibre). Cuerpo femenino + flácido detallado.",
+      "keywords": [
+        "flaccid penis",
+        "woman with a flaccid penis"
+      ],
+      "triggers": [
+        "WOMAN WITH A FLACCID PENIS"
+      ],
+      "weight": {
+        "low": 0.6,
+        "mid": 0.85,
+        "high": 1.0,
+        "notes": {
+          "low": "Toque.",
+          "mid": "Punto habitual.",
+          "high": "Muy marcado; detalla la cara en el prompt."
+        }
+      },
+      "tip": "Trigger de ficha: Woman with a flaccid penis. Dataset sin caras claras: descríbela. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "adulto",
+        "anatomía",
+        "futa"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/1522074"
+    },
+    {
+      "id": "skin-realism-nsfw",
+      "name": "Skin Realism (SDXL)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus"
+      ],
+      "description": "Skin Realism (acne, details, imperfections) SDXL. Versión REWORKED id 340833. Piel natural, no airbrush. No es LoRA de sexo; ayuda al fotoreal adulto.",
+      "keywords": [
+        "detailed natural skin",
+        "blemishes",
+        "acne",
+        "imperfections"
+      ],
+      "triggers": [
+        "Detailed natural skin and blemishes without-makeup and acne"
+      ],
+      "weight": {
+        "low": 0.35,
+        "mid": 0.5,
+        "high": 0.7,
+        "notes": {
+          "low": "Toque de poros.",
+          "mid": "Ficha: 0.5. Reacciona distinto según checkpoint.",
+          "high": "Evita 1.0: deforma y fija edad joven."
+        }
+      },
+      "tip": "Versión Civitai 340833 (REWORKED). No combines con Skin micro-detail. Fuerza ~0.5. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "fotoreal",
+        "retratos",
+        "piel"
+      ],
+      "tags": [
+        "intimate",
+        "editorial",
+        "portrait",
+        "close"
+      ],
+      "examplesUrl": "https://civitai.com/models/248951"
+    },
+    {
+      "id": "sex-box-pony",
+      "name": "Sex Box (Pony / XL)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "pony-import"
+      ],
+      "description": "Sex Box v3 [ALL XL] by UOC. Concepto “sex box”. La ficha principal es Pony; hay builds Illustrious/SDXL en la misma página. El catálogo lo enseña en motor Pony.",
+      "keywords": [
+        "sex box",
+        "sexbox",
+        "concept"
+      ],
+      "triggers": [
+        "sex box",
+        "sexbox"
+      ],
+      "weight": {
+        "low": 0.6,
+        "mid": 0.8,
+        "high": 1.0,
+        "notes": {
+          "low": "Concepto suave.",
+          "mid": "Punto Pony habitual.",
+          "high": "Fuerza el objeto; puede ignorar el resto de la escena."
+        }
+      },
+      "tip": "Motor Pony (pony-import). v3 también tiene Illustrious/SDXL en la ficha; no mapeamos comfyByBrain porque no sabemos el archivo Cloud. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "adulto",
+        "concepto",
+        "pony"
+      ],
+      "tags": [
+        "nude",
+        "playful",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/456836"
+    },
+    {
+      "id": "intercourse-vampire",
+      "name": "Intercourse with the Vampire",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "pony-import"
+      ],
+      "description": "Intercourse with the Vampire (nevarky) [PONY XL] by UOC. La ficha es Pony, no SDXL genérico. Concepto / personaje adulto.",
+      "keywords": [
+        "intercourse with the vampire",
+        "vampire",
+        "nevarky"
+      ],
+      "triggers": [
+        "1nt3rc0urs3v4mp1r3",
+        "IntercoursewiththeVampire",
+        "Intercourse with the Vampire"
+      ],
+      "weight": {
+        "low": 0.6,
+        "mid": 0.8,
+        "high": 1.0,
+        "notes": {
+          "low": "Si el checkpoint Pony ya es explícito.",
+          "mid": "Punto Pony habitual.",
+          "high": "Puede congelar el look del personaje."
+        }
+      },
+      "tip": "Pony XL (no SDXL genérico). En SDXL no cargará bien: las keywords se pegan como texto. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "adulto",
+        "personaje",
+        "pony"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/929539"
+    },
+    {
+      "id": "prefectious-xl-nsfw",
+      "name": "Prefectious XL NSFW",
+      "placeholder": true,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "illustrious-import",
+        "sdxl",
+        "sdxl-plus"
+      ],
+      "description": "ATENCIÓN: en Civitai es un CHECKPOINT Illustrious (no LoRA). No va a LoraLoader. Lo listamos para la ficha y los tags de calidad.",
+      "keywords": [
+        "masterpiece",
+        "best quality",
+        "absurdres",
+        "illustrious"
+      ],
+      "triggers": [
+        "masterpiece",
+        "best quality",
+        "absurdres",
+        "amazing quality"
+      ],
+      "weight": {
+        "low": 0.0,
+        "mid": 0.0,
+        "high": 0.0,
+        "notes": {
+          "low": "No es LoRA: el peso no carga archivo.",
+          "mid": "Solo texto / ficha.",
+          "high": "No subas peso: no hay .safetensors de LoRA."
+        }
+      },
+      "tip": "Es checkpoint Illustrious, no LoRA. No pongas comfyName de LoraLoader. Si lo usas en Cloud, va como checkpoint del cerebro, no en Incluir LoRA. CFG 5–6, Euler A / DPM++ 2M según ficha.",
+      "strengths": [
+        "anime",
+        "adulto",
+        "illustrious"
+      ],
+      "tags": [
+        "editorial",
+        "playful"
+      ],
+      "examplesUrl": "https://civitai.com/models/992378"
+    },
+    {
+      "id": "latexskin-nsfw-flux",
+      "name": "LatexSkin NSFW (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "LatexSkin(NSFW)-FLUX-PAseer. Piel / traje látex. Flux.dev es SFW de base: no espera una segunda línea sexual sin otra LoRA.",
+      "keywords": [
+        "latex",
+        "latex skin",
+        "nsfw"
+      ],
+      "triggers": [
+        "latex"
+      ],
+      "weight": {
+        "low": 0.5,
+        "mid": 0.75,
+        "high": 1.0,
+        "notes": {
+          "low": "Brillo látex suave.",
+          "mid": "Look látex claro.",
+          "high": "Cubre todo; combina con otra LoRA NSFW si quieres anatomía explícita."
+        }
+      },
+      "tip": "Trigger: latex. Flux solo no da explícito fuerte; apila otra LoRA NSFW si lo necesitas. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "strengths": [
+        "látex",
+        "piel",
+        "adulto"
+      ],
+      "tags": [
+        "luxury",
+        "intimate",
+        "sheer"
+      ],
+      "examplesUrl": "https://civitai.com/models/643395"
+    },
+    {
+      "id": "persephone-flux-nsfw",
+      "name": "Persephone Flux NSFW",
+      "placeholder": true,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "ATENCIÓN: Persephone [Flux NSFW/SFW] es CHECKPOINT Flux, no LoRA. Va a /models/checkpoints. No hay trigger de LoRA.",
+      "keywords": [
+        "flux nsfw checkpoint",
+        "persephone"
+      ],
+      "triggers": [],
+      "weight": {
+        "low": 0.0,
+        "mid": 0.0,
+        "high": 0.0,
+        "notes": {
+          "low": "No es LoRA.",
+          "mid": "Solo ficha / recordatorio.",
+          "high": "No uses LoraLoader."
+        }
+      },
+      "tip": "Checkpoint Flux (p. ej. persephoneFluxNSFWSFW_20FP8.safetensors en Civitai), no LoRA. No inventamos comfyName. Si lo tienes en Cloud, cámbialo en el checkpoint del cerebro FLUX, no en Incluir. Sampler ficha: dpmpp_2m + beta; DualCLIP aparte.",
+      "strengths": [
+        "adulto",
+        "fotoreal",
+        "flux"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "cinematic"
+      ],
+      "examplesUrl": "https://civitai.com/models/1775002"
     }
   ]
 }
