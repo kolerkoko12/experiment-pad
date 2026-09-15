@@ -117,7 +117,13 @@ export function isAtLoraLimit(selectedCount: number, max: number): boolean {
 }
 
 export function loraFitsModel(lora: LoraDef, modelId: string): boolean {
-  return lora.baseModels.length === 0 || lora.baseModels.includes(modelId)
+  if (lora.baseModels.length === 0) return true
+  if (lora.baseModels.includes(modelId)) return true
+  const id = modelId.toLowerCase()
+  return lora.baseModels.some((base) => {
+    const key = base.toLowerCase()
+    return id === key || id.startsWith(`${key}-`) || id.includes(key)
+  })
 }
 
 function lockedSceneTags(blocks: Block[], catalog: Catalog): Set<string> {

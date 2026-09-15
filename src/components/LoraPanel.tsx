@@ -104,7 +104,7 @@ function LoraPanelBody({
           )}
         >
           {selected.length} incluidas
-          {max > 0 ? ` / ${max} slots` : ' · este motor no lista archivos LoRA'}
+          {max > 0 ? ` / ${max} slots` : ' · Comfy Cloud carga los archivos mapeados'}
           {over ? ' · LÍMITE: sube de plan o quita una.' : includedGreen ? ' · ok' : ''}
         </p>
         <p className="mt-2 text-[12px] leading-snug text-paper/50">
@@ -154,7 +154,7 @@ function LoraPanelBody({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-3">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-3 pb-28">
         {groups.map((group) => (
           <section key={group.category}>
             <h3 className="mb-2 flex items-center gap-2 text-[12px] font-semibold tracking-wide uppercase">
@@ -169,7 +169,7 @@ function LoraPanelBody({
                   included={state.selectedLoraIds.includes(lora.id)}
                   expanded={expandedId === lora.id || state.selectedLoraIds.includes(lora.id) && expandedId === lora.id}
                   recommended={recommended.has(lora.id)}
-                  fits={loraFitsModel(lora, state.selectedModelId)}
+                  fits={loraFitsModel(lora, state.selectedModelId) || loraIsOnComfy(lora, brainId)}
                   onComfy={loraIsOnComfy(lora, brainId)}
                   comfyFile={resolveLoraComfyName(lora, brainId)}
                   glossary={catalog.glossary}
@@ -248,6 +248,23 @@ function LoraCard({
           )}
         </p>
       </button>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <Button type="button" size="sm" variant="outline" onClick={onCopy}>
+          <Copy />
+          Copiar keywords
+        </Button>
+        {included ? (
+          <Button type="button" size="sm" variant="secondary" onClick={onRemove}>
+            <Trash2 />
+            Quitar
+          </Button>
+        ) : (
+          <Button type="button" size="sm" onClick={onInclude}>
+            <Plus />
+            Incluir en el prompt
+          </Button>
+        )}
+      </div>
       {rich ? (
         <>
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -314,23 +331,6 @@ function LoraCard({
           )}
         </>
       ) : null}
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <Button type="button" size="sm" variant="outline" onClick={onCopy}>
-          <Copy />
-          Copiar keywords
-        </Button>
-        {included ? (
-          <Button type="button" size="sm" variant="secondary" onClick={onRemove}>
-            <Trash2 />
-            Quitar
-          </Button>
-        ) : (
-          <Button type="button" size="sm" onClick={onInclude}>
-            <Plus />
-            Incluir en el prompt
-          </Button>
-        )}
-      </div>
     </article>
   )
 }
