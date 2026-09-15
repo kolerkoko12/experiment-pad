@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "note": "source=imported|catalog. examplesUrl solo si es la ficha exacta del LoRA, nunca un índice genérico.",
+  "version": 4,
+  "note": "source=imported|catalog. examplesUrl solo si es la ficha exacta. comfyName/comfyByBrain = lora_name exacto en Comfy Cloud (nunca una URL de descarga). Sin archivo Cloud = solo trigger.",
   "loras": [
     {
       "id": "imported-character-a",
@@ -84,12 +84,14 @@
     {
       "id": "skin-microdetail",
       "name": "Skin micro-detail",
-      "placeholder": true,
+      "placeholder": false,
       "baseModels": [
         "sdxl",
-        "sdxl-plus"
+        "sdxl-plus",
+        "illustrious-import",
+        "flux"
       ],
-      "description": "Microdetalle de piel para retratos fotoreal. No cambia el rostro: solo textura y poros.",
+      "description": "Microdetalle de piel para retratos. En Generar se carga el archivo de Comfy Cloud del cerebro (Illustrious / SDXL / FLUX); el iPad no descarga pesos.",
       "keywords": [
         "detailed skin",
         "visible pores",
@@ -99,17 +101,22 @@
         "skindetail",
         "detailed skin texture"
       ],
+      "comfyByBrain": {
+        "illustrious": "illustrious-realistic_skin_texture_style.safetensors",
+        "sdxl": "sdxl-realistic_skin_texture_style_xl_detailed_skin_flux1d_illu.safetensors",
+        "flux": "flux1-realistic_skin_texture_style_xl_detailed_skin_flux1d_illu.safetensors"
+      },
       "weight": {
         "low": 0.4,
         "mid": 0.6,
         "high": 0.85,
         "notes": {
           "low": "Toque. Evita piel de plástico.",
-          "mid": "Punto de partida en Mage.",
+          "mid": "Punto de partida. LoraLoader en Cloud.",
           "high": "Si la piel se lava. Puede marcar demasiado."
         }
       },
-      "tip": "No combines dos LoRAs de piel. Si ya anclaste Complexión “piel mojada”, baja a 0.45.",
+      "tip": "No combines dos LoRAs de piel. Si ya anclaste Complexión “piel mojada”, baja a 0.45. No hay ohwx/casca/myhouse en Cloud todavía.",
       "strengths": [
         "retratos",
         "fotoreal"

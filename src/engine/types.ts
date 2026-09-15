@@ -87,6 +87,12 @@ export type LoraDef = {
   strengths: string[]
   tags: string[]
   examplesUrl?: string
+  /** Exact Comfy Cloud `lora_name` when the same file serves every brain. */
+  comfyName?: string
+  /** Alias of comfyName (catalog JSON may use either key). */
+  comfyFile?: string
+  /** Per-brain Cloud filenames (illustrious / sdxl / flux). Never a download URL. */
+  comfyByBrain?: Record<string, string>
 }
 
 export type GlossaryTerm = {

@@ -1,9 +1,23 @@
+export type ComfyLoraPayload = {
+  /** Exact Comfy Cloud `lora_name`. Never a URL, blob, or local path. */
+  name: string
+  strength_model?: number
+  strength_clip?: number
+}
+
 export type ComfyGenerateRequest = {
   prompt: string
   negative_prompt?: string
   width?: number
   height?: number
   steps?: number
+  brainId?: string
+  family?: string
+  checkpoint?: string
+  cfg?: number
+  sampler?: string
+  scheduler?: string
+  loras?: ComfyLoraPayload[]
 }
 
 export type ComfyGenerateSuccess = {
@@ -14,6 +28,10 @@ export type ComfyGenerateSuccess = {
   mimeType?: string
   filename?: string
   imageSrc: string
+  checkpoint?: string
+  family?: string
+  lorasApplied?: string[]
+  warnings: string[]
 }
 
 export class ComfyGenerateError extends Error {
@@ -44,6 +62,10 @@ type PendingBody = {
   imageBase64?: string
   mimeType?: string
   filename?: string
+  checkpoint?: string
+  family?: string
+  lorasApplied?: string[]
+  warnings?: string[]
 }
 
 export async function generateWithComfy(
@@ -69,11 +91,21 @@ async function settle(
 ): Promise<ComfyGenerateSuccess> {
   const started = Date.now()
   let current = first
+  const warnings = [...(first.body.warnings ?? [])]
+  const checkpoint = first.body.checkpoint
+  const family = first.body.family
+  const lorasApplied = first.body.lorasApplied
 
   while (true) {
     throwIfAborted(options?.signal)
     if (isSuccess(current.body)) {
-      return toSuccess(current.body)
+      return toSuccess({
+        ...current.body,
+        warnings: current.body.warnings?.length ? current.body.warnings : warnings,
+        checkpoint: current.body.checkpoint ?? checkpoint,
+        family: current.body.family ?? family,
+        lorasApplied: current.body.lorasApplied ?? lorasApplied,
+      })
     }
     if (!current.body.pending || !current.body.promptId) {
       throw errorFrom(current.status, current.body)
@@ -168,6 +200,10 @@ function toSuccess(body: PendingBody): ComfyGenerateSuccess {
     mimeType: body.mimeType,
     filename: body.filename,
     imageSrc,
+    checkpoint: body.checkpoint,
+    family: body.family,
+    lorasApplied: body.lorasApplied,
+    warnings: body.warnings ?? [],
   }
 }
 

@@ -33,6 +33,60 @@ export function selectedLoraTokens(state: PromptState, catalog: Catalog): string
     .filter((text) => text.length > 0)
 }
 
+export const MAX_COMFY_LORAS = 3
+
+export type ComfyLoraRef = {
+  name: string
+  strength_model: number
+  strength_clip: number
+}
+
+/** Exact Cloud `lora_name` for this brain, or null → trigger-only (no weights on device). */
+export function resolveLoraComfyName(lora: LoraDef, brainId?: string): string | null {
+  const brain = String(brainId || '')
+    .trim()
+    .toLowerCase()
+  const mapped = lora.comfyByBrain
+  if (mapped) {
+    if (brain && mapped[brain]) return mapped[brain]
+    if (brain.includes('illustrious') && mapped.illustrious) return mapped.illustrious
+    if (brain.includes('flux') && mapped.flux) return mapped.flux
+    if ((brain.includes('sdxl') || brain.includes('realvis') || brain.includes('realista')) && mapped.sdxl) {
+      return mapped.sdxl
+    }
+  }
+  return lora.comfyName || lora.comfyFile || null
+}
+
+export function loraIsOnComfy(lora: LoraDef, brainId?: string): boolean {
+  return resolveLoraComfyName(lora, brainId) !== null
+}
+
+export function selectedComfyLoras(
+  state: PromptState,
+  catalog: Catalog,
+  brainId?: string,
+  limit = MAX_COMFY_LORAS,
+): ComfyLoraRef[] {
+  const out: ComfyLoraRef[] = []
+  for (const lora of selectedLoras(state, catalog)) {
+    if (out.length >= limit) break
+    const name = resolveLoraComfyName(lora, brainId)
+    if (!name) continue
+    const weight = lora.weight.mid
+    out.push({ name, strength_model: weight, strength_clip: weight })
+  }
+  return out
+}
+
+export function selectedTextOnlyLoras(
+  state: PromptState,
+  catalog: Catalog,
+  brainId?: string,
+): LoraDef[] {
+  return selectedLoras(state, catalog).filter((lora) => !loraIsOnComfy(lora, brainId))
+}
+
 export function normalizeLoraIds(ids: string[] | undefined, catalog: Catalog): string[] {
   if (!ids) return []
   const known = new Set(catalog.loras.map((lora) => lora.id))

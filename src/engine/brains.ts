@@ -154,21 +154,50 @@ export function defaultParamValues(brain: BrainUiDef): BrainParamValues {
   return values
 }
 
-/** Width / height / steps for Comfy Cloud from BrainPanel params (resolution "1024x1024" or separate fields). */
+/** Width / height / steps / cfg for Comfy Cloud from BrainPanel params. */
 export function generationSizeFromBrain(params: BrainParamValues | null | undefined): {
   width?: number
   height?: number
   steps?: number
+  cfg?: number
 } {
   if (!params) return {}
   const steps = asPositiveInt(params.steps)
   const width = asPositiveInt(params.width)
   const height = asPositiveInt(params.height)
   const match = String(params.resolution ?? '').match(/(\d+)\s*[x×]\s*(\d+)/i)
+  const guidance = Number(params.guidance)
   return {
     width: width ?? (match ? Number(match[1]) : undefined),
     height: height ?? (match ? Number(match[2]) : undefined),
     steps,
+    cfg: Number.isFinite(guidance) && guidance > 0 ? guidance : undefined,
+  }
+}
+
+/** Cheap sampler/scheduler from the brain's free-text scheduler_family field. */
+export function generationSamplerFromBrain(params: BrainParamValues | null | undefined): {
+  sampler?: string
+  scheduler?: string
+} {
+  const raw = String(params?.scheduler_family ?? '').trim().toLowerCase()
+  if (!raw) return {}
+  const parts = raw.split(/[/,+|]+/).map((part) => part.trim().replace(/\s+/g, '_')).filter(Boolean)
+  const samplers = new Set([
+    'euler',
+    'euler_ancestral',
+    'dpmpp_2m',
+    'dpmpp_2m_sde',
+    'dpmpp_sde',
+    'ddim',
+    'uni_pc',
+    'lcm',
+    'heun',
+  ])
+  const schedulers = new Set(['normal', 'karras', 'exponential', 'simple', 'sgm_uniform', 'ddim_uniform', 'beta'])
+  return {
+    sampler: parts.find((part) => samplers.has(part)),
+    scheduler: parts.find((part) => schedulers.has(part)),
   }
 }
 
