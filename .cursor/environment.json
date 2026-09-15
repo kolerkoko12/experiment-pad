@@ -1,0 +1,11 @@
+{
+  "name": "control-experimental",
+  "install": "npm ci",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "npm run dev"
+    }
+  ],
+  "ports": [4733]
+}
