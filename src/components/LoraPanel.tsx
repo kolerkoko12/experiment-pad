@@ -5,15 +5,20 @@ import { GlossaryTip, termById } from '@/components/GlossaryTip'
 import { Button } from '@/components/ui/button'
 import type { Catalog, LoraDef, MageModel, PromptState } from '@/engine'
 import {
-  effectiveLoraLimit,
+  comfyLoraSlotLimit,
   isAtLoraLimit,
   isOverLoraLimit,
+  loraAllowsInclude,
+  loraCloudStatusCopy,
   loraFitsModel,
+  loraIncludeKind,
   loraIsOnComfy,
   loraKeywordText,
   loraTriggerText,
   lorasByCategory,
+  lorasMatchingPanelFilter,
   resolveLoraComfyName,
+  selectedLoraCloudSplit,
   selectedLoras,
 } from '@/engine'
 import { cn } from '@/lib/utils'
@@ -54,7 +59,6 @@ export function LoraPanel(props: LoraPanelProps) {
 function LoraPanelBody({
   catalog,
   state,
-  model,
   brainId,
   recommendedIds,
   showClose,
@@ -66,13 +70,28 @@ function LoraPanelBody({
   onCopyKeywords,
 }: LoraPanelProps & { showClose: boolean }) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [filter, setFilter] = useState<'cloud' | 'all'>('cloud')
   const selected = selectedLoras(state, catalog)
-  const max = effectiveLoraLimit(catalog, model, state.selectedPlanId)
+  const max = comfyLoraSlotLimit()
   const over = isOverLoraLimit(state.selectedLoraIds.length, max)
   const at = isAtLoraLimit(state.selectedLoraIds.length, max)
   const recommended = new Set(recommendedIds)
-  const groups = useMemo(() => lorasByCategory(catalog.loras), [catalog.loras])
-  const includedGreen = selected.length > 0 && !over
+  const split = selectedLoraCloudSplit(state, catalog, brainId)
+  const status = loraCloudStatusCopy(split)
+  const visibleLoras = useMemo(
+    () => lorasMatchingPanelFilter(catalog.loras, brainId, filter),
+    [catalog.loras, brainId, filter],
+  )
+  const groups = useMemo(() => lorasByCategory(visibleLoras, brainId), [visibleLoras, brainId])
+  const hiddenCount = catalog.loras.length - visibleLoras.length
+  const statusToneClass =
+    over
+      ? 'border border-rose-400/40 bg-rose-500/25 text-rose-100'
+      : status.tone === 'cloud'
+        ? 'border border-emerald-400/40 bg-emerald-500/25 text-emerald-50'
+        : status.tone === 'text' || status.tone === 'mixed'
+          ? 'border border-amber-300/70 bg-amber-400/35 text-amber-50'
+          : 'border border-transparent bg-black/25 text-paper/60'
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -93,30 +112,42 @@ function LoraPanelBody({
             </Button>
           ) : null}
         </div>
-        <p
-          className={cn(
-            'mt-2 rounded-2xl px-3 py-2 text-[13px] font-medium',
-            over
-              ? 'bg-rose-500/25 text-rose-100'
-              : includedGreen
-                ? 'bg-emerald-500/20 text-emerald-100'
-                : 'bg-black/25 text-paper/60',
-          )}
-        >
-          {selected.length} incluidas
-          {max > 0 ? ` / ${max} slots` : ' · Comfy Cloud carga los archivos mapeados'}
-          {over ? ' · LÍMITE: sube de plan o quita una.' : includedGreen ? ' · ok' : ''}
+        <p className={cn('mt-2 rounded-2xl px-3 py-2 text-[13px] font-medium', statusToneClass)}>
+          {status.line}
+          {max > 0 ? ` · ${max} slots Cloud` : ''}
+          {over ? ' · LÍMITE: quita una.' : status.tone === 'cloud' ? ' · ok' : ''}
         </p>
         <p className="mt-2 text-[12px] leading-snug text-paper/50">
-          Generar carga los pesos en Comfy Cloud (LoraLoader). El iPad solo manda el nombre del
-          archivo, nunca el .safetensors.
+          Verde / en Cloud solo si hay archivo mapeado para este cerebro. Si no, ámbar · solo texto
+          al Incluir. Generar carga los pesos en Comfy Cloud (LoraLoader).
         </p>
-        {model?.loraNote ? (
-          <p className="mt-1 text-[12px] text-muted-foreground">{model.loraNote}</p>
-        ) : null}
         {at || over ? (
           <p className="mt-2 text-[12px] leading-snug text-rose-100">
-            Tope de slots: quita una LoRA o abre «motor legado / techo LoRAs» para subir el plan.
+            Tope de 3 LoRAs en Comfy Cloud. Quita una para incluir otra.
+          </p>
+        ) : null}
+        <div className="mt-3 flex flex-wrap gap-2">
+          <FilterChip
+            active={filter === 'cloud'}
+            label="Solo Cloud"
+            onClick={() => setFilter('cloud')}
+          />
+          <FilterChip
+            active={filter === 'all'}
+            label="Todas"
+            onClick={() => setFilter('all')}
+          />
+        </div>
+        {filter === 'cloud' && hiddenCount > 0 ? (
+          <p className="mt-2 text-[11px] text-paper/45">
+            {hiddenCount} ocultas (solo texto / sin familia / checkpoint).{' '}
+            <button
+              type="button"
+              className="text-amber-100 underline-offset-2 hover:underline"
+              onClick={() => setFilter('all')}
+            >
+              Ver todas
+            </button>
           </p>
         ) : null}
         <div className="mt-3 flex flex-wrap gap-2">
@@ -131,59 +162,97 @@ function LoraPanelBody({
         </div>
         <div className="mt-3">
           <p className="text-[11px] tracking-wide text-paper/45 uppercase">
-            Seleccionadas · {selected.length}/{max || '—'}
+            Seleccionadas · {selected.length}/{max}
           </p>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {selected.length === 0 ? (
               <span className="text-[12px] text-paper/40">Ninguna. Toca incluir abajo.</span>
             ) : (
-              selected.map((lora) => (
-                <button
-                  key={lora.id}
-                  type="button"
-                  onClick={() => setExpandedId((id) => (id === lora.id ? null : lora.id))}
-                  className="min-h-10 rounded-2xl px-3 text-[12px] text-ink"
-                  style={{ background: lora.categoryColor }}
-                >
-                  {lora.name}
-                  {loraIsOnComfy(lora, brainId) ? '' : ' · texto'}
-                </button>
-              ))
+              selected.map((lora) => {
+                const onComfy = loraIsOnComfy(lora, brainId)
+                return (
+                  <button
+                    key={lora.id}
+                    type="button"
+                    onClick={() => setExpandedId((id) => (id === lora.id ? null : lora.id))}
+                    className={cn(
+                      'min-h-10 rounded-2xl px-3 text-[12px] text-ink',
+                      !onComfy && 'ring-1 ring-amber-300/70',
+                    )}
+                    style={{ background: lora.categoryColor }}
+                  >
+                    {lora.name}
+                    {onComfy ? ' · Cloud' : ' · solo texto'}
+                  </button>
+                )
+              })
             )}
           </div>
         </div>
       </header>
 
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-3 pb-28">
-        {groups.map((group) => (
-          <section key={group.category}>
-            <h3 className="mb-2 flex items-center gap-2 text-[12px] font-semibold tracking-wide uppercase">
-              <span className="size-2.5 rounded-full" style={{ background: group.color }} />
-              <span style={{ color: group.color }}>{group.category}</span>
-            </h3>
-            <div className="space-y-3">
-              {group.items.map((lora) => (
-                <LoraCard
-                  key={lora.id}
-                  lora={lora}
-                  included={state.selectedLoraIds.includes(lora.id)}
-                  expanded={expandedId === lora.id || state.selectedLoraIds.includes(lora.id) && expandedId === lora.id}
-                  recommended={recommended.has(lora.id)}
-                  fits={loraFitsModel(lora, state.selectedModelId) || loraIsOnComfy(lora, brainId)}
-                  onComfy={loraIsOnComfy(lora, brainId)}
-                  comfyFile={resolveLoraComfyName(lora, brainId)}
-                  glossary={catalog.glossary}
-                  onToggleExpand={() => setExpandedId((id) => (id === lora.id ? null : lora.id))}
-                  onCopy={() => onCopyKeywords(lora)}
-                  onInclude={() => onInclude(lora.id)}
-                  onRemove={() => onRemove(lora.id)}
-                />
-              ))}
-            </div>
-          </section>
-        ))}
+        {groups.length === 0 ? (
+          <p className="rounded-2xl bg-black/20 px-3 py-4 text-[13px] text-paper/55">
+            No hay LoRAs mapeadas para este cerebro. Cambia de cerebro o pulsa «Todas» para ver
+            entradas solo texto.
+          </p>
+        ) : (
+          groups.map((group) => (
+            <section key={group.category}>
+              <h3 className="mb-2 flex items-center gap-2 text-[12px] font-semibold tracking-wide uppercase">
+                <span className="size-2.5 rounded-full" style={{ background: group.color }} />
+                <span style={{ color: group.color }}>{group.category}</span>
+              </h3>
+              <div className="space-y-3">
+                {group.items.map((lora) => (
+                  <LoraCard
+                    key={lora.id}
+                    lora={lora}
+                    included={state.selectedLoraIds.includes(lora.id)}
+                    expanded={expandedId === lora.id}
+                    recommended={recommended.has(lora.id)}
+                    fits={loraFitsModel(lora, state.selectedModelId) || loraIsOnComfy(lora, brainId)}
+                    onComfy={loraIsOnComfy(lora, brainId)}
+                    comfyFile={resolveLoraComfyName(lora, brainId)}
+                    glossary={catalog.glossary}
+                    onToggleExpand={() => setExpandedId((id) => (id === lora.id ? null : lora.id))}
+                    onCopy={() => onCopyKeywords(lora)}
+                    onInclude={() => onInclude(lora.id)}
+                    onRemove={() => onRemove(lora.id)}
+                  />
+                ))}
+              </div>
+            </section>
+          ))
+        )}
       </div>
     </div>
+  )
+}
+
+function FilterChip({
+  active,
+  label,
+  onClick,
+}: {
+  active: boolean
+  label: string
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'min-h-10 rounded-2xl border px-3 text-[12px]',
+        active
+          ? 'border-teal-300/50 bg-teal-300/15 text-teal-50'
+          : 'border-border bg-black/20 text-paper/70',
+      )}
+    >
+      {label}
+    </button>
   )
 }
 
@@ -214,13 +283,16 @@ function LoraCard({
   onInclude: () => 'ok' | 'blocked'
   onRemove: () => void
 }) {
+  const kind = loraIncludeKind(lora)
+  const canInclude = loraAllowsInclude(lora)
   const rich = expanded || (!included && recommended)
   return (
     <article
       className={cn(
         'rounded-[22px] border px-3 py-3',
         lora.source === 'imported' ? 'border-rose-300/40 bg-rose-400/10' : 'border-border bg-black/20',
-        included && 'ring-1 ring-emerald-300/50',
+        included && onComfy && 'ring-1 ring-emerald-300/50',
+        included && !onComfy && 'ring-1 ring-amber-300/50',
       )}
     >
       <button type="button" onClick={onToggleExpand} className="w-full text-left">
@@ -241,7 +313,11 @@ function LoraCard({
         <h3 className="mt-1 text-[16px] text-paper">{lora.name}</h3>
         <p className="mt-1 line-clamp-2 text-[13px] text-paper/70">{lora.description}</p>
         <p className="mt-1.5 text-[11px] leading-snug">
-          {onComfy ? (
+          {kind === 'checkpoint' ? (
+            <span className="text-amber-200/90">checkpoint · cambia de cerebro</span>
+          ) : kind === 'no-family' ? (
+            <span className="text-amber-200/90">no Generar aún</span>
+          ) : onComfy ? (
             <span className="text-emerald-200/90">Comfy Cloud · pesos en el servidor</span>
           ) : (
             <span className="text-amber-200/90">solo texto / falta en Comfy</span>
@@ -258,19 +334,31 @@ function LoraCard({
             <Trash2 />
             Quitar
           </Button>
-        ) : (
+        ) : canInclude ? (
           <Button type="button" size="sm" onClick={onInclude}>
             <Plus />
             Incluir en el prompt
+          </Button>
+        ) : (
+          <Button type="button" size="sm" variant="ghost" disabled>
+            {kind === 'checkpoint' ? 'No es LoRA' : 'Sin familia'}
           </Button>
         )}
       </div>
       {rich ? (
         <>
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {onComfy ? (
+            {kind === 'checkpoint' ? (
+              <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] text-amber-200">
+                checkpoint · cambia de cerebro
+              </span>
+            ) : kind === 'no-family' ? (
+              <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] text-amber-200">
+                no Generar aún
+              </span>
+            ) : onComfy ? (
               <span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[10px] text-emerald-100">
-                Comfy Cloud
+                en Cloud
               </span>
             ) : (
               <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] text-amber-200">
@@ -287,7 +375,7 @@ function LoraCard({
                 Encaja con la escena
               </span>
             ) : null}
-            {!fits ? (
+            {!fits && canInclude ? (
               <span className="rounded-full bg-white/8 px-2 py-0.5 text-[10px] text-paper/55">
                 Otro motor — solo texto
               </span>
@@ -304,7 +392,17 @@ function LoraCard({
             <WeightChip tone="mid" label="Medio" value={lora.weight.mid} note={lora.weight.notes.mid} />
             <WeightChip tone="high" label="Alto" value={lora.weight.high} note={lora.weight.notes.high} />
           </div>
-          {onComfy && comfyFile ? (
+          {kind === 'checkpoint' ? (
+            <p className="mt-2 text-[11px] text-amber-200/90">
+              Es un checkpoint, no una LoRA. No se puede Incluir: cambia de cerebro arriba si
+              quieres ese modelo.
+            </p>
+          ) : kind === 'no-family' ? (
+            <p className="mt-2 text-[11px] text-amber-200/90">
+              No hay familia Comfy (Pony / Flux.2 Klein). No Generar aún: copia keywords o espera
+              un cerebro compatible.
+            </p>
+          ) : onComfy && comfyFile ? (
             <p className="mt-2 text-[11px] break-all text-emerald-100/80">
               Generar carga <span className="font-medium">{comfyFile}</span> en el servidor. No se
               descarga al iPad.
@@ -358,17 +456,29 @@ function WeightChip({
 
 export function LoraOpenButton({
   count,
+  cloudCount,
+  textCount,
   onClick,
 }: {
   count: number
+  cloudCount?: number
+  textCount?: number
   onClick: () => void
 }) {
+  const mixed = (textCount ?? 0) > 0
+  const allCloud = count > 0 && !mixed && (cloudCount ?? 0) > 0
   return (
     <Button
       type="button"
       variant="outline"
       onClick={onClick}
-      className={count > 0 ? 'border-emerald-400/50 text-emerald-100' : undefined}
+      className={
+        allCloud
+          ? 'border-emerald-400/50 text-emerald-100'
+          : mixed
+            ? 'border-amber-400/50 text-amber-100'
+            : undefined
+      }
       aria-label="Abrir LoRAs"
     >
       <Layers />

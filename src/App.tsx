@@ -20,13 +20,17 @@ import { Button } from '@/components/ui/button'
 import {
   findBrain,
   findLora,
+  FLUX_GENERATE_WARNING,
   generationSamplerFromBrain,
   generationSizeFromBrain,
+  isExperimentalFluxBrain,
   loadBrains,
+  loraAllowsInclude,
   loraKeywordText,
   promptPhraseDelta,
   resolveLoraComfyName,
   selectedComfyLoras,
+  selectedLoraCloudSplit,
   selectedTextOnlyLoras,
   suggestModelIdForBrain,
   type Block,
@@ -58,7 +62,7 @@ export default function App() {
       .then((pack) => {
         if (cancelled) return
         setBrainPack(pack)
-        setBrainState((prev) => prev ?? createBrainPanelState(pack, 'flux'))
+        setBrainState((prev) => prev ?? createBrainPanelState(pack))
       })
       .catch((err: unknown) => {
         console.warn('brains-ui-pack no cargó', err)
@@ -280,6 +284,18 @@ export default function App() {
                 <span className="lg:hidden">
                   <LoraOpenButton
                     count={studio.selectedLoraIds.length}
+                    cloudCount={
+                      studio.catalog
+                        ? selectedLoraCloudSplit(studio.state, studio.catalog, brainState?.brainId)
+                            .cloud
+                        : 0
+                    }
+                    textCount={
+                      studio.catalog
+                        ? selectedLoraCloudSplit(studio.state, studio.catalog, brainState?.brainId)
+                            .text
+                        : 0
+                    }
                     onClick={() => setLoraOpen(true)}
                   />
                 </span>
@@ -404,6 +420,11 @@ export default function App() {
                 onPromptbox={() => {
                   void copyText(studio.promptbox, 'Promptbox copiado (una línea por cláusula)')
                 }}
+                notice={
+                  brainState && isExperimentalFluxBrain(brainState.brainId)
+                    ? FLUX_GENERATE_WARNING
+                    : null
+                }
                 onGenerate={() => {
                   void runComfyGenerate()
                 }}
@@ -423,12 +444,20 @@ export default function App() {
           open={loraOpen}
           onClose={() => setLoraOpen(false)}
           onInclude={(id) => {
-            const result = studio.includeLora(id)
-            if (result === 'blocked') {
-              flash('Tope de LoRAs. Quita una o sube de plan (upsell).')
+            const lora = studio.catalog ? findLora(studio.catalog, id) : undefined
+            if (lora && !loraAllowsInclude(lora)) {
+              flash(
+                lora.role === 'checkpoint'
+                  ? 'Eso es un checkpoint: cambia de cerebro, no Incluir.'
+                  : 'Esta entrada no Generar aún (Pony / Flux.2 Klein).',
+              )
               return 'blocked'
             }
-            const lora = studio.catalog ? findLora(studio.catalog, id) : undefined
+            const result = studio.includeLora(id)
+            if (result === 'blocked') {
+              flash('Tope de 3 LoRAs en Comfy Cloud. Quita una.')
+              return 'blocked'
+            }
             const cloudName = lora ? resolveLoraComfyName(lora, brainState?.brainId) : null
             flash(
               cloudName
@@ -475,6 +504,11 @@ export default function App() {
             size="lg"
             className="bg-teal-300 text-ink hover:bg-teal-200"
             disabled={comfyBusy}
+            title={
+              brainState && isExperimentalFluxBrain(brainState.brainId)
+                ? FLUX_GENERATE_WARNING
+                : undefined
+            }
             onClick={() => {
               void runComfyGenerate()
             }}
@@ -496,7 +530,16 @@ export default function App() {
             <Unlock />
             Soltar todo
           </Button>
-          <Button variant="outline" className="lg:hidden" onClick={() => setLoraOpen(true)}>
+          <Button
+            variant="outline"
+            className={
+              studio.catalog &&
+              selectedLoraCloudSplit(studio.state, studio.catalog, brainState?.brainId).text > 0
+                ? 'lg:hidden border-amber-400/50 text-amber-100'
+                : 'lg:hidden'
+            }
+            onClick={() => setLoraOpen(true)}
+          >
             LoRAs
             {studio.selectedLoraIds.length > 0 ? ` · ${studio.selectedLoraIds.length}` : ''}
           </Button>

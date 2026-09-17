@@ -35,6 +35,50 @@ export function selectedLoraTokens(state: PromptState, catalog: Catalog): string
 
 export const MAX_COMFY_LORAS = 3
 
+/** Slot ceiling for Incluir / Generar. Mage plans must not cap below this. */
+export function comfyLoraSlotLimit(): number {
+  return MAX_COMFY_LORAS
+}
+
+export type LoraIncludeKind = 'include' | 'checkpoint' | 'no-family'
+
+export function loraIncludeKind(lora: LoraDef): LoraIncludeKind {
+  if (lora.role === 'checkpoint') return 'checkpoint'
+  if (lora.generar === false) return 'no-family'
+  return 'include'
+}
+
+export function loraAllowsInclude(lora: LoraDef): boolean {
+  return loraIncludeKind(lora) === 'include'
+}
+
+export type LoraCloudSplit = {
+  cloud: number
+  text: number
+  total: number
+}
+
+export function selectedLoraCloudSplit(
+  state: PromptState,
+  catalog: Catalog,
+  brainId?: string,
+): LoraCloudSplit {
+  const selected = selectedLoras(state, catalog)
+  const cloud = selected.filter((lora) => loraIsOnComfy(lora, brainId)).length
+  return { cloud, text: selected.length - cloud, total: selected.length }
+}
+
+export function loraCloudStatusCopy(split: LoraCloudSplit): {
+  tone: 'empty' | 'cloud' | 'text' | 'mixed'
+  line: string
+} {
+  const counts = `${split.cloud} en Cloud / ${split.text} solo texto`
+  if (split.total === 0) return { tone: 'empty', line: `0 incluidas · ${counts}` }
+  if (split.text === 0) return { tone: 'cloud', line: `${split.total} incluidas · ${counts}` }
+  if (split.cloud === 0) return { tone: 'text', line: `${split.total} incluidas · ${counts}` }
+  return { tone: 'mixed', line: `${split.total} incluidas · ${counts}` }
+}
+
 export type ComfyLoraRef = {
   name: string
   strength_model: number
@@ -59,6 +103,7 @@ export function resolveLoraComfyName(lora: LoraDef, brainId?: string): string | 
 }
 
 export function loraIsOnComfy(lora: LoraDef, brainId?: string): boolean {
+  if (!loraAllowsInclude(lora)) return false
   return resolveLoraComfyName(lora, brainId) !== null
 }
 
@@ -71,6 +116,7 @@ export function selectedComfyLoras(
   const out: ComfyLoraRef[] = []
   for (const lora of selectedLoras(state, catalog)) {
     if (out.length >= limit) break
+    if (!loraAllowsInclude(lora)) continue
     const name = resolveLoraComfyName(lora, brainId)
     if (!name) continue
     const weight = lora.weight.mid
@@ -100,8 +146,9 @@ export function toggleLoraSelection(ids: string[], loraId: string): string[] {
 export function effectiveLoraLimit(catalog: Catalog, model: MageModel | undefined, planId: string): number {
   const plan = findPlan(catalog, planId)
   const planMax = plan?.maxLoras ?? 5
-  if (!model || model.maxLoras <= 0) return 0
-  return Math.min(model.maxLoras, planMax)
+  const mageCap = !model || model.maxLoras <= 0 ? 0 : Math.min(model.maxLoras, planMax)
+  // Comfy Generar allows 3 LoRAs; never let Mage Free / Flux-2 techo hide that.
+  return Math.max(MAX_COMFY_LORAS, mageCap)
 }
 
 export function modelLoraLimit(model: MageModel | undefined): number {
@@ -143,7 +190,7 @@ export function suggestLorasForScene(
 ): LoraDef[] {
   const lockedTags = lockedSceneTags(state.blocks, catalog)
   const scored = catalog.loras
-    .filter((lora) => loraFitsModel(lora, state.selectedModelId))
+    .filter((lora) => loraAllowsInclude(lora) && loraFitsModel(lora, state.selectedModelId))
     .map((lora) => {
       const overlap = lora.tags.filter((tag) => lockedTags.has(tag)).length
       const strengthHit = lora.strengths.some((item) => lockedTags.has(item.toLowerCase()))
@@ -161,7 +208,10 @@ export function suggestLorasForScene(
   return picked
 }
 
-export function lorasByCategory(loras: LoraDef[]): { category: string; color: string; items: LoraDef[] }[] {
+export function lorasByCategory(
+  loras: LoraDef[],
+  brainId?: string,
+): { category: string; color: string; items: LoraDef[] }[] {
   const map = new Map<string, { color: string; items: LoraDef[] }>()
   for (const lora of loras) {
     const key = `${lora.source}:${lora.category}`
@@ -172,6 +222,20 @@ export function lorasByCategory(loras: LoraDef[]): { category: string; color: st
   return [...map.entries()].map(([key, value]) => ({
     category: key.startsWith('imported:') ? `Importadas · ${value.items[0]?.category}` : (value.items[0]?.category ?? key),
     color: value.color,
-    items: value.items,
+    items: [...value.items].sort((a, b) => {
+      const aCloud = loraIsOnComfy(a, brainId) ? 0 : 1
+      const bCloud = loraIsOnComfy(b, brainId) ? 0 : 1
+      if (aCloud !== bCloud) return aCloud - bCloud
+      return a.name.localeCompare(b.name, 'es')
+    }),
   }))
+}
+
+export function lorasMatchingPanelFilter(
+  loras: LoraDef[],
+  brainId: string | undefined,
+  filter: 'cloud' | 'all',
+): LoraDef[] {
+  if (filter !== 'cloud') return loras
+  return loras.filter((lora) => loraIsOnComfy(lora, brainId))
 }

@@ -10,6 +10,7 @@ type ExportBarProps = {
   generating: boolean
   error: string | null
   warnings?: string[]
+  notice?: string | null
   resultSrc: string | null
   onDirect: () => void
   onPromptbox: () => void
@@ -22,6 +23,7 @@ export function ExportBar({
   generating,
   error,
   warnings,
+  notice,
   resultSrc,
   onDirect,
   onPromptbox,
@@ -38,6 +40,11 @@ export function ExportBar({
       {error ? (
         <p className="rounded-2xl border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-[13px] leading-snug text-rose-100">
           {error}
+        </p>
+      ) : null}
+      {notice ? (
+        <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-[13px] leading-snug text-amber-100">
+          {notice}
         </p>
       ) : null}
       {warnings && warnings.length > 0 ? (
