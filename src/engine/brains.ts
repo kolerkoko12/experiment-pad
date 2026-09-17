@@ -208,8 +208,23 @@ function asPositiveInt(value: number | string | undefined): number | undefined {
 }
 
 export function defaultMode(brain: BrainUiDef): string {
+  if (brain.modes.includes('t2i')) return 't2i'
   return brain.modes[0] ?? 't2i'
 }
+
+/** Illustrious maps to FAMILY_CHECKPOINTS; else SDXL RealVis. Never default Flux. */
+export function preferredComfyBrainId(pack: BrainUiPack): string {
+  if (findBrain(pack, 'illustrious')) return 'illustrious'
+  if (findBrain(pack, 'sdxl')) return 'sdxl'
+  return pack.brains.find((b) => b.brain_id !== 'flux')?.brain_id ?? pack.brains[0]?.brain_id ?? ''
+}
+
+export function isExperimentalFluxBrain(brainId: string): boolean {
+  return String(brainId || '').trim().toLowerCase() === 'flux'
+}
+
+export const FLUX_GENERATE_WARNING =
+  'FLUX es experimental: Generar usa un grafo tipo SDXL (CheckpointLoaderSimple) y puede fallar. Illustrious o SDXL RealVis son el camino sólido.'
 
 export function inputsForMode(brain: BrainUiDef, mode: string): BrainModeInput[] {
   return brain.inputs_by_mode[mode] ?? []

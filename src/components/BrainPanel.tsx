@@ -10,8 +10,11 @@ import {
   defaultParamValues,
   findBrain,
   inputsForMode,
+  isExperimentalFluxBrain,
+  FLUX_GENERATE_WARNING,
   modeLabel,
   negativePlaceholder,
+  preferredComfyBrainId,
   revokeRefState,
   type BrainParamValues,
   type BrainRefFile,
@@ -89,7 +92,7 @@ const PARAM_HELP: Record<string, GlossaryTerm> = {
 export function createBrainPanelState(pack: BrainUiPack, preferredId?: string): BrainPanelState {
   const brain =
     findBrain(pack, preferredId ?? '') ??
-    pack.brains.find((b) => b.brain_id === 'flux') ??
+    findBrain(pack, preferredComfyBrainId(pack)) ??
     pack.brains[0]
   if (!brain) {
     return {
@@ -224,12 +227,17 @@ function BrainSelector({
         >
           {pack.brains.map((item) => (
             <option key={item.brain_id} value={item.brain_id}>
-              {item.label}
+              {item.brain_id === 'flux' ? `${item.label} · experimental` : item.label}
             </option>
           ))}
         </select>
         <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-5 -translate-y-1/2 text-muted-foreground" />
       </div>
+      {isExperimentalFluxBrain(brain.brain_id) ? (
+        <p className="rounded-2xl bg-amber-400/15 px-3 py-2 text-[12px] leading-snug text-amber-100">
+          {FLUX_GENERATE_WARNING}
+        </p>
+      ) : null}
       <div className="flex flex-wrap gap-1.5">
         <span className="rounded-full bg-teal-400/12 px-2.5 py-1 text-[11px] text-teal-100">
           {brain.family}

@@ -212,6 +212,25 @@ assert(
   skin.comfyByBrain.flux === 'flux1-realistic_skin_texture_style_xl_detailed_skin_flux1d_illu.safetensors',
   'flux skin file',
 )
+const verifiedNames = {
+  'aidma-nsfw-unlock': 'aidmaNSFWunlock-FLUX-V0.2.safetensors',
+  'nsfw-pov-aio-sdxl': 'NsfwPovAllInOneLoraSdxl-000009MINI.safetensors',
+  'cruzflesh-hyper-penis': 'Flux_Dev_Hyper_Penis_V2.safetensors',
+  'cruzflesh-big-penis': 'Big_Cock_Flux_Dev_-_Cruz_Flesh.safetensors',
+  'latexskin-nsfw-flux': 'latex_flux_lora_v1_PAseer.safetensors',
+  'skin-realism-nsfw': 'sdxl-skin_realism_acne_skin_details_imperfections.safetensors',
+}
+for (const [id, name] of Object.entries(verifiedNames)) {
+  const lora = catalog.loras.find((item) => item.id === id)
+  assert(lora, `${id} exists`)
+  assert(lora.comfyName === name, `${id} comfyName must be exact Cloud filename`)
+}
+const prefectious = catalog.loras.find((lora) => lora.id === 'prefectious-xl-nsfw')
+const persephone = catalog.loras.find((lora) => lora.id === 'persephone-flux-nsfw')
+assert(prefectious?.role === 'checkpoint', 'prefectious is checkpoint')
+assert(persephone?.role === 'checkpoint', 'persephone is checkpoint')
+const klein = catalog.loras.find((lora) => lora.id === 'futa-penis-klein')
+assert(klein?.generar === false, 'klein is not generable')
 for (const lora of catalog.loras) {
   const names = [
     lora.comfyName,

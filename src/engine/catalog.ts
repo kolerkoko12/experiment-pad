@@ -65,7 +65,26 @@ function normalizeLora(raw: LorasFile['loras'][number]): LoraDef {
     comfyName: cleanComfyFilename(raw.comfyName),
     comfyFile: cleanComfyFilename(raw.comfyFile),
     comfyByBrain: normalizeComfyByBrain(raw.comfyByBrain),
+    role: inferLoraRole(raw),
+    generar: inferLoraGenerar(raw),
   }
+}
+
+function inferLoraRole(raw: LorasFile['loras'][number]): LoraDef['role'] {
+  if (raw.role === 'checkpoint') return 'checkpoint'
+  const id = String(raw.id || '')
+  if (id === 'prefectious-xl-nsfw' || id === 'persephone-flux-nsfw') return 'checkpoint'
+  return 'lora'
+}
+
+function inferLoraGenerar(raw: LorasFile['loras'][number]): boolean {
+  if (raw.generar === false) return false
+  if (inferLoraRole(raw) === 'checkpoint') return false
+  const id = String(raw.id || '').toLowerCase()
+  if (id.includes('klein')) return false
+  const bases = (raw.baseModels ?? []).map((item) => item.toLowerCase())
+  if (bases.some((base) => base.includes('pony'))) return false
+  return true
 }
 
 function cleanComfyFilename(value: unknown): string | undefined {

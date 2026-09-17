@@ -396,6 +396,7 @@
       "id": "pony-anatomy",
       "name": "Pony anatomy helper",
       "placeholder": true,
+      "generar": false,
       "baseModels": [
         "pony-import"
       ],
@@ -419,7 +420,7 @@
           "high": "Distorsión fácil. Baja si hay manos raras."
         }
       },
-      "tip": "Solo con motor Pony. En SDXL genérico no cargará: las keywords se pegan como texto.",
+      "tip": "Solo con motor Pony. No Generar aún: no hay familia Pony en el cerebro Comfy.",
       "strengths": [
         "adulto",
         "anatomía"
@@ -680,7 +681,7 @@
           "high": "1.0 máximo de la ficha. Puede extrañar caras."
         }
       },
-      "tip": "Desbloquea NSFW en Flux ~0.7–0.9 (ficha 0.5–1.0). Trigger opcional de la ficha: aidmaNSFWunlock. No lo metemos en triggers para no forzar el token. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Desbloquea NSFW en Flux ~0.7–0.9 (ficha 0.5–1.0). Trigger opcional de la ficha: aidmaNSFWunlock. En Cloud: aidmaNSFWunlock-FLUX-V0.2.safetensors (LoraLoader).",
       "strengths": [
         "adulto",
         "fotoreal"
@@ -728,7 +729,7 @@
           "high": "Mini 74MB o si no marca. Watermarks: baja peso o negative watermark."
         }
       },
-      "tip": "Una categoría de trigger cada vez, fuerza 0.5–0.8 (full). No mezcles 4 poses. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Una categoría de trigger cada vez, fuerza 0.5–0.8 (full). No mezcles 4 poses. En Cloud: NsfwPovAllInOneLoraSdxl-000009MINI.safetensors (LoraLoader).",
       "strengths": [
         "adulto",
         "pov",
@@ -775,7 +776,7 @@
           "high": "Hiper fuerte. Puede comer el resto del cuerpo."
         }
       },
-      "tip": "Flux: prosa + estos tags. No inventamos comfyName (en Civitai el Flux V2 se llama Flux_Dev_Hyper_Penis_V2.safetensors; confirma el nombre en Cloud). Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Flux: prosa + estos tags. En Cloud: Flux_Dev_Hyper_Penis_V2.safetensors (LoraLoader).",
       "strengths": [
         "adulto",
         "anatomía",
@@ -821,7 +822,7 @@
           "high": "Más tamaño; puede olvidar la colocación — prueba “penis between legs”."
         }
       },
-      "tip": "Empieza en medio (≈0.75). Tag clave: a naked man. Sin comfyName Cloud. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Empieza en medio (≈0.75). Tag clave: a naked man. En Cloud: Big_Cock_Flux_Dev_-_Cruz_Flesh.safetensors (LoraLoader).",
       "strengths": [
         "adulto",
         "anatomía",
@@ -837,6 +838,7 @@
       "id": "futa-penis-klein",
       "name": "Futa penis Klein (Flux.2)",
       "placeholder": false,
+      "generar": false,
       "source": "catalog",
       "category": "Sexo",
       "categoryColor": "#F43F5E",
@@ -862,7 +864,7 @@
           "high": "No subas por encima de 1."
         }
       },
-      "tip": "Usa “woman with a penis”. Evita la palabra futanari (el modelo la confunde). Entrenado en Flux.2 Klein 9B, no Flux.1 Dev clásico. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Usa “woman with a penis”. Evita la palabra futanari (el modelo la confunde). Entrenado en Flux.2 Klein 9B, no Flux.1 Dev clásico. No Generar aún: no hay familia Klein en el selector de cerebro.",
       "strengths": [
         "adulto",
         "anatomía",
@@ -989,7 +991,7 @@
           "high": "Evita 1.0: deforma y fija edad joven."
         }
       },
-      "tip": "Versión Civitai 340833 (REWORKED). No combines con Skin micro-detail. Fuerza ~0.5. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Versión Civitai 340833 (REWORKED). No combines con Skin micro-detail. Fuerza ~0.5. En Cloud: sdxl-skin_realism_acne_skin_details_imperfections.safetensors (LoraLoader).",
       "strengths": [
         "fotoreal",
         "retratos",
@@ -1007,6 +1009,7 @@
       "id": "sex-box-pony",
       "name": "Sex Box (Pony / XL)",
       "placeholder": false,
+      "generar": false,
       "source": "catalog",
       "category": "Sexo",
       "categoryColor": "#F43F5E",
@@ -1033,7 +1036,7 @@
           "high": "Fuerza el objeto; puede ignorar el resto de la escena."
         }
       },
-      "tip": "Motor Pony (pony-import). v3 también tiene Illustrious/SDXL en la ficha; no mapeamos comfyByBrain porque no sabemos el archivo Cloud. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Motor Pony (pony-import). v3 también tiene Illustrious/SDXL en la ficha; no mapeamos archivo Cloud. No Generar aún: no hay familia Pony.",
       "strengths": [
         "adulto",
         "concepto",
@@ -1050,6 +1053,7 @@
       "id": "intercourse-vampire",
       "name": "Intercourse with the Vampire",
       "placeholder": false,
+      "generar": false,
       "source": "catalog",
       "category": "Sexo",
       "categoryColor": "#F43F5E",
@@ -1077,7 +1081,7 @@
           "high": "Puede congelar el look del personaje."
         }
       },
-      "tip": "Pony XL (no SDXL genérico). En SDXL no cargará bien: las keywords se pegan como texto. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Pony XL (no SDXL genérico). No Generar aún: no hay familia Pony en el cerebro Comfy.",
       "strengths": [
         "adulto",
         "personaje",
@@ -1094,6 +1098,8 @@
       "id": "prefectious-xl-nsfw",
       "name": "Prefectious XL NSFW",
       "placeholder": true,
+      "role": "checkpoint",
+      "generar": false,
       "source": "catalog",
       "category": "Sexo",
       "categoryColor": "#F43F5E",
@@ -1125,7 +1131,7 @@
           "high": "No subas peso: no hay .safetensors de LoRA."
         }
       },
-      "tip": "Es checkpoint Illustrious, no LoRA. No pongas comfyName de LoraLoader. Si lo usas en Cloud, va como checkpoint del cerebro, no en Incluir LoRA. CFG 5–6, Euler A / DPM++ 2M según ficha.",
+      "tip": "Es checkpoint Illustrious, no LoRA. No se puede Incluir. Cambia de cerebro a Illustrious si quieres ese look. CFG 5–6, Euler A / DPM++ 2M según ficha.",
       "strengths": [
         "anime",
         "adulto",
@@ -1167,7 +1173,7 @@
           "high": "Cubre todo; combina con otra LoRA NSFW si quieres anatomía explícita."
         }
       },
-      "tip": "Trigger: latex. Flux solo no da explícito fuerte; apila otra LoRA NSFW si lo necesitas. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Trigger: latex. Flux solo no da explícito fuerte; apila otra LoRA NSFW si lo necesitas. En Cloud: latex_flux_lora_v1_PAseer.safetensors (LoraLoader).",
       "strengths": [
         "látex",
         "piel",
@@ -1184,6 +1190,8 @@
       "id": "persephone-flux-nsfw",
       "name": "Persephone Flux NSFW",
       "placeholder": true,
+      "role": "checkpoint",
+      "generar": false,
       "source": "catalog",
       "category": "Sexo",
       "categoryColor": "#F43F5E",
@@ -1206,7 +1214,7 @@
           "high": "No uses LoraLoader."
         }
       },
-      "tip": "Checkpoint Flux (p. ej. persephoneFluxNSFWSFW_20FP8.safetensors en Civitai), no LoRA. No inventamos comfyName. Si lo tienes en Cloud, cámbialo en el checkpoint del cerebro FLUX, no en Incluir. Sampler ficha: dpmpp_2m + beta; DualCLIP aparte.",
+      "tip": "Checkpoint Flux (no LoRA). No se puede Incluir. Cambia de cerebro a FLUX si quieres ese checkpoint (experimental). Sampler ficha: dpmpp_2m + beta; DualCLIP aparte.",
       "strengths": [
         "adulto",
         "fotoreal",

@@ -37,13 +37,13 @@ export function ModelPanel({
       onToggle={(event) => setOpen((event.target as HTMLDetailsElement).open)}
     >
       <summary className="cursor-pointer list-none text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-        Opcional · motor legado / techo LoRAs · {model.name}
+        Avanzado · motor legado Mage (no recorta Comfy)
       </summary>
 
       <div className="mt-3 space-y-3">
         <p className="rounded-2xl bg-black/30 px-3 py-2 text-[12px] leading-snug text-paper/55">
-          No es el camino principal. El cerebro de arriba + Generar (Comfy) mandan. Esto solo
-          ajusta el techo de slots LoRA si lo necesitas.
+          No es el camino de Generar. El cerebro de arriba + Comfy mandan. El plan Mage no recorta
+          los 3 slots de LoRA en Cloud.
         </p>
 
         <label className="flex flex-col gap-1.5">

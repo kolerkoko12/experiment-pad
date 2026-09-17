@@ -9,11 +9,13 @@ import {
   createBlocksFromCatalog,
   cycleIntensity,
   defaultExaggeration,
-  effectiveLoraLimit,
+  comfyLoraSlotLimit,
   exportPrompt,
   exportPromptbox,
   findModel,
+  findLora,
   isAtLoraLimit,
+  loraAllowsInclude,
   loadAutosave,
   loadCatalog,
   loadConceptsPiloto,
@@ -302,7 +304,7 @@ export function usePromptStudio() {
   const segments = catalog ? buildSegments(state, catalog) : []
   const empty = catalog ? promptIsEmpty(state, catalog) : true
   const lockedCount = blocks.filter((block) => block.locked).length
-  const loraMax = catalog ? effectiveLoraLimit(catalog, selectedModel, selectedPlanId) : 0
+  const loraMax = comfyLoraSlotLimit()
   const recommendedLoras = useMemo(
     () => (catalog ? suggestLorasForScene(state, catalog, 3) : []),
     [catalog, state],
@@ -466,6 +468,8 @@ export function usePromptStudio() {
     },
     includeLora: (id: string): 'ok' | 'blocked' => {
       if (selectedLoraIds.includes(id)) return 'ok'
+      const lora = catalog ? findLora(catalog, id) : undefined
+      if (lora && !loraAllowsInclude(lora)) return 'blocked'
       if (isAtLoraLimit(selectedLoraIds.length, loraMax) && loraMax > 0) {
         return 'blocked'
       }
@@ -481,8 +485,8 @@ export function usePromptStudio() {
     clearLoras: () => setSelectedLoraIds([]),
     applySuggestedLoras: () => {
       if (!catalog) return [] as string[]
-      const room = loraMax > 0 ? Math.max(0, loraMax - selectedLoraIds.length) : 2
-      const picks = suggestLorasForScene(state, catalog, Math.min(2, room || 2))
+      const room = Math.max(0, loraMax - selectedLoraIds.length)
+      const picks = suggestLorasForScene(state, catalog, Math.min(2, room || 0))
       if (picks.length === 0) return []
       setSelectedLoraIds((current) => [...new Set([...current, ...picks.map((lora) => lora.id)])])
       return picks.map((lora) => lora.id)

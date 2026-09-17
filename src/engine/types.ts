@@ -93,6 +93,10 @@ export type LoraDef = {
   comfyFile?: string
   /** Per-brain Cloud filenames (illustrious / sdxl / flux). Never a download URL. */
   comfyByBrain?: Record<string, string>
+  /** checkpoint = not a LoRA; never offer Incluir. */
+  role?: 'lora' | 'checkpoint'
+  /** false = no matching Generar family yet (Pony / Flux.2 Klein). */
+  generar?: boolean
 }
 
 export type GlossaryTerm = {
