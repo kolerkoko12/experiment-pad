@@ -86,12 +86,12 @@ function LoraPanelBody({
   const hiddenCount = catalog.loras.length - visibleLoras.length
   const statusToneClass =
     over
-      ? 'bg-rose-500/25 text-rose-100'
+      ? 'border border-rose-400/40 bg-rose-500/25 text-rose-100'
       : status.tone === 'cloud'
-        ? 'bg-emerald-500/20 text-emerald-100'
+        ? 'border border-emerald-400/40 bg-emerald-500/25 text-emerald-50'
         : status.tone === 'text' || status.tone === 'mixed'
-          ? 'bg-amber-400/20 text-amber-100'
-          : 'bg-black/25 text-paper/60'
+          ? 'border border-amber-300/70 bg-amber-400/35 text-amber-50'
+          : 'border border-transparent bg-black/25 text-paper/60'
 
   return (
     <div className="flex h-full min-h-0 flex-col">
