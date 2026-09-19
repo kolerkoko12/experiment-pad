@@ -84,6 +84,11 @@
       "id": "piloto",
       "term": "Piloto coherente",
       "text": "Cuando está ON, escena / luz / ropa / cuerpo salen de un grafo (piscina → lluvia → mojado). OFF usa listas sueltas. El interruptor cambia el prompt al momento."
+    },
+    {
+      "id": "deriva",
+      "term": "Deriva",
+      "text": "Misma combo anclada, otro tamaño de lienzo y un detalle inesperado. Experimentar tira los bloques libres; Deriva no los cambia: busca el desvío (un error útil) para abrir otro horizonte."
     }
   ]
 }

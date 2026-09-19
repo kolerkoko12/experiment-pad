@@ -1,4 +1,4 @@
-import { Anchor, Dices, FolderOpen, Loader2, RotateCcw, Unlock, Wand2 } from 'lucide-react'
+import { Anchor, Dices, FolderOpen, Loader2, RotateCcw, Shuffle, Unlock, Wand2 } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { BlockCard } from '@/components/BlockCard'
@@ -18,12 +18,15 @@ import { SpicyBar } from '@/components/SpicyBar'
 import { TemplateDialog } from '@/components/TemplateDialog'
 import { Button } from '@/components/ui/button'
 import {
+  applyRandomCanvas,
+  DERIVA_PATH_HINT,
   findBrain,
   findLora,
   generationSamplerFromBrain,
   generationSizeFromBrain,
   loadBrains,
   loraKeywordText,
+  pickRandomCameraOp,
   promptPhraseDelta,
   resolveLoraComfyName,
   selectedComfyLoras,
@@ -192,11 +195,11 @@ export default function App() {
         },
       )
       const warnings = [...localWarnings, ...result.warnings]
-      setComfyWarnings(warnings)
+      setComfyWarnings(warnings.length > 0 ? [DERIVA_PATH_HINT, ...warnings] : warnings)
       setComfyImage(result.imageSrc)
       flash(
         warnings.length > 0
-          ? 'Imagen lista (con avisos de LoRA)'
+          ? 'Imagen lista — un aviso puede ser un camino. Prueba Deriva.'
           : result.lorasApplied?.length
             ? `Imagen lista · ${result.lorasApplied.length} LoRA en Cloud`
             : 'Imagen lista',
@@ -209,6 +212,7 @@ export default function App() {
           ? err.message
           : 'No se pudo generar. Revisa la Function y COMFY_CLOUD_API_KEY.'
       setComfyError(message)
+      setComfyWarnings([DERIVA_PATH_HINT])
       flash(message)
     } finally {
       if (comfyAbort.current === controller) {
@@ -465,7 +469,13 @@ export default function App() {
             onClick={() => {
               studio.experiment()
               studio.setMode('experimental')
-              flash('Libres re-tirados')
+              if (brainState) {
+                const rolled = applyRandomCanvas(brainState.params)
+                setBrainState({ ...brainState, params: rolled.params })
+                flash(`Libres re-tirados · ${rolled.size.label}`)
+              } else {
+                flash('Libres re-tirados')
+              }
             }}
           >
             <Dices />
@@ -496,13 +506,32 @@ export default function App() {
             <Unlock />
             Soltar todo
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              studio.drift()
+              studio.setMode('experimental')
+              const nextCam = pickRandomCameraOp(Math.random, studio.cameraOp)
+              studio.setCameraOp(nextCam)
+              if (brainState) {
+                const rolled = applyRandomCanvas(brainState.params)
+                setBrainState({ ...brainState, params: rolled.params })
+                flash(`Deriva · ${rolled.size.label} · misma combo, otro horizonte`)
+              } else {
+                flash('Deriva · misma combo, otro detalle')
+              }
+            }}
+          >
+            <Shuffle />
+            Deriva
+          </Button>
           <Button variant="outline" className="lg:hidden" onClick={() => setLoraOpen(true)}>
             LoRAs
             {studio.selectedLoraIds.length > 0 ? ` · ${studio.selectedLoraIds.length}` : ''}
           </Button>
           <Button
             variant="outline"
-            className={studio.selectedLoraIds.length > 0 ? 'lg:col-span-2' : 'col-span-2'}
+            className="col-span-2 lg:col-span-1"
             onClick={() => setTemplatesOpen(true)}
           >
             <FolderOpen />

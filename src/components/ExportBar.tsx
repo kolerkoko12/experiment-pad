@@ -78,9 +78,10 @@ export function ExportBar({
       <p className="flex items-start gap-1 pb-1 text-[11px] leading-snug text-muted-foreground">
         <GlossaryTip term={termById(catalog.glossary, 'promptbox')} />
         <span>
-          <strong className="text-paper/70">Generar</strong> envía Prompt Final, cerebro y nombres
-          de LoRA a Comfy Cloud. Los pesos .safetensors no se bajan al iPad: LoraLoader los carga
-          en el servidor. Directo / Promptbox solo copian. La clave vive en Netlify.
+          <strong className="text-paper/70">Generar</strong> envía Prompt Final, cerebro, lienzo y
+          nombres de LoRA a Comfy Cloud. <strong className="text-paper/70">Deriva</strong> no tira
+          la combo: cambia el marco y un detalle raro. Un aviso no es el final. Directo / Promptbox
+          solo copian.
         </span>
       </p>
     </div>

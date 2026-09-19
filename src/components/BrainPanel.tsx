@@ -6,6 +6,11 @@ import { PromptCompare } from '@/components/PromptCompare'
 import { Input } from '@/components/ui/input'
 import type { GlossaryTerm } from '@/engine'
 import {
+  applyRandomCanvas,
+  canvasFromParams,
+  canvasLabel,
+} from '@/engine/deriva'
+import {
   defaultMode,
   defaultParamValues,
   findBrain,
@@ -165,6 +170,11 @@ export function BrainPanel({
     <section className="space-y-3 rounded-[22px] border border-teal-400/25 bg-card/80 p-3">
       <BrainSelector pack={pack} brain={brain} onChange={setBrain} />
       <ModeSelector brain={brain} mode={state.mode} onChange={setMode} />
+      <LienzoStrip
+        values={state.params}
+        glossary={glossary}
+        onChange={(params) => onChange({ ...state, params })}
+      />
       <DynamicParams
         brain={brain}
         values={state.params}
@@ -283,6 +293,42 @@ function ModeSelector({
           </button>
         ))}
       </div>
+    </div>
+  )
+}
+
+function LienzoStrip({
+  values,
+  glossary,
+  onChange,
+}: {
+  values: BrainParamValues
+  glossary?: GlossaryTerm[]
+  onChange: (v: BrainParamValues) => void
+}) {
+  const size = canvasFromParams(values)
+  const tip = termOrFallback(glossary, 'deriva', {
+    id: 'deriva',
+    term: 'Deriva',
+    text: 'Misma combo, otro tamaño. El desvío no es fallo: es otro horizonte.',
+  })
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-amber-400/20 bg-amber-400/8 px-3 py-2">
+      <div>
+        <p className="flex items-center gap-0.5 text-[11px] font-semibold tracking-[0.16em] text-amber-100/80 uppercase">
+          Lienzo
+          <GlossaryTip term={tip} />
+        </p>
+        <p className="text-[14px] text-paper/90">{canvasLabel(size)}</p>
+        <p className="text-[11px] text-paper/50">Aleatorio. Misma escena, otro marco.</p>
+      </div>
+      <button
+        type="button"
+        className="min-h-11 rounded-2xl border border-amber-300/40 bg-amber-300/15 px-3 text-[13px] text-amber-50"
+        onClick={() => onChange(applyRandomCanvas(values).params)}
+      >
+        Tirar tamaño
+      </button>
     </div>
   )
 }
