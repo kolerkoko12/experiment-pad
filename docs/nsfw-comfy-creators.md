@@ -38,8 +38,8 @@ Tope de la Function: **3 LoRAs**. Una pose por job.
 
 1. Cerebro **SDXL**.
 2. Incluir **NSFW POV All In One SDXL** (`NsfwPovAllInOneLoraSdxl-000009MINI.safetensors`) + **Skin Realism**.
-3. Un solo trigger de pose: `riding cowgirl` / `doggy style` / `reversecowgirl` / `butterfly sex` / `sidefuck`.
-4. Picante 3 + gancho **Fluidos / squirting** si quieres el spray en texto.
+3. Un solo trigger de pose: `blowjob` / `licking cock` / `riding cowgirl` / `doggy style` / `reversecowgirl` / `orgasming`.
+4. Picante 3 + gancho **Fluidos / saliva / escupir**. Acciones Control: Sacando la lengua, Carita ahegao, Escupiendo.
 5. Sujeto adulto explícito (30+). Negative: `child, teen, underage, watermark`.
 
 ### Receta B — anatomía + penetración (sube los `.safetensors` a Cloud)
@@ -52,4 +52,4 @@ Tope de la Function: **3 LoRAs**. Una pose por job.
 
 Si no caben 3, prioriza **pose + vulva + skin**. El squirting puede ir solo como trigger / gancho Fluidos.
 
-Bloques Control: Pose Missionary/Cowgirl/Doggy POV, Acción Penetración vaginal o Squirting, Cámara POV íntimo.
+Bloques Control: Pose Missionary/Cowgirl/Doggy POV, Acción Penetración / Squirting / Lengua / Ahegao / Escupir, Cámara POV íntimo.
