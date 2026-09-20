@@ -1,6 +1,6 @@
 {
-  "version": 5,
-  "note": "source=imported|catalog. examplesUrl solo si es la ficha exacta. comfyName/comfyByBrain = lora_name exacto en Comfy Cloud (nunca una URL de descarga). Sin archivo Cloud = solo trigger.",
+  "version": 6,
+  "note": "source=imported|catalog. examplesUrl solo si es la ficha exacta. comfyName/comfyByBrain = lora_name exacto en Comfy Cloud (nunca una URL de descarga). Sin archivo Cloud = solo trigger. Flow Sexo hiperreal = cerebro SDXL (RealVis), no Flux Dev.",
   "loras": [
     {
       "id": "imported-character-a",
@@ -711,11 +711,11 @@
       ],
       "triggers": [
         "blowjob",
-        "doggy style",
+        "licking cock",
         "riding cowgirl",
-        "handjob",
-        "threesome",
-        "undressing"
+        "doggy style",
+        "reversecowgirl",
+        "orgasming"
       ],
       "comfyName": "NsfwPovAllInOneLoraSdxl-000009MINI.safetensors",
       "weight": {
@@ -740,6 +740,190 @@
         "raw"
       ],
       "examplesUrl": "https://civitai.com/models/144203/nsfw-pov-all-in-one-sdxl-realisticanimewd14-74mb-version-available"
+    },
+    {
+      "id": "pov-missionary-sdxl",
+      "name": "POV Missionary SDXL",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus"
+      ],
+      "description": "POV missionary (getphat). Penetración frontal bien anclada en SDXL. Trigger principal pm1s. Peso ficha 0.8–1.0. Retrato ~1152×896.",
+      "keywords": [
+        "pov missionary",
+        "vaginal penetration",
+        "sdxl"
+      ],
+      "triggers": [
+        "pm1s",
+        "girl",
+        "pov",
+        "penis"
+      ],
+      "weight": {
+        "low": 0.7,
+        "mid": 0.9,
+        "high": 1.0,
+        "notes": {
+          "low": "Si ya hay otro LoRA de pose.",
+          "mid": "0.8–1.0 como pide la ficha.",
+          "high": "1.0+ solo si el prompt es largo y no marca."
+        }
+      },
+      "tip": "Cerebro SDXL (RealVis), no Flux. Pon pm1s, girl, pov, penis al inicio. Una pose por job. Sin comfyName: sube pm1s.safetensors a Cloud y pega el nombre exacto.",
+      "strengths": [
+        "adulto",
+        "pov",
+        "penetracion"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/128383/pov-missionary-sdxl-10"
+    },
+    {
+      "id": "pov-cowgirl-sdxl",
+      "name": "POV Cowgirl SDXL",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus"
+      ],
+      "description": "POV cowgirl (getphat). Ella arriba, penetración clara. Trigger principal cwgr. Peso ficha 0.7–1.0.",
+      "keywords": [
+        "pov cowgirl",
+        "girl on top",
+        "vaginal penetration",
+        "sdxl"
+      ],
+      "triggers": [
+        "cwgr",
+        "girl",
+        "pov",
+        "penis"
+      ],
+      "weight": {
+        "low": 0.65,
+        "mid": 0.85,
+        "high": 1.0,
+        "notes": {
+          "low": "Si apilas Skin Realism.",
+          "mid": "0.7–1.0 de la ficha.",
+          "high": "Sube si el prompt es largo."
+        }
+      },
+      "tip": "Cerebro SDXL. cwgr + girl + pov + penis al inicio. No mezcles con missionary en el mismo job. Sin comfyName: sube cwgr.safetensors a Cloud.",
+      "strengths": [
+        "adulto",
+        "pov",
+        "penetracion"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/126879/pov-cowgirl-sdxl-10"
+    },
+    {
+      "id": "hairypussy-sdxl",
+      "name": "Realistic hairy vagina (SDXL)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus"
+      ],
+      "description": "Olkoth hairypussy SDXL. Vulva hiperrealista, pelo púbico natural, close-up o plano medio. Trigger hairypussy. Peso ficha ~1.0.",
+      "keywords": [
+        "hairypussy",
+        "realistic vagina",
+        "vulva",
+        "photorealistic"
+      ],
+      "triggers": [
+        "hairypussy"
+      ],
+      "weight": {
+        "low": 0.6,
+        "mid": 1.0,
+        "high": 1.0,
+        "notes": {
+          "low": "Si ya hay Skin Realism o el AIO.",
+          "mid": "1.0 como pide la ficha.",
+          "high": "No pases de 1.0: deforma piel."
+        }
+      },
+      "tip": "La pieza de anatomía. Cerebro SDXL + RealVis. No es LoRA de pose: apílalo con missionary/cowgirl/AIO (tope 3). Sin comfyName: sube hairypussy.safetensors a Cloud.",
+      "strengths": [
+        "adulto",
+        "fotoreal",
+        "anatomia"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/283835/realistic-hairy-vagina"
+    },
+    {
+      "id": "pornmaster-squirting-sdxl",
+      "name": "PornMaster squirting (SDXL)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "sdxl",
+        "sdxl-plus"
+      ],
+      "description": "PornMaster squirting SDXL V3 (LoRA; la ficha a veces lo marca LyCORIS). Female ejaculation / squirting. Entrenado sobre PornMaster-Pro-SDXL-V7.",
+      "keywords": [
+        "squirting",
+        "female ejaculation",
+        "pussy juice",
+        "sdxl"
+      ],
+      "triggers": [
+        "female ejaculation",
+        "squirting excessive pussy juice upward from her pussy",
+        "pussy juice",
+        "spread pussy"
+      ],
+      "weight": {
+        "low": 0.45,
+        "mid": 0.7,
+        "high": 0.9,
+        "notes": {
+          "low": "Toque de fluido.",
+          "mid": "Marca squirting sin romper la pose.",
+          "high": "Spray fuerte. Baja si deforma cadera o manos."
+        }
+      },
+      "tip": "Una categoría de fluido. No apiles V3 + inpainting. Cerebro SDXL. Sin comfyName: el archivo Cloud debe llamarse exactamente PornMaster-squirting-sdxl-V3-lora-000004.safetensors (o el nombre que veas tras importar).",
+      "strengths": [
+        "adulto",
+        "fluidos",
+        "sexo"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/106683"
     },
     {
       "id": "cruzflesh-hyper-penis",

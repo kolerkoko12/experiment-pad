@@ -508,6 +508,34 @@
         "prompt": "sitting astride a chair back, chin on crossed arms, bored and magnetic",
         "weight": 1,
         "tags": ["still", "playful", "nightlife"]
+      },
+      {
+        "id": "missionary-pov",
+        "label": "Missionary POV",
+        "prompt": "adult woman, missionary, lying on her back, legs open toward camera, vaginal penetration, pov, photorealistic anatomy",
+        "weight": 1.15,
+        "tags": ["intimate", "raw", "close"]
+      },
+      {
+        "id": "cowgirl-pov",
+        "label": "Cowgirl POV",
+        "prompt": "adult woman, riding cowgirl, straddling, vaginal penetration, looking at viewer, pov, photorealistic anatomy",
+        "weight": 1.15,
+        "tags": ["intimate", "raw", "motion"]
+      },
+      {
+        "id": "doggy-pov",
+        "label": "Doggy POV",
+        "prompt": "adult woman, doggy style, on all fours, vaginal penetration from behind, pov, photorealistic anatomy",
+        "weight": 1.1,
+        "tags": ["intimate", "raw", "motion"]
+      },
+      {
+        "id": "blowjob-kneel",
+        "label": "De rodillas, mamada",
+        "prompt": "adult woman kneeling, blowjob, looking up, tongue out, spit and saliva, pov",
+        "weight": 1.2,
+        "tags": ["intimate", "raw", "close"]
       }
     ],
     "object": [
@@ -688,6 +716,41 @@
         "prompt": "holding a breath, chest still, a drop of water paused on the lip",
         "weight": 1.05,
         "tags": ["tension", "intimate", "water"]
+      },
+      {
+        "id": "vaginal-penetration",
+        "label": "Penetración vaginal",
+        "prompt": "consensual vaginal penetration, penis inside vagina, realistic insertion, detailed labia, adult bodies",
+        "weight": 1.2,
+        "tags": ["intimate", "raw", "close"]
+      },
+      {
+        "id": "squirting",
+        "label": "Squirting",
+        "prompt": "female ejaculation, squirting, pussy juice, wet vulva, orgasm, photorealistic fluids",
+        "weight": 1.1,
+        "tags": ["intimate", "raw", "water"]
+      },
+      {
+        "id": "tongue-out",
+        "label": "Sacando la lengua",
+        "prompt": "adult woman, tongue out, wet tongue, looking at viewer, saliva on the lip",
+        "weight": 1.15,
+        "tags": ["intimate", "raw", "close"]
+      },
+      {
+        "id": "ahegao-face",
+        "label": "Carita ahegao",
+        "prompt": "ahegao, rolling eyes, tongue out, open mouth, drooling, orgasm face, adult woman",
+        "weight": 1.15,
+        "tags": ["intimate", "raw", "close"]
+      },
+      {
+        "id": "spit-saliva",
+        "label": "Escupiendo",
+        "prompt": "spitting, thick saliva, spit on tongue, drool, wet chin, messy oral, adult woman",
+        "weight": 1.2,
+        "tags": ["intimate", "raw", "close"]
       }
     ],
     "camera": [
@@ -753,6 +816,13 @@
         "prompt": "tight macro on skin and water, pores and droplets, intimate crop",
         "weight": 1,
         "tags": ["close", "intimate", "water"]
+      },
+      {
+        "id": "pov-intimate",
+        "label": "POV íntimo",
+        "prompt": "first-person pov, viewer as partner, intimate crop, shallow depth of field, photoreal skin",
+        "weight": 1.2,
+        "tags": ["close", "intimate", "raw"]
       },
       {
         "id": "three-quarter",
