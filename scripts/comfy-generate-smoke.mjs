@@ -212,17 +212,36 @@ assert(
   skin.comfyByBrain.flux === 'flux1-realistic_skin_texture_style_xl_detailed_skin_flux1d_illu.safetensors',
   'flux skin file',
 )
+const cloudById = {
+  'aidma-nsfw-unlock': 'aidmaNSFWunlock-FLUX-V0.2.safetensors',
+  'nsfw-pov-aio-sdxl': 'NsfwPovAllInOneLoraSdxl-000009MINI.safetensors',
+  'cruzflesh-hyper-penis': 'Flux_Dev_Hyper_Penis_V2.safetensors',
+  'cruzflesh-big-penis': 'Big_Cock_Flux_Dev_-_Cruz_Flesh.safetensors',
+  'latexskin-nsfw-flux': 'latex_flux_lora_v1_PAseer.safetensors',
+  'piercing-nipples-flux': 'piercingnipples-f1.safetensors',
+  'pov-blowjob-flux': 'bj_flux.safetensors',
+  'bl0j0-pov-blowjob-flux': 'bl0j0.safetensors',
+  'pvnh-nohands-bj-flux': 'pvnhFLUX.safetensors',
+  'pm1s-missionary-flux': 'pm1sFlux.safetensors',
+  'doggystyle-pov-flux': 'Doggystyle.safetensors',
+  'spitting-image-flux': 'Spitting_Image_Flux.safetensors',
+  'female-tongue-flux': 'tongue-flux-v2.1.safetensors',
+  'wet-and-messy-flux': 'Wet_and_Messy-Flux-Dev.safetensors',
+  'angel-pony-yahamyntta': 'ANGEL_PONY_epoch10.safetensors',
+  'yfg-hidden-faces-flux': 'YFG-Hidden-Faces-v1e16.safetensors',
+}
+for (const [id, file] of Object.entries(cloudById)) {
+  const row = catalog.loras.find((lora) => lora.id === id)
+  assert(row, `${id} exists`)
+  assert(row.comfyName === file, `${id} comfyName is ${file}`)
+}
 
 const angel = catalog.loras.find((lora) => lora.id === 'angel-pony-yahamyntta')
-assert(angel, 'angel-pony-yahamyntta exists')
-assert(angel.comfyName === 'ANGEL_PONY_epoch10.safetensors', 'angel cloud file')
 assert(angel.baseModels.includes('flux'), 'angel flux base')
 assert(angel.triggers.includes('yahamyntta'), 'angel trigger')
 assert(angel.weight.mid === 0.8, 'angel mid weight')
 
 const hiddenFaces = catalog.loras.find((lora) => lora.id === 'yfg-hidden-faces-flux')
-assert(hiddenFaces, 'yfg-hidden-faces-flux exists')
-assert(hiddenFaces.comfyName === 'YFG-Hidden-Faces-v1e16.safetensors', 'yfg hidden faces cloud file')
 assert(hiddenFaces.baseModels.includes('flux'), 'yfg flux base')
 assert(hiddenFaces.weight.mid === 0.8, 'yfg mid weight')
 assert(!hiddenFaces.triggers.includes('yahamyntta'), 'yfg has no character token')
