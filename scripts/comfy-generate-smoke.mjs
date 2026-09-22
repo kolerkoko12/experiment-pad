@@ -228,7 +228,6 @@ const cloudById = {
   'female-tongue-flux': 'tongue-flux-v2.1.safetensors',
   'wet-and-messy-flux': 'Wet_and_Messy-Flux-Dev.safetensors',
   'angel-pony-yahamyntta': 'ANGEL_PONY_epoch10.safetensors',
-  'yfg-hidden-faces-flux': 'YFG-Hidden-Faces-v1e16.safetensors',
 }
 for (const [id, file] of Object.entries(cloudById)) {
   const row = catalog.loras.find((lora) => lora.id === id)
@@ -239,12 +238,7 @@ for (const [id, file] of Object.entries(cloudById)) {
 const angel = catalog.loras.find((lora) => lora.id === 'angel-pony-yahamyntta')
 assert(angel.baseModels.includes('flux'), 'angel flux base')
 assert(angel.triggers.includes('yahamyntta'), 'angel trigger')
-assert(angel.weight.mid === 0.8, 'angel mid weight')
-
-const hiddenFaces = catalog.loras.find((lora) => lora.id === 'yfg-hidden-faces-flux')
-assert(hiddenFaces.baseModels.includes('flux'), 'yfg flux base')
-assert(hiddenFaces.weight.mid === 0.8, 'yfg mid weight')
-assert(!hiddenFaces.triggers.includes('yahamyntta'), 'yfg has no character token')
+assert(angel.weight.low === 0.75 && angel.weight.mid === 0.8 && angel.weight.high === 0.85, 'angel weight range')
 for (const lora of catalog.loras) {
   const names = [
     lora.comfyName,

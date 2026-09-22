@@ -1660,53 +1660,6 @@
         "editorial"
       ],
       "examplesUrl": "https://civitai.com/models/2954719"
-    },
-    {
-      "id": "yfg-hidden-faces-flux",
-      "name": "YFG Hidden Faces Flux",
-      "placeholder": false,
-      "source": "catalog",
-      "category": "Sexo",
-      "categoryColor": "#F43F5E",
-      "baseModels": [
-        "flux"
-      ],
-      "description": "YFG Hidden Faces, Flux.1 D (ficha v1.0). Concepto de cara tapada en primer plano: no hay token fijo. Si la cara está lejos de cámara puede no marcar.",
-      "keywords": [
-        "hidden face",
-        "covered eyes",
-        "veiled",
-        "masked"
-      ],
-      "triggers": [
-        "hidden face",
-        "covered eyes",
-        "veiled",
-        "masked"
-      ],
-      "comfyName": "YFG-Hidden-Faces-v1e16.safetensors",
-      "weight": {
-        "low": 0.65,
-        "mid": 0.8,
-        "high": 0.9,
-        "notes": {
-          "low": "Oclusión suave.",
-          "mid": "Punto de la ficha (~0.8).",
-          "high": "Tapa más la cara; puede comer el retrato si no es primer plano."
-        }
-      },
-      "tip": "Sin token fijo: describe hidden face, covered eyes, veiled o masked. Mejor en primer plano. Peso ~0.8. Flux.1 D, no la build Krea. En Cloud: YFG-Hidden-Faces-v1e16.safetensors.",
-      "strengths": [
-        "cara tapada",
-        "primer plano",
-        "flux"
-      ],
-      "tags": [
-        "close",
-        "portrait",
-        "intimate"
-      ],
-      "examplesUrl": "https://civitai.com/models/1552247?modelVersionId=1756471"
     }
   ]
 }
