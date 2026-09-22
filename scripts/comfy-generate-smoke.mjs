@@ -212,6 +212,27 @@ assert(
   skin.comfyByBrain.flux === 'flux1-realistic_skin_texture_style_xl_detailed_skin_flux1d_illu.safetensors',
   'flux skin file',
 )
+const cloudById = {
+  'aidma-nsfw-unlock': 'aidmaNSFWunlock-FLUX-V0.2.safetensors',
+  'nsfw-pov-aio-sdxl': 'NsfwPovAllInOneLoraSdxl-000009MINI.safetensors',
+  'cruzflesh-hyper-penis': 'Flux_Dev_Hyper_Penis_V2.safetensors',
+  'cruzflesh-big-penis': 'Big_Cock_Flux_Dev_-_Cruz_Flesh.safetensors',
+  'latexskin-nsfw-flux': 'latex_flux_lora_v1_PAseer.safetensors',
+  'piercing-nipples-flux': 'piercingnipples-f1.safetensors',
+  'pov-blowjob-flux': 'bj_flux.safetensors',
+  'bl0j0-pov-blowjob-flux': 'bl0j0.safetensors',
+  'pvnh-nohands-bj-flux': 'pvnhFLUX.safetensors',
+  'pm1s-missionary-flux': 'pm1sFlux.safetensors',
+  'doggystyle-pov-flux': 'Doggystyle.safetensors',
+  'spitting-image-flux': 'Spitting_Image_Flux.safetensors',
+  'female-tongue-flux': 'tongue-flux-v2.1.safetensors',
+  'wet-and-messy-flux': 'Wet_and_Messy-Flux-Dev.safetensors',
+}
+for (const [id, file] of Object.entries(cloudById)) {
+  const row = catalog.loras.find((lora) => lora.id === id)
+  assert(row, `${id} exists`)
+  assert(row.comfyName === file, `${id} comfyName is ${file}`)
+}
 for (const lora of catalog.loras) {
   const names = [
     lora.comfyName,
