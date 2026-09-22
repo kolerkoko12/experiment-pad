@@ -1617,6 +1617,49 @@
         "raw"
       ],
       "examplesUrl": "https://civitai.com/models/694850?modelVersionId=777601"
+    },
+    {
+      "id": "angel-pony-yahamyntta",
+      "name": "ANGEL / ANGEL PONY",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Personaje",
+      "categoryColor": "#FB7185",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "LoRA de personaje Flux.1 Dev. El trigger obligatorio es yahamyntta; el nombre visible no lo sustituye. «Pony» en el título es solo display.",
+      "keywords": [
+        "yahamyntta",
+        "same face",
+        "character consistency"
+      ],
+      "triggers": [
+        "yahamyntta"
+      ],
+      "comfyName": "ANGEL_PONY_epoch10.safetensors",
+      "weight": {
+        "low": 0.75,
+        "mid": 0.8,
+        "high": 0.85,
+        "notes": {
+          "low": "Identidad suave (0.75).",
+          "mid": "Punto de partida ~0.8.",
+          "high": "Techo del rango (0.85). Más alto puede congelar ropa o pose."
+        }
+      },
+      "tip": "Trigger obligatorio: yahamyntta (el nombre visible no es el trigger). «Pony» en el nombre es solo display; el LoRA es Flux.1 Dev. Instagram @yahamyntta. Peso medio ~0.8 (rango 0.75–0.85). En Cloud: ANGEL_PONY_epoch10.safetensors.",
+      "strengths": [
+        "personaje",
+        "serie",
+        "fotoreal"
+      ],
+      "tags": [
+        "portrait",
+        "intimate",
+        "editorial"
+      ],
+      "examplesUrl": "https://civitai.com/models/2954719"
     }
   ]
 }
