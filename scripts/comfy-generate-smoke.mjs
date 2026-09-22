@@ -212,6 +212,20 @@ assert(
   skin.comfyByBrain.flux === 'flux1-realistic_skin_texture_style_xl_detailed_skin_flux1d_illu.safetensors',
   'flux skin file',
 )
+
+const angel = catalog.loras.find((lora) => lora.id === 'angel-pony-yahamyntta')
+assert(angel, 'angel-pony-yahamyntta exists')
+assert(angel.comfyName === 'ANGEL_PONY_epoch10.safetensors', 'angel cloud file')
+assert(angel.baseModels.includes('flux'), 'angel flux base')
+assert(angel.triggers.includes('yahamyntta'), 'angel trigger')
+assert(angel.weight.mid === 0.8, 'angel mid weight')
+
+const hiddenFaces = catalog.loras.find((lora) => lora.id === 'yfg-hidden-faces-flux')
+assert(hiddenFaces, 'yfg-hidden-faces-flux exists')
+assert(hiddenFaces.comfyName === 'YFG-Hidden-Faces-v1e16.safetensors', 'yfg hidden faces cloud file')
+assert(hiddenFaces.baseModels.includes('flux'), 'yfg flux base')
+assert(hiddenFaces.weight.mid === 0.8, 'yfg mid weight')
+assert(!hiddenFaces.triggers.includes('yahamyntta'), 'yfg has no character token')
 for (const lora of catalog.loras) {
   const names = [
     lora.comfyName,

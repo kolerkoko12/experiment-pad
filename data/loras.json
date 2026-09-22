@@ -1212,6 +1212,96 @@
         "cinematic"
       ],
       "examplesUrl": "https://civitai.com/models/1775002"
+    },
+    {
+      "id": "angel-pony-yahamyntta",
+      "name": "ANGEL / ANGEL PONY",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Personaje",
+      "categoryColor": "#FB7185",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "LoRA de personaje Flux.1 Dev. El trigger obligatorio es yahamyntta; el nombre visible no lo sustituye. «Pony» en el título es solo display.",
+      "keywords": [
+        "yahamyntta",
+        "same face",
+        "character consistency"
+      ],
+      "triggers": [
+        "yahamyntta"
+      ],
+      "comfyName": "ANGEL_PONY_epoch10.safetensors",
+      "weight": {
+        "low": 0.75,
+        "mid": 0.8,
+        "high": 0.85,
+        "notes": {
+          "low": "Identidad suave (0.75).",
+          "mid": "Punto de partida ~0.8.",
+          "high": "Techo del rango (0.85). Más alto puede congelar ropa o pose."
+        }
+      },
+      "tip": "Trigger obligatorio: yahamyntta (el nombre visible no es el trigger). «Pony» en el nombre es solo display; el LoRA es Flux.1 Dev. Instagram @yahamyntta. Peso medio ~0.8 (rango 0.75–0.85). En Cloud: ANGEL_PONY_epoch10.safetensors.",
+      "strengths": [
+        "personaje",
+        "serie",
+        "fotoreal"
+      ],
+      "tags": [
+        "portrait",
+        "intimate",
+        "editorial"
+      ],
+      "examplesUrl": "https://civitai.com/models/2954719"
+    },
+    {
+      "id": "yfg-hidden-faces-flux",
+      "name": "YFG Hidden Faces Flux",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "YFG Hidden Faces, Flux.1 D (ficha v1.0). Concepto de cara tapada en primer plano: no hay token fijo. Si la cara está lejos de cámara puede no marcar.",
+      "keywords": [
+        "hidden face",
+        "covered eyes",
+        "veiled",
+        "masked"
+      ],
+      "triggers": [
+        "hidden face",
+        "covered eyes",
+        "veiled",
+        "masked"
+      ],
+      "comfyName": "YFG-Hidden-Faces-v1e16.safetensors",
+      "weight": {
+        "low": 0.65,
+        "mid": 0.8,
+        "high": 0.9,
+        "notes": {
+          "low": "Oclusión suave.",
+          "mid": "Punto de la ficha (~0.8).",
+          "high": "Tapa más la cara; puede comer el retrato si no es primer plano."
+        }
+      },
+      "tip": "Sin token fijo: describe hidden face, covered eyes, veiled o masked. Mejor en primer plano. Peso ~0.8. Flux.1 D, no la build Krea. En Cloud: YFG-Hidden-Faces-v1e16.safetensors.",
+      "strengths": [
+        "cara tapada",
+        "primer plano",
+        "flux"
+      ],
+      "tags": [
+        "close",
+        "portrait",
+        "intimate"
+      ],
+      "examplesUrl": "https://civitai.com/models/1552247?modelVersionId=1756471"
     }
   ]
 }
