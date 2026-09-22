@@ -1,6 +1,7 @@
 export * from './brains'
 export * from './catalog'
 export * from './coherent'
+export * from './deriva'
 export * from './combination'
 export * from './exportPrompt'
 export * from './extensions'

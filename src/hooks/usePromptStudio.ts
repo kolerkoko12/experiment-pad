@@ -9,6 +9,7 @@ import {
   createBlocksFromCatalog,
   cycleIntensity,
   defaultExaggeration,
+  driftVariations,
   effectiveLoraLimit,
   exportPrompt,
   exportPromptbox,
@@ -414,6 +415,11 @@ export function usePromptStudio() {
         catalog,
         coherentRef.current ? 'on' : 'off',
       )
+    },
+    drift: () => {
+      if (!catalog) return
+      dropPair()
+      setBlocks((current) => driftVariations(current, catalog))
     },
     seedPiloto: (conceptId: string) => {
       if (!catalog || !pilotoRef.current) return
