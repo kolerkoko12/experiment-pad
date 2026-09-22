@@ -669,6 +669,7 @@
         "nude"
       ],
       "triggers": [],
+      "comfyName": "aidmaNSFWunlock-FLUX-V0.2.safetensors",
       "weight": {
         "low": 0.5,
         "mid": 0.8,
@@ -679,7 +680,7 @@
           "high": "1.0 máximo de la ficha. Puede extrañar caras."
         }
       },
-      "tip": "Desbloquea NSFW en Flux ~0.7–0.9 (ficha 0.5–1.0). Trigger opcional de la ficha: aidmaNSFWunlock. No lo metemos en triggers para no forzar el token. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Desbloquea NSFW en Flux ~0.7–0.9 (ficha 0.5–1.0). Trigger opcional de la ficha: aidmaNSFWunlock. No lo metemos en triggers para no forzar el token. Archivo en Comfy Cloud: aidmaNSFWunlock-FLUX-V0.2.safetensors.",
       "strengths": [
         "adulto",
         "fotoreal"
@@ -701,7 +702,7 @@
         "sdxl",
         "sdxl-plus"
       ],
-      "description": "POV adulto All-in-One para SDXL (rchrd). 19 categorías de trigger. Una categoría por generación. Versión full 0.5–0.8; mini 0.8–1.0.",
+      "description": "POV adulto All-in-One para SDXL (rchrd). 19 categorías de trigger. Una categoría por generación. En Cloud está la mini (000009MINI): fuerza 0.8–1.0.",
       "keywords": [
         "pov",
         "nsfw",
@@ -716,17 +717,18 @@
         "threesome",
         "undressing"
       ],
+      "comfyName": "NsfwPovAllInOneLoraSdxl-000009MINI.safetensors",
       "weight": {
-        "low": 0.5,
-        "mid": 0.65,
-        "high": 0.8,
+        "low": 0.8,
+        "mid": 0.9,
+        "high": 1.0,
         "notes": {
-          "low": "Full version, escena suave.",
-          "mid": "0.5–0.8 full (empieza ~0.6).",
-          "high": "Mini 74MB o si no marca. Watermarks: baja peso o negative watermark."
+          "low": "Mini: suelo de la ficha (0.8).",
+          "mid": "Mini 0.8–1.0. Generar manda este peso al LoraLoader.",
+          "high": "Mini al máximo. Watermarks: baja peso o negative watermark."
         }
       },
-      "tip": "Una categoría de trigger cada vez, fuerza 0.5–0.8 (full). No mezcles 4 poses. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Una categoría de trigger cada vez. El archivo en Cloud es la mini (NsfwPovAllInOneLoraSdxl-000009MINI): fuerza 0.8–1.0. No mezcles 4 poses.",
       "strengths": [
         "adulto",
         "pov",
@@ -762,6 +764,7 @@
         "hanging penis",
         "a naked man"
       ],
+      "comfyName": "Flux_Dev_Hyper_Penis_V2.safetensors",
       "weight": {
         "low": 0.55,
         "mid": 0.8,
@@ -772,7 +775,7 @@
           "high": "Hiper fuerte. Puede comer el resto del cuerpo."
         }
       },
-      "tip": "Flux: prosa + estos tags. No inventamos comfyName (en Civitai el Flux V2 se llama Flux_Dev_Hyper_Penis_V2.safetensors; confirma el nombre en Cloud). Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Flux: prosa + estos tags. Archivo en Comfy Cloud: Flux_Dev_Hyper_Penis_V2.safetensors.",
       "strengths": [
         "adulto",
         "anatomía",
@@ -807,6 +810,7 @@
         "a naked man",
         "erection"
       ],
+      "comfyName": "Big_Cock_Flux_Dev_-_Cruz_Flesh.safetensors",
       "weight": {
         "low": 0.55,
         "mid": 0.75,
@@ -817,7 +821,7 @@
           "high": "Más tamaño; puede olvidar la colocación — prueba “penis between legs”."
         }
       },
-      "tip": "Empieza en medio (≈0.75). Tag clave: a naked man. Sin comfyName Cloud. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Empieza en medio (≈0.75). Tag clave: a naked man. Archivo en Comfy Cloud: Big_Cock_Flux_Dev_-_Cruz_Flesh.safetensors.",
       "strengths": [
         "adulto",
         "anatomía",
@@ -1151,6 +1155,7 @@
       "triggers": [
         "latex"
       ],
+      "comfyName": "latex_flux_lora_v1_PAseer.safetensors",
       "weight": {
         "low": 0.5,
         "mid": 0.75,
@@ -1161,7 +1166,7 @@
           "high": "Cubre todo; combina con otra LoRA NSFW si quieres anatomía explícita."
         }
       },
-      "tip": "Trigger: latex. Flux solo no da explícito fuerte; apila otra LoRA NSFW si lo necesitas. Sin comfyName: el archivo tiene que existir en Comfy Cloud con el nombre exacto que pongas luego en comfyName. Hasta entonces Incluir solo pega el trigger (badge ámbar).",
+      "tip": "Trigger: latex. Flux solo no da explícito fuerte; apila otra LoRA NSFW si lo necesitas. Archivo en Comfy Cloud: latex_flux_lora_v1_PAseer.safetensors.",
       "strengths": [
         "látex",
         "piel",
@@ -1212,6 +1217,406 @@
         "cinematic"
       ],
       "examplesUrl": "https://civitai.com/models/1775002"
+    },
+    {
+      "id": "piercing-nipples-flux",
+      "name": "Piercing on Nipples (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "Piercing on Nipples Flux.1 Dev (Skullkid). No cambia cara ni cuerpo. Mejor en inpaint, también vale en txt2img.",
+      "keywords": [
+        "piercingnipples",
+        "nipple piercing",
+        "nipples"
+      ],
+      "triggers": [
+        "piercingnipples"
+      ],
+      "comfyName": "piercingnipples-f1.safetensors",
+      "weight": {
+        "low": 0.6,
+        "mid": 0.8,
+        "high": 1.0,
+        "notes": {
+          "low": "Detalle suave.",
+          "mid": "Punto de partida.",
+          "high": "Marca el piercing. Baja si come el resto del pecho."
+        }
+      },
+      "tip": "Trigger: piercingnipples. Archivo en Comfy Cloud: piercingnipples-f1.safetensors.",
+      "strengths": [
+        "adulto",
+        "detalle"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "close"
+      ],
+      "examplesUrl": "https://civitai.com/models/941714?modelVersionId=1054251"
+    },
+    {
+      "id": "pov-blowjob-flux",
+      "name": "POV Blowjob (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "(Mainly) POV Blowjob v1.0 Flux (mrkakapopoloch). POV realista. La ficha no lista un token propio; el autor usa 0.8–1.",
+      "keywords": [
+        "pov blowjob",
+        "pov",
+        "blowjob"
+      ],
+      "triggers": [
+        "pov blowjob"
+      ],
+      "comfyName": "bj_flux.safetensors",
+      "weight": {
+        "low": 0.8,
+        "mid": 0.9,
+        "high": 1.0,
+        "notes": {
+          "low": "Suelo de la ficha (0.8).",
+          "mid": "0.8–1, punto habitual.",
+          "high": "Tope que cita el autor."
+        }
+      },
+      "tip": "Prosa POV. Sin trigger secreto en la ficha. Archivo en Comfy Cloud: bj_flux.safetensors. Ficha Flux (no la versión Krea).",
+      "strengths": [
+        "adulto",
+        "pov",
+        "sexo"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/380283?modelVersionId=746029"
+    },
+    {
+      "id": "bl0j0-pov-blowjob-flux",
+      "name": "POV Blowjob bl0j0 (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "POV Blowjob FLUX (getphat). Triggers de ficha: bl0j0, girl, blowjob, pov, penis. Peso 0.9 o menos.",
+      "keywords": [
+        "bl0j0",
+        "blowjob",
+        "pov"
+      ],
+      "triggers": [
+        "bl0j0",
+        "girl",
+        "blowjob",
+        "pov",
+        "penis"
+      ],
+      "comfyName": "bl0j0.safetensors",
+      "weight": {
+        "low": 0.6,
+        "mid": 0.8,
+        "high": 0.9,
+        "notes": {
+          "low": "Si ya hay otra LoRA de pose.",
+          "mid": "Por debajo del tope.",
+          "high": "Ficha: 0.9 o menos. No subas de ahí."
+        }
+      },
+      "tip": "Triggers: bl0j0, girl, blowjob, pov, penis. Peso ≤0.9. Archivo en Comfy Cloud: bl0j0.safetensors.",
+      "strengths": [
+        "adulto",
+        "pov",
+        "sexo"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/678730"
+    },
+    {
+      "id": "pvnh-nohands-bj-flux",
+      "name": "POV No Hands Blowjob (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "POV No Hands Blowjob FLUX (getphat). Triggers: pvnh, male pov, woman, blowjob. Peso 0.85–0.91.",
+      "keywords": [
+        "pvnh",
+        "no hands",
+        "blowjob",
+        "male pov"
+      ],
+      "triggers": [
+        "pvnh",
+        "male pov",
+        "woman",
+        "blowjob"
+      ],
+      "comfyName": "pvnhFLUX.safetensors",
+      "weight": {
+        "low": 0.85,
+        "mid": 0.88,
+        "high": 0.91,
+        "notes": {
+          "low": "Suelo de la ficha (0.85).",
+          "mid": "Dentro de 0.85–0.91.",
+          "high": "Tope de la ficha (0.91)."
+        }
+      },
+      "tip": "Triggers: pvnh, male pov, woman, blowjob. Fuerza 0.85–0.91. Archivo en Comfy Cloud: pvnhFLUX.safetensors.",
+      "strengths": [
+        "adulto",
+        "pov",
+        "sexo"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/800041?modelVersionId=894586"
+    },
+    {
+      "id": "pm1s-missionary-flux",
+      "name": "POV Missionary pm1s (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "POV Missionary FLUX. Triggers de ficha: pm1s, girl, pov, penis.",
+      "keywords": [
+        "pm1s",
+        "missionary",
+        "pov"
+      ],
+      "triggers": [
+        "pm1s",
+        "girl",
+        "pov",
+        "penis"
+      ],
+      "comfyName": "pm1sFlux.safetensors",
+      "weight": {
+        "low": 0.6,
+        "mid": 0.8,
+        "high": 1.0,
+        "notes": {
+          "low": "Pose suave.",
+          "mid": "Punto de partida.",
+          "high": "Si no marca la pose. Baja si deforma."
+        }
+      },
+      "tip": "Triggers: pm1s, girl, pov, penis. Archivo en Comfy Cloud: pm1sFlux.safetensors.",
+      "strengths": [
+        "adulto",
+        "pov",
+        "sexo"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/678145/pov-missionary-flux"
+    },
+    {
+      "id": "doggystyle-pov-flux",
+      "name": "Doggystyle POV (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "Doggystyle PoV Flux LoRA (KalemFakes). Trigger de ficha: doggystyle.",
+      "keywords": [
+        "doggystyle",
+        "pov",
+        "from behind"
+      ],
+      "triggers": [
+        "doggystyle"
+      ],
+      "comfyName": "Doggystyle.safetensors",
+      "weight": {
+        "low": 0.6,
+        "mid": 0.8,
+        "high": 1.0,
+        "notes": {
+          "low": "Pose suave.",
+          "mid": "Punto de partida.",
+          "high": "Marca la pose. Baja si come el resto de la escena."
+        }
+      },
+      "tip": "Trigger: doggystyle. Archivo en Comfy Cloud: Doggystyle.safetensors.",
+      "strengths": [
+        "adulto",
+        "pov",
+        "sexo"
+      ],
+      "tags": [
+        "nude",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/691100?modelVersionId=773477"
+    },
+    {
+      "id": "spitting-image-flux",
+      "name": "Spitting Image (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "Flux LoRA Spitting Image (dvyio). Estilo caricatura. La ficha pide la frase in the style of SPTTNGMG.",
+      "keywords": [
+        "SPTTNGMG",
+        "spitting image",
+        "caricature"
+      ],
+      "triggers": [
+        "in the style of SPTTNGMG"
+      ],
+      "comfyName": "Spitting_Image_Flux.safetensors",
+      "weight": {
+        "low": 0.6,
+        "mid": 0.8,
+        "high": 1.0,
+        "notes": {
+          "low": "Tinte de estilo.",
+          "mid": "Punto de partida.",
+          "high": "Caricatura fuerte."
+        }
+      },
+      "tip": "Trigger: in the style of SPTTNGMG. Archivo en Comfy Cloud: Spitting_Image_Flux.safetensors.",
+      "strengths": [
+        "estilo",
+        "caricatura"
+      ],
+      "tags": [
+        "editorial",
+        "playful"
+      ],
+      "examplesUrl": "https://civitai.com/models/773587?modelVersionId=865233"
+    },
+    {
+      "id": "female-tongue-flux",
+      "name": "Female Tongue, Mouth and Teeth (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "Female Tongue, Mouth and Teeth FLUX v2.1 (jhnprst2150). Boca abierta, lengua, dientes. Sin token secreto: prosa de la ficha. Fuerza 0.7–1. CFG bajo.",
+      "keywords": [
+        "tongue out",
+        "open mouth",
+        "showing teeth"
+      ],
+      "triggers": [
+        "tongue out",
+        "open mouth",
+        "showing teeth"
+      ],
+      "comfyName": "tongue-flux-v2.1.safetensors",
+      "weight": {
+        "low": 0.7,
+        "mid": 0.85,
+        "high": 1.0,
+        "notes": {
+          "low": "Suelo de la ficha (0.7).",
+          "mid": "Dentro de 0.7–1.",
+          "high": "Tope de la ficha. Primeros planos."
+        }
+      },
+      "tip": "Sin trigger oculto: describe lengua, boca abierta y dientes. Fuerza 0.7–1. Archivo en Comfy Cloud: tongue-flux-v2.1.safetensors.",
+      "strengths": [
+        "adulto",
+        "detalle",
+        "fotoreal"
+      ],
+      "tags": [
+        "close",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/693749"
+    },
+    {
+      "id": "wet-and-messy-flux",
+      "name": "Wet and Messy (Flux)",
+      "placeholder": false,
+      "source": "catalog",
+      "category": "Sexo",
+      "categoryColor": "#F43F5E",
+      "baseModels": [
+        "flux"
+      ],
+      "description": "Wet and Messy FLUX (Lurulf). Ropa y pelo mojados o sucios (agua, aceite, barro). Triggers: wet, wam, wetlook. Fuerza 0.8–0.9.",
+      "keywords": [
+        "wet",
+        "wam",
+        "wetlook",
+        "wet clothes"
+      ],
+      "triggers": [
+        "wet",
+        "wam",
+        "wetlook"
+      ],
+      "comfyName": "Wet_and_Messy-Flux-Dev.safetensors",
+      "weight": {
+        "low": 0.8,
+        "mid": 0.85,
+        "high": 0.9,
+        "notes": {
+          "low": "Suelo de la ficha (0.8).",
+          "mid": "Dentro de 0.8–0.9.",
+          "high": "Tope de la ficha (0.9)."
+        }
+      },
+      "tip": "Triggers: wet, wam, wetlook. Fuerza 0.8–0.9. Archivo en Comfy Cloud: Wet_and_Messy-Flux-Dev.safetensors.",
+      "strengths": [
+        "tela",
+        "agua",
+        "adulto"
+      ],
+      "tags": [
+        "sheer",
+        "intimate",
+        "raw"
+      ],
+      "examplesUrl": "https://civitai.com/models/694850?modelVersionId=777601"
     }
   ]
 }
