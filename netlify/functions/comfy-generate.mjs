@@ -6,6 +6,8 @@
  * already exist on Comfy Cloud via LoraLoader (selection metadata only).
  */
 
+import { collectWorkflowWarnings } from '../../src/lib/validateComfyWorkflow.mjs'
+
 const DEFAULT_BASE = 'https://cloud.comfy.org'
 const DEFAULT_CHECKPOINT = 'sd_xl_base_1.0.safetensors'
 const DEFAULT_WIDTH = 1024
@@ -147,6 +149,13 @@ export async function handleComfyGenerate(event) {
     const knownLoras = await getKnownLoraNames(baseUrl, apiKey)
     const plan = planComfyJob(payload, env, knownLoras)
     const workflow = buildTxt2ImgWorkflow(plan)
+    try {
+      for (const warning of collectWorkflowWarnings(workflow)) {
+        plan.warnings.push(warning)
+      }
+    } catch {
+      // Orphan-input checks are advisory and must not block a Cloud submit.
+    }
     const extra = publicPlanMeta(plan)
 
     const submitted = await comfyFetch(`${baseUrl}/api/prompt`, apiKey, {
